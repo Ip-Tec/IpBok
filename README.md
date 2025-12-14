@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧾 IpBok
 
-## Getting Started
+**IpBok** is a lightweight agent-based accounting and transaction tracking system built with **Next.js** and **Prisma**. It helps business owners and agents record daily cash and bank activity, reconcile balances, and view key financial insights — all in a simple, scalable platform. :contentReference[oaicite:1]{index=1}
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+- **Role-based user system**
+  - Owner
+  - Agent
+- **Daily transaction tracking**
+  - Cash and bank deposits & withdrawals
+  - Expenses
+  - Charges
+- **Daily reconciliation**
+- **Transaction logs**
+- **Dashboard views**
+- **Modular and scalable architecture**
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js (React)  
+- **Backend:** API routes in Next.js  
+- **Database:** Prisma ORM  
+- **Styling:** Tailwind CSS  
+- **Deployment:** Vercel / any Next.js supported host
+
+---
+
+## 🧩 Project Structure
+
+```sh
+
+/
+├─ app/                     # Pages & application routes
+├─ components/              # UI components
+├─ lib/                     # Libraries and helpers
+├─ prisma/                  # Prisma schema & migrations
+├─ public/                  # Public assets
+├─ types/                   # TypeScript types
+├─ hooks/                   # React hooks
+├─ .gitignore
+├─ package.json
+├─ next.config.ts
+├─ tsconfig.json
+└─ README.md
+
+````
+
+---
+
+## 🧪 Getting Started
+
+### 🛟 1. Clone the repo
+
+```bash
+git clone https://github.com/Ip-Tec/IpBok.git
+cd IpBok
+````
+
+---
+
+### 🧰 2. Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+---
+
+### 🌍 3. Configure environment
+
+Create a `.env` file from the example and update your settings:
+
+```bash
+cp .env.example .env
+```
+
+Set your database URL and other environment variables.
+
+---
+
+### 🧠 4. Migrate database
+
+```bash
+npx prisma migrate dev
+```
+
+---
+
+### 🚧 5. Start the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view in the browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Deployment
 
-## Learn More
+You can deploy this project easily on **Vercel** (recommended) or any hosting that supports **Next.js**.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🤝 Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Contributions are welcome!
+Feel free to open issues or submit pull requests to improve functionality or add new features.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Project is coming soon...
+
+---
+
+✨ Built with ❤️ by **Ip-Tec** — a simple, reliable base for scalable accounting and transaction tracking.
