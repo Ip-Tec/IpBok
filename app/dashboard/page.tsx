@@ -30,16 +30,16 @@ export default function Dashboard() {
       <p>Welcome, {user.name}!</p>
       <p>Role: {user.role}</p>
       {/* Conditional rendering based on role */}
-      {user.role === 'Admin' && (
-        <div>
-          <h2>Admin Tools</h2>
-          <p>Manage system users, businesses, etc.</p>
-        </div>
-      )}
-      {user.role === 'Owner' && (
+      {user.role === 'OWNER' && (
         <div>
           <h2>Owner Tools</h2>
           <p>Manage your business, agents, transactions.</p>
+        </div>
+      )}
+      {user.role === 'AGENT' && (
+        <div>
+          <h2>Agent Tools</h2>
+          <p>Log daily transactions.</p>
         </div>
       )}
       {/* Add more based on permissions */}

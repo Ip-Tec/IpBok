@@ -1,6 +1,8 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 interface CustomUser {
   id: string;
@@ -10,7 +12,7 @@ interface CustomUser {
   businessId?: string;
 }
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -28,27 +30,16 @@ const handler = NextAuth({
         }
 
         try {
-          // Call your Python backend API for login
-          const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/login`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
           });
 
-          const user = await res.json();
-
-          if (res.ok && user) {
+          if (user && user.password && await bcrypt.compare(credentials.password, user.password)) {
             return {
               id: user.id,
               email: user.email,
               name: user.name,
-              role: user.role, // e.g., 'Owner', 'Admin'
-              businessId: user.businessId, // if applicable
+              role: user.role,
             } as CustomUser;
           }
         } catch (error) {
@@ -63,39 +54,67 @@ const handler = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account?.provider === "google" && user) {
-        // For Google, call backend to get or create user
-        try {
-          const res = await fetch(`${process.env.BACKEND_URL}/auth/google`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: user.email,
+    async signIn({ user, account }) {
+      // For Google OAuth, create user if they don't exist
+      if (account?.provider === "google") {
+        const userExists = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+        if (!userExists) {
+          // Use a nested write to create user, business, and membership atomically
+          await prisma.user.create({
+            data: {
+              email: user.email!,
               name: user.name,
-              googleId: account.providerAccountId,
-            }),
+              role: "OWNER",
+              memberships: {
+                create: {
+                  role: "OWNER",
+                  business: {
+                    create: { name: `${user.name}'s Business` },
+                  },
+                },
+              },
+            },
           });
-          const backendUser = await res.json();
-          if (res.ok) {
-            token.role = backendUser.role || "Owner";
-            token.businessId = backendUser.businessId;
-          }
-        } catch (error) {
-          console.error("Google auth backend error:", error);
         }
-      } else if (user) {
-        const customUser = user as CustomUser;
-        token.role = customUser.role;
-        token.businessId = customUser.businessId;
       }
+      return true; // Continue with the sign-in process
+    },
+    async jwt({ token, user, account }) {
+      // On initial sign-in, the user object is passed in
+      if (user) {
+        token.sub = user.id;
+      }
+
+      // On subsequent requests, token.sub will exist.
+      // We use this to refresh the user data on the token.
+      if (token.sub) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.sub },
+          include: { memberships: true },
+        });
+
+        if (dbUser) {
+          token.role = dbUser.role;
+          // For simplicity, we'll add the first business found.
+          // This can be expanded later for multi-business support.
+          if (dbUser.memberships && dbUser.memberships.length > 0) {
+            token.businessId = dbUser.memberships[0].businessId;
+          }
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
+      // Persist the data from the token to the session
       if (token) {
         session.user.id = token.sub!;
         session.user.role = token.role as string;
-        session.user.businessId = token.businessId as string;
+        if (token.businessId) {
+          session.user.businessId = token.businessId as string;
+        }
       }
       return session;
     },
@@ -103,6 +122,8 @@ const handler = NextAuth({
   pages: {
     signIn: "/login",
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

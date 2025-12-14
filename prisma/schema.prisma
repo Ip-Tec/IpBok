@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String        @unique
+  emailVerified DateTime?
+  password      String?
+  role          Role      @default(AGENT)
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  memberships   Membership[]
+  transactions  Transaction[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// IpBok models
+enum Role {
+  OWNER
+  AGENT
+}
+
+model Business {
+  id             String             @id @default(cuid())
+  name           String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  memberships    Membership[]
+  accounts       FinancialAccount[]
+  transactions   Transaction[]
+  dailySummaries DailySummary[]
+}
+
+model Membership {
+  id         String   @id @default(cuid())
+  userId     String
+  businessId String
+  role       Role
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+}
+
+model FinancialAccount {
+  id           String        @id @default(cuid())
+  name         String // e.g., "Cash", "Bank Account"
+  type         AccountType
+  balance      Float         @default(0)
+  businessId   String
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+enum AccountType {
+  CASH
+  BANK
+}
+
+model TransactionType {
+  id           String        @id @default(cuid())
+  name         String        @unique // e.g., "Deposit", "Withdrawal", "Expense", "Charge"
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  amount        Float
+  typeId        String
+  type          TransactionType   @relation(fields: [typeId], references: [id])
+  paymentMethod PaymentMethod
+  recordedById  String
+  recordedBy    User              @relation(fields: [recordedById], references: [id])
+  businessId    String
+  business      Business          @relation(fields: [businessId], references: [id])
+  accountId     String?
+  account       FinancialAccount? @relation(fields: [accountId], references: [id])
+  date          DateTime          @default(now())
+  description   String?
+  createdAt     DateTime          @default(now())
+}
+
+enum PaymentMethod {
+  CASH
+  BANK
+}
+
+model DailySummary {
+  id               String   @id @default(cuid())
+  businessId       String
+  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  date             DateTime @db.Date
+  openingBalance   Float
+  totalDeposits    Float    @default(0)
+  totalWithdrawals Float    @default(0)
+  totalExpenses    Float    @default(0)
+  totalCharges     Float    @default(0)
+  closingBalance   Float
+  reconciled       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  @@unique([businessId, date])
+}
