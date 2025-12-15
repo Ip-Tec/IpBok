@@ -7,13 +7,8 @@ import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
+  if (!theme) {
     return <Button variant="ghost" size="icon" className="h-9 w-9" />;
   }
 

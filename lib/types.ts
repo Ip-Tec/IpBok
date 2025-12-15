@@ -24,6 +24,22 @@ export interface Transaction {
   paymentMethod: 'cash' | 'bank';
   description?: string;
   date: string;
+  status: 'pending' | 'reconciled'; // Added status field
+}
+
+export interface AgentSummaryCards {
+  todayTotalCollected: number;
+  cashCollectedToday: number;
+  bankCollectedToday: number;
+  pendingReconciliationStatus: 'Pending' | 'Reconciled' | 'Not Applicable';
+  yesterdayBalance?: number; // Optional
+}
+
+export interface AgentTaskStatus {
+  loggedIn: boolean;
+  transactionsRecorded: boolean;
+  reconciliationPending: boolean;
+  reconciled: boolean;
 }
 
 export interface Agent {

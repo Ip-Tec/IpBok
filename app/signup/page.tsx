@@ -14,7 +14,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [_error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
@@ -175,7 +175,7 @@ export default function Signup() {
               </div>
             </div>
           </div>
-          {error && <div className="text-red-500 text-sm">{error}</div>}
+          {_error && <div className="text-red-500 text-sm">{_error}</div>}
           <div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing Up..." : "Sign Up"}

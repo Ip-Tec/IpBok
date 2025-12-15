@@ -18,15 +18,18 @@ interface SideNavProps {
   }[];
 }
 
-const SideNav = ({
-  user,
-  isSidebarOpen,
-  setIsSidebarOpen,
-  sidebarNavLinks,
-}: SideNavProps) => {
+interface NavLinksProps {
+  sidebarNavLinks: {
+    name: string;
+    href: string;
+    icon: React.ReactNode;
+  }[];
+}
+
+const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
   const pathname = usePathname();
 
-  const NavLinks = () => (
+  return (
     <nav className="flex flex-col justify-between flex-1 mt-8">
       <ul>
         {sidebarNavLinks.map((link) => (
@@ -57,7 +60,15 @@ const SideNav = ({
       </ul>
     </nav>
   );
+};
 
+
+const SideNav = ({
+  user,
+  isSidebarOpen,
+  setIsSidebarOpen,
+  sidebarNavLinks,
+}: SideNavProps) => {
   return (
     <>
       {/* Mobile sidebar overlay */}
@@ -86,7 +97,7 @@ const SideNav = ({
             <X className="w-6 h-6" />
           </button>
         </div>
-        <NavLinks />
+        <NavLinks sidebarNavLinks={sidebarNavLinks} />
       </aside>
     </>
   );

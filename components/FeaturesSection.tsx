@@ -72,7 +72,7 @@ const FeaturesSection = () => {
           </h2>
           <p className="mx-auto max-w-2xl text-muted-foreground">
             Whether you're tracking personal expenses or running a growing business, 
-            our tool simplifies bookkeeping and keeps you financially organized.
+            our tool simplifies bookkeeping and keeps you&apos;re financially organized.
           </p>
         </div>
 
