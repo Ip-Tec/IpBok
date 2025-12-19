@@ -1,3 +1,4 @@
+import { X, Linkedin, Github } from "lucide-react";
 import Logo from "./Logo";
 
 const Footer = () => {
@@ -15,6 +16,21 @@ const Footer = () => {
               Building simple tools for clarity and impact.
             </p>
           </div>
+          <div className="">
+            <h3>Contact</h3>
+            <p className="mt-4 text-center text-sm text-muted-foreground md:text-left">
+              Email: contact@ipbok.com
+            </p>
+            <p className="text-center text-sm text-muted-foreground md:text-left">
+              Phone: +1 (123) 456-7890
+            </p>
+            <h4 className="text-justify my-4">Social media</h4>
+            <p className="mt-4 flex items-center gap-2 text-justify text-muted-foreground md:text-left">
+              <X className="h-4 w-4 hover:text-foreground text-lg" />
+              <Github className="h-4 w-4 hover:text-foreground text-lg" />
+              <Linkedin className="h-4 w-4 hover:text-foreground text-lg" />
+            </p>
+          </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
             <a href="#" className="transition-colors hover:text-foreground">
@@ -22,9 +38,6 @@ const Footer = () => {
             </a>
             <a href="#" className="transition-colors hover:text-foreground">
               Terms
-            </a>
-            <a href="#" className="transition-colors hover:text-foreground">
-              Contact
             </a>
             <a href="#" className="transition-colors hover:text-foreground">
               Support

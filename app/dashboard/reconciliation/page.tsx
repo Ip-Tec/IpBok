@@ -1,10 +1,10 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { User } from "@/lib/types";
-import OwnerDashboardContent from "@/components/dashboards/OwnerDashboardContent";
-import AgentDashboardContent from "@/components/dashboards/AgentDashboardContent";
+import OwnerReconciliationView from "@/components/dashboards/reconciliation/OwnerReconciliationView";
+import AgentReconciliationView from "@/components/dashboards/reconciliation/AgentReconciliationView";
 
-export default function DashboardPage() {
+export default function ReconciliationPage() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -22,8 +22,8 @@ export default function DashboardPage() {
   const user = session.user as User;
 
   return user.role.toLowerCase() === "owner" ? (
-    <OwnerDashboardContent {...user} />
+    <OwnerReconciliationView />
   ) : (
-    <AgentDashboardContent {...user} />
+    <AgentReconciliationView user={user} />
   );
 }

@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@/src/generated/enums";
 import bcrypt from "bcryptjs";
 
 interface CustomUser {
@@ -66,10 +67,10 @@ export const authOptions: NextAuthOptions = {
             data: {
               email: user.email!,
               name: user.name,
-              role: "OWNER",
+              role: Role.OWNER,
               memberships: {
                 create: {
-                  role: "OWNER",
+                  role: Role.OWNER,
                   business: {
                     create: { name: `${user.name}'s Business` },
                   },

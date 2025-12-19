@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "./ui/button";
 import { ArrowRight, Play } from "lucide-react";
 
@@ -15,7 +16,9 @@ const HeroSection = () => {
         {/* Badge */}
         <div className="animate-fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-light px-4 py-1.5">
           <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-sm font-medium text-primary">New: Business Mode Now Available</span>
+          <span className="text-sm font-medium text-primary">
+            New: Business Mode Now Available
+          </span>
         </div>
 
         {/* Main heading */}
@@ -27,8 +30,8 @@ const HeroSection = () => {
 
         {/* Tagline */}
         <p className="animate-fade-up-delay-2 mb-8 max-w-2xl text-lg text-muted-foreground md:text-xl">
-          Track your income, expenses, loans, and reports — all in one place. 
-          No spreadsheets required.
+          Track your income, expenses, loans, and reports — all in one place. No
+          spreadsheets required.
         </p>
 
         {/* CTA Buttons */}
@@ -37,10 +40,13 @@ const HeroSection = () => {
             Try Demo
             <Play className="h-5 w-5" />
           </Button>
-          <Button variant="heroOutline" size="xl">
-            Sign Up Free
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+
+          <Link href="/signup" className="pointer cursor-pointer">
+            <Button variant="heroOutline" size="xl">
+              Sign Up Free
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
 
         {/* Trust badge */}
@@ -56,20 +62,26 @@ const HeroSection = () => {
                 {/* Dashboard preview cards */}
                 <div className="col-span-2 rounded-lg bg-card p-6 shadow-soft">
                   <div className="mb-4 flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">Monthly Overview</span>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Monthly Overview
+                    </span>
                     <span className="text-xs text-primary">December 2025</span>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-foreground">Income</span>
-                      <span className="font-semibold text-primary">$29,450</span>
+                      <span className="font-semibold text-primary">
+                        $29,450
+                      </span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">
                       <div className="h-full w-3/4 rounded-full bg-gradient-primary" />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-foreground">Expenses</span>
-                      <span className="font-semibold text-muted-foreground">$18,230</span>
+                      <span className="font-semibold text-muted-foreground">
+                        $18,230
+                      </span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">
                       <div className="h-full w-1/2 rounded-full bg-secondary-foreground/30" />
@@ -78,11 +90,15 @@ const HeroSection = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="rounded-lg bg-card p-4 shadow-soft">
-                    <span className="text-xs text-muted-foreground">Profit</span>
+                    <span className="text-xs text-muted-foreground">
+                      Profit
+                    </span>
                     <p className="text-2xl font-bold text-primary">$14,220</p>
                   </div>
                   <div className="rounded-lg bg-card p-4 shadow-soft">
-                    <span className="text-xs text-muted-foreground">Savings Goal</span>
+                    <span className="text-xs text-muted-foreground">
+                      Savings Goal
+                    </span>
                     <p className="text-2xl font-bold text-foreground">78%</p>
                   </div>
                 </div>
