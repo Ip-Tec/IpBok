@@ -1,14 +1,15 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
-  if (!theme) {
+  // When the theme is not yet resolved, we can't render the correct icon.
+  // Returning a placeholder avoids the hydration mismatch.
+  if (!resolvedTheme) {
     return <Button variant="ghost" size="icon" className="h-9 w-9" />;
   }
 
@@ -17,9 +18,9 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       className="h-9 w-9"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
-      {theme === "dark" ? (
+      {resolvedTheme === "dark" ? (
         <Sun className="h-4 w-4 text-foreground" />
       ) : (
         <Moon className="h-4 w-4 text-foreground" />

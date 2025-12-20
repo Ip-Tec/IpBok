@@ -68,6 +68,8 @@ enum Role {
 model Business {
   id             String             @id @default(cuid())
   name           String
+  address        String?
+  phone          String?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   memberships    Membership[]
