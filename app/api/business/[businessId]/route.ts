@@ -6,8 +6,9 @@ import { Role } from "@/src/generated/enums";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { businessId: string } }
+  { params: paramsPromise }: { params: Promise<{ businessId: string }> }
 ) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authOptions);
     const { businessId } = params;
@@ -45,8 +46,9 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { businessId: string } }
+  { params: paramsPromise }: { params: Promise<{ businessId:string }> }
 ) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authOptions);
     const { businessId } = params;
@@ -57,6 +59,17 @@ export async function PUT(
 
     if (session.user.businessId !== businessId) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+    });
+
+    if (!business) {
+      return NextResponse.json(
+        { message: "Business not found" },
+        { status: 404 }
+      );
     }
 
     const body = await req.json();
@@ -74,10 +87,10 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedBusiness);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating business:", error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }

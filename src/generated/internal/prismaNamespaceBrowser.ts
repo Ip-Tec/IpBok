@@ -132,6 +132,8 @@ export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFi
 export const BusinessScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  address: 'address',
+  phone: 'phone',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -264,7 +266,9 @@ export type VerificationTokenOrderByRelevanceFieldEnum = (typeof VerificationTok
 
 export const BusinessOrderByRelevanceFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  address: 'address',
+  phone: 'phone'
 } as const
 
 export type BusinessOrderByRelevanceFieldEnum = (typeof BusinessOrderByRelevanceFieldEnum)[keyof typeof BusinessOrderByRelevanceFieldEnum]
