@@ -83,22 +83,43 @@ const AgentDashboardContent = (user: User) => {
   }, [systemExpectedCash, agentEnteredCash]);
 
   const handleAddTransaction = (
-    newTransaction: Omit<
+    mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status"
-    >
+      "id" | "businessId" | "userId" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" },
+    chargeTransaction?: Omit<
+      Transaction,
+      "id" | "businessId" | "userId" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" }
   ) => {
-    // In a real app, you'd send this to an API and then update state with the response
-    const transactionWithDefaults: Transaction = {
-      ...newTransaction,
+    const transactionsToAdd: Transaction[] = [];
+
+    // Add main transaction
+    const mainTransactionWithDefaults: Transaction = {
+      ...mainTransaction,
       id: uuidv4(),
-      businessId: user.businessId || "unknown", // Fallback if businessId is not available
+      businessId: user.businessId || "unknown",
       userId: user.id,
       date: new Date().toISOString(),
-      status: "pending", // New transactions are pending by default
+      status: "pending",
     };
-    setTransactionsData((prev) => [...prev, transactionWithDefaults]);
-    setIsFormOpen(false); // Close the dialog after adding
+    transactionsToAdd.push(mainTransactionWithDefaults);
+
+    // Add charge transaction if it exists
+    if (chargeTransaction) {
+      const chargeTransactionWithDefaults: Transaction = {
+        ...chargeTransaction,
+        id: uuidv4(),
+        businessId: user.businessId || "unknown",
+        userId: user.id,
+        date: new Date().toISOString(),
+        status: "pending",
+      };
+      transactionsToAdd.push(chargeTransactionWithDefaults);
+    }
+
+    setTransactionsData((prev) => [...prev, ...transactionsToAdd]);
+    setIsFormOpen(false);
     setCurrentTransactionType(null);
   };
 
@@ -109,74 +130,74 @@ const AgentDashboardContent = (user: User) => {
           Welcome, {user.name}
         </h1>
       </header>
-      <div className="p-3 text-gray-800 dark:text-gray-200">
+      <div className="p-8 text-gray-800 dark:text-gray-200">
         {/* Grid for Summary, Task Status, Reconciliation, Notifications */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-      </div>
-
-      {/* A. Agent – Top Summary Cards */}
-      <div className="md:col-span-2 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800 h-full">
-        <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
-        <AgentSummaryCardsComponent summary={summaryCardsData} />
-      </div>
-
-      {/* B. Agent – Daily Task Status */}
-      <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800 h-full">
-        <h3 className="text-lg font-semibold mb-4">Daily Task Status</h3>
-        <AgentDailyTaskStatus status={taskStatusData} />
-      </div>
-
-      {/* E. Agent – Reconciliation Section (End of Day) */}
-      <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800 h-full">
-        <h3 className="text-lg font-semibold mb-4">
-          Reconciliation (End of Day)
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="systemExpectedCash">System Expected Cash</Label>
-            <Input
-              id="systemExpectedCash"
-              type="number"
-              value={systemExpectedCash.toFixed(2)}
-              readOnly
-              className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-            />
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {/* A. Agent – Top Summary Cards */}
+          <div className="md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
+            <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
+            <AgentSummaryCardsComponent summary={summaryCardsData} />
           </div>
-          <div>
-            <Label htmlFor="agentEnteredCash">Agent Entered Cash</Label>
-            <Input
-              id="agentEnteredCash"
-              type="number"
-              value={agentEnteredCash}
-              onChange={(e) =>
-                setAgentEnteredCash(parseFloat(e.target.value))
-              }
-              readOnly={isDayLocked}
-              className={
-                isDayLocked
-                  ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                  : ""
-              }
-            />
+
+          {/* B. Agent – Daily Task Status */}
+          <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
+            <h3 className="text-lg font-semibold mb-4">Daily Task Status</h3>
+            <AgentDailyTaskStatus status={taskStatusData} />
           </div>
-          <div>
-            <Label htmlFor="difference">Difference</Label>
-            <Input
-              id="difference"
-              type="number"
-              value={reconciliationDifference.toFixed(2)}
-              readOnly
-              className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-            />
+
+          {/* E. Agent – Reconciliation Section (End of Day) */}
+          <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
+            <h3 className="text-lg font-semibold mb-4">
+              Reconciliation (End of Day)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="systemExpectedCash">System Expected Cash</Label>
+                <Input
+                  id="systemExpectedCash"
+                  type="number"
+                  value={systemExpectedCash.toFixed(2)}
+                  readOnly
+                  className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <Label htmlFor="agentEnteredCash">Agent Entered Cash</Label>
+                <Input
+                  id="agentEnteredCash"
+                  type="number"
+                  value={agentEnteredCash}
+                  onChange={(e) =>
+                    setAgentEnteredCash(parseFloat(e.target.value))
+                  }
+                  readOnly={isDayLocked}
+                  className={
+                    isDayLocked
+                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                      : ""
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="difference">Difference</Label>
+                <Input
+                  id="difference"
+                  type="number"
+                  value={reconciliationDifference.toFixed(2)}
+                  readOnly
+                  className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                />
+              </div>
+            </div>
+            <Button
+              className="mt-6 w-full"
+              disabled={isDayLocked}
+              onClick={() => setIsDayLocked(true)} // Basic lock functionality
+            >
+              🔒 Submit & Lock Day
+            </Button>
           </div>
         </div>
-        <Button
-          className="mt-6 w-full"
-          disabled={isDayLocked}
-          onClick={() => setIsDayLocked(true)} // Basic lock functionality
-        >
-          🔒 Submit & Lock Day
-        </Button>
       </div>
 
       {/* D. Agent – Today’s Transactions (Full width, separate from the above grid) */}
@@ -257,11 +278,14 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Deposit</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(transaction) => {
-              handleAddTransaction(transaction);
+            onAddTransaction={(mainTx, chargeTx) => {
+              handleAddTransaction(mainTx, chargeTx);
+              const description = chargeTx
+                ? `Successfully added a ${mainTx.type} of ${mainTx.amount} and a Charge of ${chargeTx.amount}.`
+                : `Successfully added a ${mainTx.type} of ${mainTx.amount}.`;
               toast({
-                title: "Deposit Added",
-                description: `Successfully added a deposit of ${transaction.amount}.`,
+                title: `${mainTx.type} Added`,
+                description: description,
               });
             }}
             transactionType="Deposit"
@@ -281,11 +305,14 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Withdrawal</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(transaction) => {
-              handleAddTransaction(transaction);
+            onAddTransaction={(mainTx, chargeTx) => {
+              handleAddTransaction(mainTx, chargeTx);
+              const description = chargeTx
+                ? `Successfully added a ${mainTx.type} of ${mainTx.amount} and a Charge of ${chargeTx.amount}.`
+                : `Successfully added a ${mainTx.type} of ${mainTx.amount}.`;
               toast({
-                title: "Withdrawal Added",
-                description: `Successfully added a withdrawal of ${transaction.amount}.`,
+                title: `${mainTx.type} Added`,
+                description: description,
               });
             }}
             transactionType="Withdrawal"
@@ -305,11 +332,11 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Charge</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(transaction) => {
-              handleAddTransaction(transaction);
+            onAddTransaction={(mainTx) => {
+              handleAddTransaction(mainTx);
               toast({
                 title: "Charge Added",
-                description: `Successfully added a charge of ${transaction.amount}.`,
+                description: `Successfully added a charge of ${mainTx.amount}.`,
               });
             }}
             transactionType="Charge"

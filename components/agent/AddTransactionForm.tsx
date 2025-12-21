@@ -8,8 +8,19 @@ import { Textarea } from "@/components/ui/textarea"; // Assuming shadcn/ui texta
 import { Transaction } from "@/lib/types";
 
 interface AddTransactionFormProps {
-  onAddTransaction: (transaction: Omit<Transaction, 'id' | 'businessId' | 'userId' | 'date' | 'status'>) => void;
-  transactionType: 'Deposit' | 'Withdrawal' | 'Charge';
+  // This type represents the data needed to create a new transaction,
+  // excluding properties that are automatically generated or determined by the system.
+  onAddTransaction: (
+    mainTransaction: Omit<
+      Transaction,
+      "id" | "businessId" | "userId" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" },
+    chargeTransaction?: Omit<
+      Transaction,
+      "id" | "businessId" | "userId" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" }
+  ) => void;
+  transactionType: "Deposit" | "Withdrawal" | "Charge";
 }
 
 const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
@@ -19,6 +30,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
   const [amount, setAmount] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "bank">("cash");
   const [notes, setNotes] = useState<string>("");
+  const [chargeAmount, setChargeAmount] = useState<string>(""); // New state for charge
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,17 +39,40 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
       return;
     }
 
-    const newTransaction = {
+    const mainTransaction = {
       type: transactionType,
       amount: parseFloat(amount),
       paymentMethod,
       description: notes,
     };
-    onAddTransaction(newTransaction);
+
+    let secondaryChargeTransaction:
+      | (Omit<
+          Transaction,
+          "id" | "businessId" | "userId" | "date" | "status" | "type"
+        > & { type: "Deposit" | "Withdrawal" | "Charge" })
+      | undefined;
+
+    if (
+      (transactionType === "Deposit" || transactionType === "Withdrawal") &&
+      chargeAmount &&
+      parseFloat(chargeAmount) > 0
+    ) {
+      secondaryChargeTransaction = {
+        type: "Charge",
+        amount: parseFloat(chargeAmount),
+        paymentMethod, // Assuming charge uses the same payment method
+        description: `Charge for ${transactionType}: ${notes}`,
+      };
+    }
+
+    onAddTransaction(mainTransaction, secondaryChargeTransaction);
+
     // Clear form
     setAmount("");
     setNotes("");
     setPaymentMethod("cash");
+    setChargeAmount(""); // Clear charge amount as well
   };
 
   return (
@@ -54,6 +89,18 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
           required
         />
       </div>
+      {(transactionType === "Deposit" || transactionType === "Withdrawal") && (
+        <div>
+          <Label htmlFor="chargeAmount">Charge Amount (optional)</Label>
+          <Input
+            id="chargeAmount"
+            type="number"
+            value={chargeAmount}
+            onChange={(e) => setChargeAmount(e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+      )}
       <div>
         <Label>Payment Method</Label>
         <RadioGroup

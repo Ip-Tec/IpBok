@@ -1,3 +1,12 @@
+export interface User {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  role: string;
+  businessId?: string;
+}
+
 export interface Transaction {
   id: string;
   amount: number;
@@ -11,4 +20,5 @@ export interface Transaction {
     name: string | null;
     email: string;
   } | null;
+  status: string;
 }

@@ -1,11 +1,108 @@
 "use client";
-import React from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
 import KpiCard from "@/components/dashboards/KpiCard";
-import { DollarSign, Users, TrendingUp, TrendingDown, Calendar as CalendarIcon } from "lucide-react";
+import { DollarSign, Users, TrendingUp, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/DatePickerWithRange";
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+// Helper function to fetch report data
+const getReportData = async (dateRange?: DateRange) => {
+  const params = new URLSearchParams();
+  if (dateRange?.from) {
+    params.append("startDate", format(dateRange.from, "yyyy-MM-dd"));
+  }
+  if (dateRange?.to) {
+    params.append("endDate", format(dateRange.to, "yyyy-MM-dd"));
+  }
+
+  const res = await fetch(`/api/reports?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch report data");
+  }
+  return res.json();
+};
+
 const OwnerReportsView = () => {
+  const [date, setDate] = useState<DateRange | undefined>();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["reports", date],
+    queryFn: () => getReportData(date),
+  });
+
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+    }).format(value);
+
+  const handleExport = () => {
+    const params = new URLSearchParams();
+    if (date?.from) {
+      params.append("startDate", format(date.from, "yyyy-MM-dd"));
+    }
+    if (date?.to) {
+      params.append("endDate", format(date.to, "yyyy-MM-dd"));
+    }
+    window.open(`/api/reports/export?${params.toString()}`, "_blank");
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Daily Revenue',
+      },
+    },
+  };
+
+  const chartData = {
+    labels: data?.revenueOverTime?.map((d: any) => d.date) || [],
+    datasets: [
+      {
+        label: 'Revenue',
+        data: data?.revenueOverTime?.map((d: any) => d.revenue) || [],
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+      },
+    ],
+  };
+
+  if (error) {
+    return (
+      <div className="p-8 text-red-500">Error: {error.message}</div>
+    );
+  }
+
   return (
     <div className="p-8">
       <header className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b">
@@ -18,8 +115,8 @@ const OwnerReportsView = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 mt-4 md:mt-0">
-          <DatePickerWithRange />
-          <Button>Export</Button>
+          <DatePickerWithRange date={date} onDateChange={setDate} />
+          <Button onClick={handleExport}>Export</Button>
         </div>
       </header>
 
@@ -27,39 +124,37 @@ const OwnerReportsView = () => {
       <div className="grid grid-cols-1 gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           title="Total Revenue"
-          value="₦1,250,000"
+          value={isLoading ? "..." : formatCurrency(data?.totalRevenue || 0)}
           icon={DollarSign}
-          change="+12.5%"
-          changeType="increase"
         />
         <KpiCard
           title="Total Transactions"
-          value="8,430"
+          value={isLoading ? "..." : (data?.totalTransactions || 0).toLocaleString()}
           icon={TrendingUp}
-          change="+8.1%"
-          changeType="increase"
         />
         <KpiCard
           title="Active Agents"
-          value="24"
+          value={isLoading ? "..." : data?.activeAgents || 0}
           icon={Users}
-          change="-2"
-          changeType="decrease"
         />
         <KpiCard
           title="Average Transaction"
-          value="₦148.28"
+          value={isLoading ? "..." : formatCurrency(data?.averageTransaction || 0)}
           icon={TrendingDown}
-          change="+1.2%"
-          changeType="increase"
         />
       </div>
 
       {/* Charts Section */}
       <div className="mt-8">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Revenue Over Time</h2>
-        <div className="mt-4 p-8 bg-gray-100 rounded-lg shadow dark:bg-gray-800/50 flex items-center justify-center">
-          <p className="text-gray-500 dark:text-gray-400">[Chart Placeholder]</p>
+        <div className="mt-4 p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-72">
+              <p className="text-gray-500 dark:text-gray-400">Loading Chart...</p>
+            </div>
+          ) : (
+            <Line options={chartOptions} data={chartData} />
+          )}
         </div>
       </div>
       
@@ -77,25 +172,20 @@ const OwnerReportsView = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Placeholder Rows */}
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <td className="px-6 py-4">Agent 1</td>
-                <td className="px-6 py-4">520</td>
-                <td className="px-6 py-4">₦150,000</td>
-                <td className="px-6 py-4 text-green-500">Active</td>
-              </tr>
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <td className="px-6 py-4">Agent 2</td>
-                <td className="px-6 py-4">480</td>
-                <td className="px-6 py-4">₦135,000</td>
-                <td className="px-6 py-4 text-green-500">Active</td>
-              </tr>
-              <tr className="bg-white dark:bg-gray-800">
-                <td className="px-6 py-4">Agent 3</td>
-                <td className="px-6 py-4">350</td>
-                <td className="px-6 py-4">₦95,000</td>
-                <td className="px-6 py-4 text-yellow-500">Idle</td>
-              </tr>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center">Loading...</td>
+                </tr>
+              ) : (
+                data?.agentPerformance?.map((agent: any) => (
+                  <tr key={agent.agentId} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td className="px-6 py-4">{agent.agentName}</td>
+                    <td className="px-6 py-4">{agent.transactions.toLocaleString()}</td>
+                    <td className="px-6 py-4">{formatCurrency(agent.totalVolume)}</td>
+                    <td className="px-6 py-4 text-green-500">{agent.status}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

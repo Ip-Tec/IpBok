@@ -28,10 +28,10 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import KpiCard from "./KpiCard";
+import { useOwnerDashboardData } from "@/hooks/useOwnerDashboardData";
 
 ChartJS.register(
   CategoryScale,
@@ -65,6 +65,7 @@ const TabButton = ({ name, activeTab, setActiveTab }: TabButtonProps) => (
 
 const OwnerDashboardContent = (user: User) => {
   const [activeTab, setActiveTab] = useState("Overview");
+  const { data, isLoading, error } = useOwnerDashboardData();
 
   const chartOptions = {
     responsive: true,
@@ -79,108 +80,34 @@ const OwnerDashboardContent = (user: User) => {
     },
   };
 
-  const dailyReconciliation = {
-    totalExpectedCash: 40000,
-    totalSubmittedCash: 38000,
-    difference: -2000,
-    agents: [
-      {
-        name: "Agent 1",
-        expected: 10000,
-        submitted: 10000,
-        difference: 0,
-        status: "Reconciled",
-      },
-      {
-        name: "Agent 2",
-        expected: 15000,
-        submitted: 14000,
-        difference: -1000,
-        status: "Pending",
-      },
-      {
-        name: "Agent 3",
-        expected: 5000,
-        submitted: 5000,
-        difference: 0,
-        status: "Reconciled",
-      },
-      {
-        name: "Agent 4",
-        expected: 10000,
-        submitted: 9000,
-        difference: -1000,
-        status: "Pending",
-      },
-    ],
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-2xl font-semibold">Loading...</div>
+      </div>
+    );
+  }
 
-  const recentTransactions = [
-    {
-      datetime: "2025-12-14 10:30",
-      agent: "Agent 1",
-      type: "Deposit",
-      method: "Cash",
-      amount: 500,
-      status: "Completed",
-    },
-    {
-      datetime: "2025-12-14 10:35",
-      agent: "Agent 2",
-      type: "Withdrawal",
-      method: "Bank",
-      amount: 200,
-      status: "Completed",
-    },
-    {
-      datetime: "2025-12-14 10:40",
-      agent: "Agent 1",
-      type: "Expense",
-      method: "Cash",
-      amount: 50,
-      status: "Completed",
-    },
-  ];
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-2xl font-semibold text-red-500">
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
 
-  const alerts = [
-    { text: "Agent 4 hasn't reconciled today", time: "2h ago" },
-    { text: "Cash shortfall of $2,000 detected", time: "3h ago" },
-    { text: "Large expense of $500 added by Agent 3", time: "5h ago" },
-    { text: "Agent 5 was added to the system", time: "1d ago" },
-  ];
-
-  const revenueVsExpensesData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [
-      {
-        label: "Revenue",
-        data: [1200, 1900, 3000, 5000, 2300, 3100, 4000],
-        backgroundColor: "rgba(101, 116, 205, 0.8)",
-      },
-      {
-        label: "Expenses",
-        data: [800, 1200, 1800, 2500, 1500, 1900, 2200],
-        backgroundColor: "rgba(255, 107, 107, 0.8)",
-      },
-    ],
-  };
-
-  const cashVsBankData = {
-    labels: ["Cash", "Bank"],
-    datasets: [
-      {
-        data: [100000, 150000],
-        backgroundColor: [
-          "rgba(101, 116, 205, 0.8)",
-          "rgba(255, 107, 107, 0.8)",
-        ],
-        hoverBackgroundColor: [
-          "rgba(101, 116, 205, 1)",
-          "rgba(255, 107, 107, 1)",
-        ],
-      },
-    ],
-  };
+  const { kpis, charts, recentTransactions, dailyReconciliation } = data;
+  const totalExpectedCash = dailyReconciliation.reduce(
+    (acc: any, agent: any) => acc + agent.expected,
+    0
+  );
+  const totalSubmittedCash = dailyReconciliation.reduce(
+    (acc: any, agent: any) => acc + agent.submitted,
+    0
+  );
+  const difference = totalSubmittedCash - totalExpectedCash;
 
   return (
     <>
@@ -233,35 +160,27 @@ const OwnerDashboardContent = (user: User) => {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <KpiCard
                     title="Total Balance"
-                    value="₦250,000"
+                    value={`₦${kpis.totalBalance.toLocaleString()}`}
                     description="Cash + Bank"
                     icon={DollarSign}
-                    change="5.4%"
-                    changeType="increase"
                   />
                   <KpiCard
                     title="Today's Net"
-                    value="₦3,800"
+                    value={`₦${kpis.todaysNet.toLocaleString()}`}
                     description="Revenue - Expenses"
                     icon={Activity}
-                    change="2.1%"
-                    changeType="increase"
                   />
                   <KpiCard
                     title="Active Agents"
-                    value="45 / 50"
+                    value={kpis.activeAgents}
                     description="Agents active today"
                     icon={UserCheck}
-                    change="1"
-                    changeType="increase"
                   />
                   <KpiCard
                     title="Pending Reconciliations"
-                    value="5"
+                    value={kpis.pendingReconciliations}
                     description="Awaiting agent submission"
                     icon={FileCheck}
-                    change="2"
-                    changeType="decrease"
                   />
                 </div>
 
@@ -275,7 +194,7 @@ const OwnerDashboardContent = (user: User) => {
                       <div className="h-64">
                         <Bar
                           options={chartOptions}
-                          data={revenueVsExpensesData}
+                          data={charts.revenueVsExpensesData}
                         />
                       </div>
                     </div>
@@ -284,7 +203,7 @@ const OwnerDashboardContent = (user: User) => {
                         Cash vs Bank Ratio
                       </h4>
                       <div className="h-64">
-                        <Doughnut data={cashVsBankData} />
+                        <Doughnut data={charts.cashVsBankData} />
                       </div>
                     </div>
                   </div>
@@ -297,19 +216,17 @@ const OwnerDashboardContent = (user: User) => {
                     Alerts & Notifications
                   </h3>
                   <ul className="mt-4 space-y-4">
-                    {alerts.map((alert, index) => (
-                      <li key={index} className="flex">
-                        <AlertCircle className="flex-shrink-0 w-5 h-5 mt-1 text-yellow-500" />
-                        <div className="ml-3">
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            {alert.text}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {alert.time}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
+                    <li className="flex">
+                      <AlertCircle className="flex-shrink-0 w-5 h-5 mt-1 text-yellow-500" />
+                      <div className="ml-3">
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          Feature coming soon
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          now
+                        </p>
+                      </div>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -321,17 +238,17 @@ const OwnerDashboardContent = (user: User) => {
               <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-3">
                 <KpiCard
                   title="Total Expected Cash"
-                  value={`₦${dailyReconciliation.totalExpectedCash.toLocaleString()}`}
+                  value={`₦${totalExpectedCash.toLocaleString()}`}
                   icon={TrendingUp}
                 />
                 <KpiCard
                   title="Total Submitted Cash"
-                  value={`₦${dailyReconciliation.totalSubmittedCash.toLocaleString()}`}
+                  value={`₦${totalSubmittedCash.toLocaleString()}`}
                   icon={TrendingDown}
                 />
                 <KpiCard
                   title="Difference"
-                  value={`₦${dailyReconciliation.difference.toLocaleString()}`}
+                  value={`₦${difference.toLocaleString()}`}
                   icon={DollarSign}
                 />
               </div>
@@ -364,7 +281,7 @@ const OwnerDashboardContent = (user: User) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {dailyReconciliation.agents.map((agent, index) => (
+                      {dailyReconciliation.map((agent: any, index: number) => (
                         <tr
                           key={index}
                           className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
@@ -442,7 +359,7 @@ const OwnerDashboardContent = (user: User) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentTransactions.map((tx, index) => (
+                    {recentTransactions.map((tx: any, index: number) => (
                       <tr
                         key={index}
                         className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"

@@ -115,8 +115,16 @@ export default function DashboardLayout({
         setIsSidebarOpen={setIsSidebarOpen}
         sidebarNavLinks={navLinks}
       />
-      <main className="flex-1 lg:ml-64">
-        {children}
+      <main className="flex-1 flex flex-col lg:ml-64">
+        <header className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 lg:hidden">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-gray-500 rounded-md hover:text-gray-600 focus:outline-none focus:ring"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </header>
+        <div className="flex-1 p-4">{children}</div>
       </main>
     </div>
   );
