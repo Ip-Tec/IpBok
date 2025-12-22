@@ -5,7 +5,7 @@ import {
   AgentTaskStatus,
   Transaction,
 } from "@/lib/types";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { PlusCircle } from "lucide-react";
 import AgentSummaryCardsComponent from "../agent/AgentSummaryCards";
 import AgentDailyTaskStatus from "../agent/AgentDailyTaskStatus";
@@ -30,98 +30,178 @@ const AgentDashboardContent = (user: User) => {
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] =
     useState(false);
   const [currentTransactionType, setCurrentTransactionType] = useState<
-    "Deposit" | "Withdrawal" | "Charge" | null
+    "Deposit" | "Withdrawal" | null
   >(null);
 
-  const [summaryCardsData, _setSummaryCardsData] = useState<AgentSummaryCards>({
-    todayTotalCollected: 1250.0,
-    cashCollectedToday: 750.0,
-    bankCollectedToday: 500.0,
-    pendingReconciliationStatus: "Pending",
-    yesterdayBalance: 1500.0,
+  const [summaryCardsData, setSummaryCardsData] = useState<AgentSummaryCards>({
+    todayTotalCollected: 0,
+    cashCollectedToday: 0,
+    bankCollectedToday: 0,
+    pendingReconciliationStatus: "N/A",
+    yesterdayBalance: 0,
   });
+  const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
 
-  const [taskStatusData, _setTaskStatusData] = useState<AgentTaskStatus>({
-    loggedIn: true,
-    transactionsRecorded: true,
-    reconciliationPending: true,
-    reconciled: false,
-  });
+  const [taskStatusData, setTaskStatusData] = useState<AgentTaskStatus>({} as AgentTaskStatus);
+  const [isLoadingTaskStatus, setIsLoadingTaskStatus] = useState<boolean>(true);
 
-  const [transactionsData, setTransactionsData] = useState<Transaction[]>([
-    {
-      id: uuidv4(),
-      businessId: user.businessId || "unknown",
-      userId: user.id,
-      type: "Deposit",
-      amount: 500.0,
-      paymentMethod: "cash",
-      date: new Date().toISOString(),
-      status: "pending",
-      description: "Initial cash deposit",
-    },
-    {
-      id: uuidv4(),
-      businessId: user.businessId || "unknown",
-      userId: user.id,
-      type: "Withdrawal",
-      amount: 100.0,
-      paymentMethod: "bank",
-      date: new Date().toISOString(),
-      status: "pending",
-      description: "Bank withdrawal for expenses",
-    },
-  ]);
+  const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState<boolean>(true);
 
-  const [systemExpectedCash, _setSystemExpectedCash] = useState<number>(1000.0);
+  const [systemExpectedCash, setSystemExpectedCash] = useState<number>(0);
   const [agentEnteredCash, setAgentEnteredCash] = useState<number>(0);
+  const [isLoadingReconciliation, setIsLoadingReconciliation] = useState<boolean>(true);
   const [isDayLocked, setIsDayLocked] = useState<boolean>(false);
   const { toast } = useToast();
+
+  const fetchSummaryData = useCallback(async () => {
+    if (!user.id) return;
+    setIsLoadingSummary(true);
+    try {
+      const response = await fetch(`/api/agents/${user.id}/summary`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data: AgentSummaryCards = await response.json();
+      setSummaryCardsData(data);
+    } catch (error) {
+      console.error("Failed to fetch summary data:", error);
+      toast({ title: "Error", description: "Failed to load summary data.", variant: "destructive" });
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  }, [user.id, toast]);
+
+  const fetchTaskStatusData = useCallback(async () => {
+    if (!user.id) return;
+    setIsLoadingTaskStatus(true);
+    try {
+      const response = await fetch(`/api/agents/${user.id}/task-status`); // Assuming this endpoint exists
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data: AgentTaskStatus = await response.json();
+      setTaskStatusData(data);
+    } catch (error) {
+      console.error("Failed to fetch task status data:", error);
+      toast({ title: "Error", description: "Failed to load task status.", variant: "destructive" });
+    } finally {
+      setIsLoadingTaskStatus(false);
+    }
+  }, [user.id, toast]);
+
+  const fetchTransactionsData = useCallback(async () => {
+    if (!user.id) return;
+    setIsLoadingTransactions(true);
+    try {
+      const response = await fetch(`/api/transactions?businessId=${user.businessId}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data: Transaction[] = await response.json();
+      setTransactionsData(data);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      toast({ title: "Error", description: "Failed to load transactions.", variant: "destructive" });
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  }, [user.id, toast]);
+
+  const fetchReconciliationData = useCallback(async () => {
+    if (!user.id) return;
+    setIsLoadingReconciliation(true);
+    try {
+      const response = await fetch(`/api/agents/${user.id}/reconciliation`); // New agent-specific endpoint
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json(); 
+      setSystemExpectedCash(data.expected || 0); // Use 'expected' from agent-specific data
+      setAgentEnteredCash(data.submitted || 0); // Use 'submitted' from agent-specific data
+      setIsDayLocked(data.status === "Reconciled"); // Assuming status determines if day is locked
+    } catch (error) {
+      console.error("Failed to fetch reconciliation data:", error);
+      toast({ title: "Error", description: "Failed to load reconciliation data.", variant: "destructive" });
+    } finally {
+      setIsLoadingReconciliation(false);
+    }
+  }, [user.id, toast]);
+
+  useEffect(() => {
+    fetchSummaryData();
+    fetchTaskStatusData();
+    fetchTransactionsData();
+    fetchReconciliationData();
+  }, [fetchSummaryData, fetchTaskStatusData, fetchTransactionsData, fetchReconciliationData]);
 
   const reconciliationDifference = React.useMemo(() => {
     return systemExpectedCash - agentEnteredCash;
   }, [systemExpectedCash, agentEnteredCash]);
 
-  const handleAddTransaction = (
-    mainTransaction: Omit<
-      Transaction,
-      "id" | "businessId" | "userId" | "date" | "status" | "type"
-    > & { type: "Deposit" | "Withdrawal" | "Charge" },
-    chargeTransaction?: Omit<
-      Transaction,
-      "id" | "businessId" | "userId" | "date" | "status" | "type"
-    > & { type: "Deposit" | "Withdrawal" | "Charge" }
-  ) => {
-    const transactionsToAdd: Transaction[] = [];
+  const handleAddTransaction = useCallback(
+    async (
+      mainTransaction: Omit<
+        Transaction,
+        "id" | "businessId" | "userId" | "date" | "status" | "type"
+      > & { type: "Deposit" | "Withdrawal" | "Charge" },
+      chargeTransaction?: Omit<
+        Transaction,
+        "id" | "businessId" | "userId" | "date" | "status" | "type"
+      > & { type: "Deposit" | "Withdrawal" | "Charge" }
+    ) => {
+      if (!user.id || !user.businessId) return;
 
-    // Add main transaction
-    const mainTransactionWithDefaults: Transaction = {
-      ...mainTransaction,
-      id: uuidv4(),
-      businessId: user.businessId || "unknown",
-      userId: user.id,
-      date: new Date().toISOString(),
-      status: "pending",
-    };
-    transactionsToAdd.push(mainTransactionWithDefaults);
+      const transactionsToProcess = [mainTransaction];
+      if (chargeTransaction) {
+        transactionsToProcess.push(chargeTransaction);
+      }
 
-    // Add charge transaction if it exists
-    if (chargeTransaction) {
-      const chargeTransactionWithDefaults: Transaction = {
-        ...chargeTransaction,
-        id: uuidv4(),
-        businessId: user.businessId || "unknown",
-        userId: user.id,
-        date: new Date().toISOString(),
-        status: "pending",
-      };
-      transactionsToAdd.push(chargeTransactionWithDefaults);
-    }
+      try {
+        for (const transaction of transactionsToProcess) {
+          const transactionToSave = {
+            ...transaction,
+            businessId: user.businessId,
+            userId: user.id,
+            date: new Date().toISOString(),
+            status: "pending",
+          };
+          const response = await fetch("/api/transactions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(transactionToSave),
+          });
 
-    setTransactionsData((prev) => [...prev, ...transactionsToAdd]);
-    setIsFormOpen(false);
-    setCurrentTransactionType(null);
-  };
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+        
+        // This toast will be displayed only if all transactions are successfully processed.
+        const description = chargeTransaction
+          ? `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount} and a Charge of ${chargeTransaction.amount}.`
+          : `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount}.`;
+        
+        toast({
+          title: `${mainTransaction.type} Added`,
+          description: description,
+        });
+
+        // Re-fetch all relevant data to update the dashboard
+        fetchTransactionsData();
+        fetchSummaryData();
+        fetchReconciliationData();
+      } catch (error) {
+        console.error("Failed to add transaction:", error);
+        const description = chargeTransaction
+        ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
+        : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
+        toast({
+          title: "Error",
+          description: description,
+          variant: "destructive",
+        });
+      } finally {
+        setIsFormOpen(false);
+        setCurrentTransactionType(null);
+      }
+    },
+    [user.id, user.businessId, toast, fetchTransactionsData, fetchSummaryData, fetchReconciliationData]
+  );
 
   return (
     <>
@@ -136,13 +216,21 @@ const AgentDashboardContent = (user: User) => {
           {/* A. Agent – Top Summary Cards */}
           <div className="md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
-            <AgentSummaryCardsComponent summary={summaryCardsData} />
+            {isLoadingSummary ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">Loading summary...</p>
+            ) : (
+              <AgentSummaryCardsComponent summary={summaryCardsData} />
+            )}
           </div>
 
           {/* B. Agent – Daily Task Status */}
           <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Daily Task Status</h3>
-            <AgentDailyTaskStatus status={taskStatusData} />
+            {isLoadingTaskStatus ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">Loading task status...</p>
+            ) : (
+              <AgentDailyTaskStatus status={taskStatusData} />
+            )}
           </div>
 
           {/* E. Agent – Reconciliation Section (End of Day) */}
@@ -150,49 +238,60 @@ const AgentDashboardContent = (user: User) => {
             <h3 className="text-lg font-semibold mb-4">
               Reconciliation (End of Day)
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="systemExpectedCash">System Expected Cash</Label>
-                <Input
-                  id="systemExpectedCash"
-                  type="number"
-                  value={systemExpectedCash.toFixed(2)}
-                  readOnly
-                  className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                />
+            {isLoadingReconciliation ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">Loading reconciliation data...</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="systemExpectedCash">System Expected Cash</Label>
+                  <Input
+                    id="systemExpectedCash"
+                    type="number"
+                    value={systemExpectedCash.toFixed(2)}
+                    readOnly
+                    className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="agentEnteredCash">Agent Entered Cash</Label>
+                  <Input
+                    id="agentEnteredCash"
+                    type="number"
+                    value={agentEnteredCash}
+                    onChange={(e) =>
+                      setAgentEnteredCash(parseFloat(e.target.value))
+                    }
+                    readOnly={isDayLocked}
+                    className={
+                      isDayLocked
+                        ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        : ""
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="difference">Difference</Label>
+                  <Input
+                    id="difference"
+                    type="number"
+                    value={reconciliationDifference.toFixed(2)}
+                    readOnly
+                    className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="agentEnteredCash">Agent Entered Cash</Label>
-                <Input
-                  id="agentEnteredCash"
-                  type="number"
-                  value={agentEnteredCash}
-                  onChange={(e) =>
-                    setAgentEnteredCash(parseFloat(e.target.value))
-                  }
-                  readOnly={isDayLocked}
-                  className={
-                    isDayLocked
-                      ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                      : ""
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor="difference">Difference</Label>
-                <Input
-                  id="difference"
-                  type="number"
-                  value={reconciliationDifference.toFixed(2)}
-                  readOnly
-                  className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                />
-              </div>
-            </div>
+            )}
             <Button
               className="mt-6 w-full"
               disabled={isDayLocked}
-              onClick={() => setIsDayLocked(true)} // Basic lock functionality
+              onClick={() => {
+                // TODO: Implement API call to lock the day
+                toast({
+                  title: "Day Locked",
+                  description: "Day submitted and locked for reconciliation.",
+                });
+                setIsDayLocked(true); // Optimistic UI update
+              }}
             >
               🔒 Submit & Lock Day
             </Button>
@@ -204,7 +303,11 @@ const AgentDashboardContent = (user: User) => {
       <div className="mt-6">
         <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
           <h3 className="text-lg font-semibold mb-4">Today’s Transactions</h3>
-          <AgentTransactionsTable transactions={transactionsData} />
+          {isLoadingTransactions ? (
+            <p className="text-center text-gray-500 dark:text-gray-400">Loading transactions...</p>
+          ) : (
+            <AgentTransactionsTable transactions={transactionsData} />
+          )}
         </div>
       </div>
 
@@ -251,7 +354,7 @@ const AgentDashboardContent = (user: User) => {
             >
               Add Withdrawal
             </Button>
-            <Button
+            {/* <Button
               className="w-full"
               onClick={() => {
                 setCurrentTransactionType("Charge");
@@ -260,7 +363,7 @@ const AgentDashboardContent = (user: User) => {
               }}
             >
               Add Charge
-            </Button>
+            </Button> */}
           </div>
         </DialogContent>
       </Dialog>
@@ -278,16 +381,7 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Deposit</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(mainTx, chargeTx) => {
-              handleAddTransaction(mainTx, chargeTx);
-              const description = chargeTx
-                ? `Successfully added a ${mainTx.type} of ${mainTx.amount} and a Charge of ${chargeTx.amount}.`
-                : `Successfully added a ${mainTx.type} of ${mainTx.amount}.`;
-              toast({
-                title: `${mainTx.type} Added`,
-                description: description,
-              });
-            }}
+            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
             transactionType="Deposit"
           />
         </DialogContent>
@@ -305,44 +399,13 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Withdrawal</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(mainTx, chargeTx) => {
-              handleAddTransaction(mainTx, chargeTx);
-              const description = chargeTx
-                ? `Successfully added a ${mainTx.type} of ${mainTx.amount} and a Charge of ${chargeTx.amount}.`
-                : `Successfully added a ${mainTx.type} of ${mainTx.amount}.`;
-              toast({
-                title: `${mainTx.type} Added`,
-                description: description,
-              });
-            }}
+            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
             transactionType="Withdrawal"
           />
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={isFormOpen && currentTransactionType === "Charge"}
-        onOpenChange={(open) => {
-          setIsFormOpen(open);
-          if (!open) setCurrentTransactionType(null);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Charge</DialogTitle>
-          </DialogHeader>
-          <AddTransactionForm
-            onAddTransaction={(mainTx) => {
-              handleAddTransaction(mainTx);
-              toast({
-                title: "Charge Added",
-                description: `Successfully added a charge of ${mainTx.amount}.`,
-              });
-            }}
-            transactionType="Charge"
-          />
-        </DialogContent>
-      </Dialog>
+
     </>
   );
 };

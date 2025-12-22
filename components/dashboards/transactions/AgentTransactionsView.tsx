@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { User, Transaction } from "@/lib/types";
 import { v4 as uuidv4 } from "uuid";
 import AgentTransactionsTable from "@/components/agent/AgentTransactionsTable";
@@ -25,59 +25,105 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] =
     useState(false);
   const [currentTransactionType, setCurrentTransactionType] = useState<
-    "Deposit" | "Withdrawal" | "Charge" | null
+    "Deposit" | "Withdrawal" | null
   >(null);
   const { toast } = useToast();
 
-  const [transactionsData, setTransactionsData] = useState<Transaction[]>([
-    {
-      id: uuidv4(),
-      businessId: user.businessId || "unknown",
-      userId: user.id,
-      type: "Deposit",
-      amount: 500.0,
-      paymentMethod: "cash",
-      date: new Date().toISOString(),
-      status: "pending",
-      description: "Initial cash deposit",
-    },
-    {
-      id: uuidv4(),
-      businessId: user.businessId || "unknown",
-      userId: user.id,
-      type: "Withdrawal",
-      amount: 100.0,
-      paymentMethod: "bank",
-      date: new Date().toISOString(),
-      status: "pending",
-      description: "Bank withdrawal for expenses",
-    },
-  ]);
+  const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const handleAddTransaction = (
-    newTransaction: Omit<
-      Transaction,
-      "id" | "businessId" | "userId" | "date" | "status"
-    >
-  ) => {
-    const transactionWithDefaults: Transaction = {
-      ...newTransaction,
-      id: uuidv4(),
-      businessId: user.businessId || "unknown",
-      userId: user.id,
-      date: new Date().toISOString(),
-      status: "pending",
-    };
-    setTransactionsData((prev) => [...prev, transactionWithDefaults]);
-    setIsFormOpen(false);
-    setCurrentTransactionType(null);
-    toast({
-      title: `${newTransaction.type} Added`,
-      description: `Successfully added a ${newTransaction.type.toLowerCase()} of ${
-        newTransaction.amount
-      }.`,
-    });
-  };
+  const fetchTransactions = useCallback(async () => {
+    if (!user.businessId) return; // Don't fetch if business ID is not available
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/transactions?businessId=${user.businessId}`); // Pass businessId as a query parameter
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data: Transaction[] = await response.json();
+      setTransactionsData(data);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load transactions.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast, user.id]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  const handleAddTransaction = useCallback(
+    async (
+      mainTransaction: Omit<
+        Transaction,
+        "id" | "businessId" | "userId" | "date" | "status" | "type"
+      > & { type: "Deposit" | "Withdrawal" | "Charge" },
+      chargeTransaction?: Omit<
+        Transaction,
+        "id" | "businessId" | "userId" | "date" | "status" | "type"
+      > & { type: "Deposit" | "Withdrawal" | "Charge" }
+    ) => {
+      setIsLoading(true);
+      const transactionsToProcess = [mainTransaction];
+      if (chargeTransaction) {
+        transactionsToProcess.push(chargeTransaction);
+      }
+      try {
+        for (const transaction of transactionsToProcess) {
+          const transactionToSave = {
+            ...transaction,
+            businessId: user.businessId,
+            userId: user.id,
+            date: new Date().toISOString(),
+            status: "pending",
+          };
+          const response = await fetch("/api/transactions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(transactionToSave),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+        
+        const description = chargeTransaction
+          ? `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount} and a Charge of ${chargeTransaction.amount}.`
+          : `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount}.`;
+        
+        toast({
+          title: `${mainTransaction.type} Added`,
+          description: description,
+        });
+        
+        setIsFormOpen(false);
+        setCurrentTransactionType(null);
+        fetchTransactions(); // Re-fetch transactions to update the list
+      } catch (error) {
+        console.error("Failed to add transaction:", error);
+        const description = chargeTransaction
+        ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
+        : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
+        toast({
+          title: "Error",
+          description: description,
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user.businessId, user.id, toast, fetchTransactions]
+  );
 
   return (
     <div className="p-8">
@@ -126,22 +172,20 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
               >
                 Add Withdrawal
               </Button>
-              <Button
-                onClick={() => {
-                  setCurrentTransactionType("Charge");
-                  setIsFormOpen(true);
-                  setIsAddTransactionDialogOpen(false);
-                }}
-              >
-                Add Charge
-              </Button>
+
             </div>
           </DialogContent>
         </Dialog>
       </header>
 
       <div className="mt-6">
-        <AgentTransactionsTable transactions={transactionsData} />
+        {isLoading ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            Loading transactions...
+          </p>
+        ) : (
+          <AgentTransactionsTable transactions={transactionsData} />
+        )}
       </div>
 
       {/* Add Transaction Dialogs */}
@@ -154,7 +198,7 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
             <DialogTitle>Add Deposit</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={handleAddTransaction}
+            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
             transactionType="Deposit"
           />
         </DialogContent>
@@ -169,26 +213,13 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
             <DialogTitle>Add Withdrawal</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={handleAddTransaction}
+            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
             transactionType="Withdrawal"
           />
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={isFormOpen && currentTransactionType === "Charge"}
-        onOpenChange={(open) => !open && setIsFormOpen(false)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Charge</DialogTitle>
-          </DialogHeader>
-          <AddTransactionForm
-            onAddTransaction={handleAddTransaction}
-            transactionType="Charge"
-          />
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 };

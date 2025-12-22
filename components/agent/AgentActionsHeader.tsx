@@ -20,9 +20,9 @@ interface AgentActionsHeaderProps {
   setIsFormOpen: (isOpen: boolean) => void;
   isFormOpen: boolean;
   setCurrentTransactionType: (
-    type: "Deposit" | "Withdrawal" | "Charge" | null
+    type: "Deposit" | "Withdrawal" | null
   ) => void;
-  currentTransactionType: "Deposit" | "Withdrawal" | "Charge" | null;
+  currentTransactionType: "Deposit" | "Withdrawal" | null;
   onAddTransaction: (
     newTransaction: Omit<
       Transaction,
@@ -128,7 +128,7 @@ const AgentActionsHeader: React.FC<AgentActionsHeaderProps> = ({
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Charge</DialogTitle>
+                <DialogTitle>Add Charge...</DialogTitle>
               </DialogHeader>
               <AddTransactionForm
                 onAddTransaction={onAddTransaction}

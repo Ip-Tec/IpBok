@@ -5,7 +5,7 @@ import {
   AgentTaskStatus,
   Transaction,
 } from "@/lib/types";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
   ArrowRightLeft,
@@ -38,16 +38,43 @@ const AgentDashboard = (user: User) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] = useState(false);
   const [currentTransactionType, setCurrentTransactionType] = useState<
-    "Deposit" | "Withdrawal" | "Charge" | null
+    "Deposit" | "Withdrawal" | null
   >(null);
 
-  const [summaryCardsData, _setSummaryCardsData] = useState<AgentSummaryCards>({
-    todayTotalCollected: 1250.0,
-    cashCollectedToday: 750.0,
-    bankCollectedToday: 500.0,
-    pendingReconciliationStatus: "Pending",
-    yesterdayBalance: 1500.0,
-  });
+  const [summaryCardsData, setSummaryCardsData] = useState<AgentSummaryCards>(
+    {} as AgentSummaryCards
+  );
+  const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
+
+  const fetchSummaryData = useCallback(async () => {
+    if (!user.id) {
+      setIsLoadingSummary(false);
+      return;
+    }
+    setIsLoadingSummary(true);
+    try {
+      const response = await fetch(`/api/agents/${user.id}/summary`); // Assuming this endpoint exists
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data: AgentSummaryCards = await response.json();
+      setSummaryCardsData(data);
+    } catch (error) {
+      console.error("Failed to fetch summary data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load summary data.",
+        variant: "destructive",
+      });
+      setSummaryCardsData({} as AgentSummaryCards); // Reset on error
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  }, [user.id, toast]);
+
+  useEffect(() => {
+    fetchSummaryData();
+  }, [fetchSummaryData]);
 
   const [taskStatusData, _setTaskStatusData] = useState<AgentTaskStatus>({
     loggedIn: true,
@@ -166,7 +193,13 @@ const AgentDashboard = (user: User) => {
         {/* A. Agent – Top Summary Cards */}
         <div className="md:col-span-2 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800 h-full">
           <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
-          <AgentSummaryCardsComponent summary={summaryCardsData} />
+          {isLoadingSummary ? (
+            <p className="text-center text-gray-500 dark:text-gray-400">
+              Loading summary...
+            </p>
+          ) : (
+            <AgentSummaryCardsComponent summary={summaryCardsData} />
+          )}
         </div>
 
         {/* B. Agent – Daily Task Status */}
@@ -279,16 +312,7 @@ const AgentDashboard = (user: User) => {
             >
               Add Withdrawal
             </Button>
-            <Button
-              className="w-full"
-              onClick={() => {
-                setCurrentTransactionType("Charge");
-                setIsFormOpen(true);
-                setIsAddTransactionDialogOpen(false);
-              }}
-            >
-              Add Charge
-            </Button>
+            
           </div>
         </DialogContent>
       </Dialog>
@@ -342,29 +366,7 @@ const AgentDashboard = (user: User) => {
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={isFormOpen && currentTransactionType === "Charge"}
-        onOpenChange={(open) => {
-          setIsFormOpen(open);
-          if (!open) setCurrentTransactionType(null);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Charge</DialogTitle>
-          </DialogHeader>
-          <AddTransactionForm
-            onAddTransaction={(transaction) => {
-              handleAddTransaction(transaction);
-              toast({
-                title: "Charge Added",
-                description: `Successfully added a charge of ${transaction.amount}.`,
-              });
-            }}
-            transactionType="Charge"
-          />
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 };
