@@ -42,29 +42,64 @@ const AgentDashboardContent = (user: User) => {
   });
   const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
 
-  const [taskStatusData, setTaskStatusData] = useState<AgentTaskStatus>({} as AgentTaskStatus);
+  const [taskStatusData, setTaskStatusData] = useState<AgentTaskStatus>(
+    {} as AgentTaskStatus
+  );
   const [isLoadingTaskStatus, setIsLoadingTaskStatus] = useState<boolean>(true);
 
   const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
-  const [isLoadingTransactions, setIsLoadingTransactions] = useState<boolean>(true);
+  const [isLoadingTransactions, setIsLoadingTransactions] =
+    useState<boolean>(true);
 
   const [systemExpectedCash, setSystemExpectedCash] = useState<number>(0);
   const [agentEnteredCash, setAgentEnteredCash] = useState<number>(0);
-  const [isLoadingReconciliation, setIsLoadingReconciliation] = useState<boolean>(true);
+  const [isLoadingReconciliation, setIsLoadingReconciliation] =
+    useState<boolean>(true);
   const [isDayLocked, setIsDayLocked] = useState<boolean>(false);
   const { toast } = useToast();
 
   const fetchSummaryData = useCallback(async () => {
-    if (!user.id) return;
+    if (!user.id) {
+      setIsLoadingSummary(false);
+      return;
+    }
     setIsLoadingSummary(true);
     try {
       const response = await fetch(`/api/agents/${user.id}/summary`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Failed to fetch summary" }));
+        toast({
+          title: "Error",
+          description: errorData.message || `HTTP error! status: ${response.status}`,
+          variant: "destructive",
+        });
+        setIsLoadingSummary(false);
+        return;
+      }
       const data: AgentSummaryCards = await response.json();
-      setSummaryCardsData(data);
+      // Ensure all required fields have default values
+      setSummaryCardsData({
+        todayTotalCollected: data.todayTotalCollected ?? 0,
+        cashCollectedToday: data.cashCollectedToday ?? 0,
+        bankCollectedToday: data.bankCollectedToday ?? 0,
+        pendingReconciliationStatus: data.pendingReconciliationStatus ?? "N/A",
+        yesterdayBalance: data.yesterdayBalance ?? 0,
+      });
     } catch (error) {
       console.error("Failed to fetch summary data:", error);
-      toast({ title: "Error", description: "Failed to load summary data.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to load summary data.",
+        variant: "destructive",
+      });
+      // Set default values on error instead of empty object
+      setSummaryCardsData({
+        todayTotalCollected: 0,
+        cashCollectedToday: 0,
+        bankCollectedToday: 0,
+        pendingReconciliationStatus: "Error",
+        yesterdayBalance: 0,
+      });
     } finally {
       setIsLoadingSummary(false);
     }
@@ -75,12 +110,22 @@ const AgentDashboardContent = (user: User) => {
     setIsLoadingTaskStatus(true);
     try {
       const response = await fetch(`/api/agents/${user.id}/task-status`); // Assuming this endpoint exists
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok)
+        toast({
+          title: "Error",
+          description: `HTTP error! status: ${response.status}`,
+          variant: "destructive",
+        });
+      // throw new Error(`HTTP error! status: ${response.status}`);
       const data: AgentTaskStatus = await response.json();
       setTaskStatusData(data);
     } catch (error) {
       console.error("Failed to fetch task status data:", error);
-      toast({ title: "Error", description: "Failed to load task status.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to load task status.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingTaskStatus(false);
     }
@@ -90,13 +135,24 @@ const AgentDashboardContent = (user: User) => {
     if (!user.id) return;
     setIsLoadingTransactions(true);
     try {
-      const response = await fetch(`/api/transactions?businessId=${user.businessId}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const response = await fetch(
+        `/api/transactions?businessId=${user.businessId}`
+      );
+      if (!response.ok)
+        toast({
+          title: "Error",
+          description: `HTTP error! status: ${response.status}`,
+          variant: "destructive",
+        });
       const data: Transaction[] = await response.json();
       setTransactionsData(data);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
-      toast({ title: "Error", description: "Failed to load transactions.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to load transactions.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingTransactions(false);
     }
@@ -107,14 +163,24 @@ const AgentDashboardContent = (user: User) => {
     setIsLoadingReconciliation(true);
     try {
       const response = await fetch(`/api/agents/${user.id}/reconciliation`); // New agent-specific endpoint
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json(); 
+      if (!response.ok)
+        toast({
+          title: "Error",
+          description: `HTTP error! status: ${response.status}`,
+          variant: "destructive",
+        });
+      //throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
       setSystemExpectedCash(data.expected || 0); // Use 'expected' from agent-specific data
       setAgentEnteredCash(data.submitted || 0); // Use 'submitted' from agent-specific data
       setIsDayLocked(data.status === "Reconciled"); // Assuming status determines if day is locked
     } catch (error) {
       console.error("Failed to fetch reconciliation data:", error);
-      toast({ title: "Error", description: "Failed to load reconciliation data.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to load reconciliation data.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingReconciliation(false);
     }
@@ -125,7 +191,12 @@ const AgentDashboardContent = (user: User) => {
     fetchTaskStatusData();
     fetchTransactionsData();
     fetchReconciliationData();
-  }, [fetchSummaryData, fetchTaskStatusData, fetchTransactionsData, fetchReconciliationData]);
+  }, [
+    fetchSummaryData,
+    fetchTaskStatusData,
+    fetchTransactionsData,
+    fetchReconciliationData,
+  ]);
 
   const reconciliationDifference = React.useMemo(() => {
     return systemExpectedCash - agentEnteredCash;
@@ -152,12 +223,15 @@ const AgentDashboardContent = (user: User) => {
       try {
         for (const transaction of transactionsToProcess) {
           const transactionToSave = {
-            ...transaction,
+            type: transaction.type,
+            amount: transaction.amount,
+            paymentMethod: transaction.paymentMethod,
+            description: transaction.description || "",
             businessId: user.businessId,
             userId: user.id,
             date: new Date().toISOString(),
-            status: "pending",
           };
+          
           const response = await fetch("/api/transactions", {
             method: "POST",
             headers: {
@@ -167,15 +241,21 @@ const AgentDashboardContent = (user: User) => {
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json().catch(() => ({ message: "Failed to add transaction" }));
+            toast({
+              title: "Error",
+              description: errorData.message || "Failed to add transaction.",
+              variant: "destructive",
+            });
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
           }
         }
-        
+
         // This toast will be displayed only if all transactions are successfully processed.
         const description = chargeTransaction
           ? `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount} and a Charge of ${chargeTransaction.amount}.`
           : `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount}.`;
-        
+
         toast({
           title: `${mainTransaction.type} Added`,
           description: description,
@@ -188,8 +268,8 @@ const AgentDashboardContent = (user: User) => {
       } catch (error) {
         console.error("Failed to add transaction:", error);
         const description = chargeTransaction
-        ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
-        : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
+          ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
+          : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
         toast({
           title: "Error",
           description: description,
@@ -200,7 +280,14 @@ const AgentDashboardContent = (user: User) => {
         setCurrentTransactionType(null);
       }
     },
-    [user.id, user.businessId, toast, fetchTransactionsData, fetchSummaryData, fetchReconciliationData]
+    [
+      user.id,
+      user.businessId,
+      toast,
+      fetchTransactionsData,
+      fetchSummaryData,
+      fetchReconciliationData,
+    ]
   );
 
   return (
@@ -217,7 +304,9 @@ const AgentDashboardContent = (user: User) => {
           <div className="md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
             {isLoadingSummary ? (
-              <p className="text-center text-gray-500 dark:text-gray-400">Loading summary...</p>
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Loading summary...
+              </p>
             ) : (
               <AgentSummaryCardsComponent summary={summaryCardsData} />
             )}
@@ -227,7 +316,9 @@ const AgentDashboardContent = (user: User) => {
           <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Daily Task Status</h3>
             {isLoadingTaskStatus ? (
-              <p className="text-center text-gray-500 dark:text-gray-400">Loading task status...</p>
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Loading task status...
+              </p>
             ) : (
               <AgentDailyTaskStatus status={taskStatusData} />
             )}
@@ -239,11 +330,15 @@ const AgentDashboardContent = (user: User) => {
               Reconciliation (End of Day)
             </h3>
             {isLoadingReconciliation ? (
-              <p className="text-center text-gray-500 dark:text-gray-400">Loading reconciliation data...</p>
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Loading reconciliation data...
+              </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="systemExpectedCash">System Expected Cash</Label>
+                  <Label htmlFor="systemExpectedCash">
+                    System Expected Cash
+                  </Label>
                   <Input
                     id="systemExpectedCash"
                     type="number"
@@ -304,9 +399,15 @@ const AgentDashboardContent = (user: User) => {
         <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
           <h3 className="text-lg font-semibold mb-4">Today’s Transactions</h3>
           {isLoadingTransactions ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">Loading transactions...</p>
+            <p className="text-center text-gray-500 dark:text-gray-400">
+              Loading transactions...
+            </p>
           ) : (
-            <AgentTransactionsTable transactions={transactionsData} />
+            <AgentTransactionsTable
+              transactions={transactionsData}
+              user={user}
+              onTransactionUpdate={fetchTransactionsData}
+            />
           )}
         </div>
       </div>
@@ -381,7 +482,9 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Deposit</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
+            onAddTransaction={(mainTx, chargeTx) =>
+              handleAddTransaction(mainTx, chargeTx)
+            }
             transactionType="Deposit"
           />
         </DialogContent>
@@ -399,13 +502,13 @@ const AgentDashboardContent = (user: User) => {
             <DialogTitle>Add Withdrawal</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
+            onAddTransaction={(mainTx, chargeTx) =>
+              handleAddTransaction(mainTx, chargeTx)
+            }
             transactionType="Withdrawal"
           />
         </DialogContent>
       </Dialog>
-
-
     </>
   );
 };

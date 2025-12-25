@@ -32,6 +32,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import KpiCard from "./KpiCard";
 import { useOwnerDashboardData } from "@/hooks/useOwnerDashboardData";
+import { GiveCashDialog } from "./agents/GiveCashDialog";
+import {
+  Dialog,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { NotificationBell } from "@/components/NotificationBell";
+import { AgentProfitSummary } from "./agents/AgentProfitSummary";
 
 ChartJS.register(
   CategoryScale,
@@ -65,7 +72,8 @@ const TabButton = ({ name, activeTab, setActiveTab }: TabButtonProps) => (
 
 const OwnerDashboardContent = (user: User) => {
   const [activeTab, setActiveTab] = useState("Overview");
-  const { data, isLoading, error } = useOwnerDashboardData();
+  const [isGiveCashDialogOpen, setIsGiveCashDialogOpen] = useState(false);
+  const { data, isLoading, error, refresh } = useOwnerDashboardData();
 
   const chartOptions = {
     responsive: true,
@@ -82,16 +90,16 @@ const OwnerDashboardContent = (user: User) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-2xl font-semibold">Loading...</div>
+      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="text-2xl font-semibold text-gray-900 dark:text-white">Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-2xl font-semibold text-red-500">
+      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="text-2xl font-semibold text-red-500 dark:text-red-400">
           Error: {error}
         </div>
       </div>
@@ -107,6 +115,10 @@ const OwnerDashboardContent = (user: User) => {
     (acc: any, agent: any) => acc + agent.submitted,
     0
   );
+  const totalCharges = dailyReconciliation.reduce(
+    (acc: any, agent: any) => acc + (agent.charges || 0),
+    0
+  );
   const difference = totalSubmittedCash - totalExpectedCash;
 
   return (
@@ -116,9 +128,22 @@ const OwnerDashboardContent = (user: User) => {
           Owner Dashboard
         </h1>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
-            <PlusCircle className="w-4 h-4 mr-2" /> Add Transaction
-          </Button>
+          <NotificationBell />
+          <Dialog open={isGiveCashDialogOpen} onOpenChange={setIsGiveCashDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" onClick={() => setIsGiveCashDialogOpen(true)}>
+                <PlusCircle className="w-4 h-4 mr-2" /> Cash Given to Agents
+              </Button>
+            </DialogTrigger>
+            <GiveCashDialog 
+              open={isGiveCashDialogOpen} 
+              onOpenChange={setIsGiveCashDialogOpen} 
+              onCashGiven={() => {
+                refresh();
+                setIsGiveCashDialogOpen(false);
+              }} 
+            />
+          </Dialog>
           <Button>
             <Download className="w-4 h-4 mr-2" /> Export Report
           </Button>
@@ -147,6 +172,11 @@ const OwnerDashboardContent = (user: User) => {
             />
             <TabButton
               name="Transactions"
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            <TabButton
+              name="Agent Profit"
               activeTab={activeTab}
               setActiveTab={setActiveTab}
             />
@@ -235,16 +265,21 @@ const OwnerDashboardContent = (user: User) => {
 
           {activeTab === "Reconciliation" && (
             <div>
-              <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-4">
                 <KpiCard
-                  title="Total Expected Cash"
+                  title="Total Cash Given"
                   value={`₦${totalExpectedCash.toLocaleString()}`}
                   icon={TrendingUp}
                 />
                 <KpiCard
-                  title="Total Submitted Cash"
+                  title="Total Cash in Account"
                   value={`₦${totalSubmittedCash.toLocaleString()}`}
                   icon={TrendingDown}
+                />
+                <KpiCard
+                  title="Total Charges (Profit)"
+                  value={`₦${totalCharges.toLocaleString()}`}
+                  icon={DollarSign}
                 />
                 <KpiCard
                   title="Difference"
@@ -267,10 +302,13 @@ const OwnerDashboardContent = (user: User) => {
                           Agent Name
                         </th>
                         <th scope="col" className="px-6 py-3">
-                          Expected Amount
+                          Cash Given
                         </th>
                         <th scope="col" className="px-6 py-3">
-                          Submitted Amount
+                          Cash in Account
+                        </th>
+                        <th scope="col" className="px-6 py-3">
+                          Charges (Profit)
                         </th>
                         <th scope="col" className="px-6 py-3">
                           Difference
@@ -293,12 +331,15 @@ const OwnerDashboardContent = (user: User) => {
                           <td className="px-6 py-4">
                             ₦{agent.submitted.toLocaleString()}
                           </td>
+                          <td className="px-6 py-4 text-green-600 dark:text-green-400 font-semibold">
+                            ₦{(agent.charges || 0).toLocaleString()}
+                          </td>
                           <td
                             className={cn(
                               "px-6 py-4",
                               agent.difference < 0
-                                ? "text-red-500"
-                                : "text-green-500"
+                                ? "text-red-500 dark:text-red-400"
+                                : "text-green-500 dark:text-green-400"
                             )}
                           >
                             ₦{agent.difference.toLocaleString()}
@@ -308,8 +349,8 @@ const OwnerDashboardContent = (user: User) => {
                               className={cn(
                                 "flex items-center",
                                 agent.status === "Reconciled"
-                                  ? "text-green-500"
-                                  : "text-yellow-500"
+                                  ? "text-green-500 dark:text-green-400"
+                                  : "text-yellow-500 dark:text-yellow-400"
                               )}
                             >
                               {agent.status === "Reconciled" ? (
@@ -377,6 +418,12 @@ const OwnerDashboardContent = (user: User) => {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {activeTab === "Agent Profit" && (
+            <div className="mt-4">
+              <AgentProfitSummary />
             </div>
           )}
         </div>

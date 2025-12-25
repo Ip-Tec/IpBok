@@ -9,7 +9,7 @@ declare module "next-auth" {
     user: {
       id: string;
       role: string;
-      businessId?: string;
+      businessId: string;
     } & DefaultSession["user"];
   }
 }
@@ -17,6 +17,6 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role: string;
-    businessId?: string;
+    businessId: string;
   }
 }

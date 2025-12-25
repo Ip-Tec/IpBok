@@ -38,6 +38,11 @@ export type User = Prisma.UserModel
  */
 export type VerificationToken = Prisma.VerificationTokenModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model Business
  * 
  */
@@ -67,3 +72,8 @@ export type Transaction = Prisma.TransactionModel
  * 
  */
 export type DailySummary = Prisma.DailySummaryModel
+/**
+ * Model CashAdvance
+ * 
+ */
+export type CashAdvance = Prisma.CashAdvanceModel

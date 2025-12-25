@@ -388,12 +388,14 @@ export const ModelName = {
   Session: 'Session',
   User: 'User',
   VerificationToken: 'VerificationToken',
+  Notification: 'Notification',
   Business: 'Business',
   Membership: 'Membership',
   FinancialAccount: 'FinancialAccount',
   TransactionType: 'TransactionType',
   Transaction: 'Transaction',
-  DailySummary: 'DailySummary'
+  DailySummary: 'DailySummary',
+  CashAdvance: 'CashAdvance'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "user" | "verificationToken" | "business" | "membership" | "financialAccount" | "transactionType" | "transaction" | "dailySummary"
+    modelProps: "account" | "session" | "user" | "verificationToken" | "notification" | "business" | "membership" | "financialAccount" | "transactionType" | "transaction" | "dailySummary" | "cashAdvance"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -674,6 +676,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.VerificationTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.VerificationTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    Notification: {
+      payload: Prisma.$NotificationPayload<ExtArgs>
+      fields: Prisma.NotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.NotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        update: {
+          args: Prisma.NotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.NotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotification>
+        }
+        groupBy: {
+          args: Prisma.NotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationCountAggregateOutputType> | number
         }
       }
     }
@@ -1073,6 +1141,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CashAdvance: {
+      payload: Prisma.$CashAdvancePayload<ExtArgs>
+      fields: Prisma.CashAdvanceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CashAdvanceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CashAdvanceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>
+        }
+        findFirst: {
+          args: Prisma.CashAdvanceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CashAdvanceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>
+        }
+        findMany: {
+          args: Prisma.CashAdvanceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>[]
+        }
+        create: {
+          args: Prisma.CashAdvanceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>
+        }
+        createMany: {
+          args: Prisma.CashAdvanceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CashAdvanceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>
+        }
+        update: {
+          args: Prisma.CashAdvanceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>
+        }
+        deleteMany: {
+          args: Prisma.CashAdvanceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CashAdvanceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CashAdvanceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CashAdvancePayload>
+        }
+        aggregate: {
+          args: Prisma.CashAdvanceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCashAdvance>
+        }
+        groupBy: {
+          args: Prisma.CashAdvanceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CashAdvanceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CashAdvanceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CashAdvanceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1162,6 +1296,18 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  message: 'message',
+  isRead: 'isRead',
+  link: 'link',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const BusinessScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1209,6 +1355,8 @@ export const TransactionScalarFieldEnum = {
   typeId: 'typeId',
   paymentMethod: 'paymentMethod',
   recordedById: 'recordedById',
+  recipientId: 'recipientId',
+  status: 'status',
   businessId: 'businessId',
   accountId: 'accountId',
   date: 'date',
@@ -1234,6 +1382,23 @@ export const DailySummaryScalarFieldEnum = {
 } as const
 
 export type DailySummaryScalarFieldEnum = (typeof DailySummaryScalarFieldEnum)[keyof typeof DailySummaryScalarFieldEnum]
+
+
+export const CashAdvanceScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  description: 'description',
+  status: 'status',
+  businessId: 'businessId',
+  givenById: 'givenById',
+  receivedById: 'receivedById',
+  date: 'date',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CashAdvanceScalarFieldEnum = (typeof CashAdvanceScalarFieldEnum)[keyof typeof CashAdvanceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1297,6 +1462,16 @@ export const VerificationTokenOrderByRelevanceFieldEnum = {
 export type VerificationTokenOrderByRelevanceFieldEnum = (typeof VerificationTokenOrderByRelevanceFieldEnum)[keyof typeof VerificationTokenOrderByRelevanceFieldEnum]
 
 
+export const NotificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  message: 'message',
+  link: 'link',
+  userId: 'userId'
+} as const
+
+export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
+
+
 export const BusinessOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1337,6 +1512,7 @@ export const TransactionOrderByRelevanceFieldEnum = {
   id: 'id',
   typeId: 'typeId',
   recordedById: 'recordedById',
+  recipientId: 'recipientId',
   businessId: 'businessId',
   accountId: 'accountId',
   description: 'description'
@@ -1351,6 +1527,17 @@ export const DailySummaryOrderByRelevanceFieldEnum = {
 } as const
 
 export type DailySummaryOrderByRelevanceFieldEnum = (typeof DailySummaryOrderByRelevanceFieldEnum)[keyof typeof DailySummaryOrderByRelevanceFieldEnum]
+
+
+export const CashAdvanceOrderByRelevanceFieldEnum = {
+  id: 'id',
+  description: 'description',
+  businessId: 'businessId',
+  givenById: 'givenById',
+  receivedById: 'receivedById'
+} as const
+
+export type CashAdvanceOrderByRelevanceFieldEnum = (typeof CashAdvanceOrderByRelevanceFieldEnum)[keyof typeof CashAdvanceOrderByRelevanceFieldEnum]
 
 
 
@@ -1388,6 +1575,13 @@ export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'AccountType'
  */
 export type EnumAccountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountType'>
@@ -1409,9 +1603,16 @@ export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 
 
 /**
- * Reference to a field of type 'Boolean'
+ * Reference to a field of type 'TransactionStatus'
  */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+export type EnumTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CashAdvanceStatus'
+ */
+export type EnumCashAdvanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashAdvanceStatus'>
     
 
 /**
@@ -1513,12 +1714,14 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   user?: Prisma.UserOmit
   verificationToken?: Prisma.VerificationTokenOmit
+  notification?: Prisma.NotificationOmit
   business?: Prisma.BusinessOmit
   membership?: Prisma.MembershipOmit
   financialAccount?: Prisma.FinancialAccountOmit
   transactionType?: Prisma.TransactionTypeOmit
   transaction?: Prisma.TransactionOmit
   dailySummary?: Prisma.DailySummaryOmit
+  cashAdvance?: Prisma.CashAdvanceOmit
 }
 
 /* Types for Logging */

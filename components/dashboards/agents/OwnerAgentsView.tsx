@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { UserPlus, User, Search, Trash2, Pencil } from "lucide-react";
+import { UserPlus, User, Search, Trash2, Pencil, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
 import { AddAgentDialog } from "./AddAgentDialog";
 import { EditAgentDialog } from "./EditAgentDialog";
+import { GiveCashDialog } from "./GiveCashDialog";
 import { toast } from "sonner";
 
 interface Agent {
@@ -22,6 +23,7 @@ const OwnerAgentsView = () => {
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isGiveCashDialogOpen, setIsGiveCashDialogOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
 
 
@@ -91,6 +93,11 @@ const OwnerAgentsView = () => {
     setSelectedAgent(agent);
     setIsEditDialogOpen(true);
   };
+
+  const handleGiveCash = (agent: Agent) => {
+    setSelectedAgent(agent);
+    setIsGiveCashDialogOpen(true);
+  }
 
   return (
     <div className="p-8">
@@ -174,8 +181,8 @@ const OwnerAgentsView = () => {
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${
                         agent.status === "Active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                          : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                       }`}
                     >
                       {agent.status}
@@ -183,12 +190,20 @@ const OwnerAgentsView = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleGiveCash(agent)}
+                        aria-label="Give cash"
+                    >
+                        <DollarSign className="w-4 h-4 text-green-500 dark:text-green-400" />
+                    </Button>
+                    <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEdit(agent)}
                       aria-label="Edit agent"
                     >
-                      <Pencil className="w-4 h-4 text-blue-500" />
+                      <Pencil className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -214,6 +229,17 @@ const OwnerAgentsView = () => {
             fetchAgents();
             setIsEditDialogOpen(false);
           }}
+        />
+      )}
+      {selectedAgent && (
+        <GiveCashDialog
+            open={isGiveCashDialogOpen}
+            onOpenChange={setIsGiveCashDialogOpen}
+            agentId={selectedAgent.id}
+            onCashGiven={() => {
+                fetchAgents();
+                setIsGiveCashDialogOpen(false);
+            }}
         />
       )}
     </div>

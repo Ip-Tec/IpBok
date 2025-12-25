@@ -28,7 +28,9 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
   transactionType,
 }) => {
   const [amount, setAmount] = useState<string>("");
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "bank">("cash");
+  const [paymentMethod, setPaymentMethod] = useState<
+    "CASH" | "ATM_CARD" | "BANK_TRANSFER" | "MOBILE_MONEY"
+  >(transactionType === "Withdrawal" ? "ATM_CARD" : "CASH");
   const [notes, setNotes] = useState<string>("");
   const [chargeAmount, setChargeAmount] = useState<string>(""); // New state for charge
 
@@ -36,6 +38,12 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     e.preventDefault();
     if (!amount) {
       alert("Please enter an amount.");
+      return;
+    }
+
+    // Validate charge amount is required for Deposit and Withdrawal
+    if ((transactionType === "Deposit" || transactionType === "Withdrawal") && (!chargeAmount || parseFloat(chargeAmount) < 0)) {
+      alert("Please enter a valid charge amount.");
       return;
     }
 
@@ -56,7 +64,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     if (
       (transactionType === "Deposit" || transactionType === "Withdrawal") &&
       chargeAmount &&
-      parseFloat(chargeAmount) > 0
+      parseFloat(chargeAmount) >= 0
     ) {
       secondaryChargeTransaction = {
         type: "Charge",
@@ -71,7 +79,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     // Clear form
     setAmount("");
     setNotes("");
-    setPaymentMethod("cash");
+    setPaymentMethod(transactionType === "Withdrawal" ? "ATM_CARD" : "CASH");
     setChargeAmount(""); // Clear charge amount as well
   };
 
@@ -91,32 +99,81 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
       </div>
       {(transactionType === "Deposit" || transactionType === "Withdrawal") && (
         <div>
-          <Label htmlFor="chargeAmount">Charge Amount (optional)</Label>
+          <Label htmlFor="chargeAmount">Charge Amount</Label>
           <Input
             id="chargeAmount"
             type="number"
             value={chargeAmount}
             onChange={(e) => setChargeAmount(e.target.value)}
             placeholder="0.00"
+            required
+            min="0"
+            step="0.01"
           />
         </div>
       )}
       <div>
         <Label>Payment Method</Label>
         <RadioGroup
-          defaultValue="cash"
           value={paymentMethod}
-          onValueChange={(value: "cash" | "bank") => setPaymentMethod(value)}
-          className="flex space-x-4"
+          onValueChange={(
+            value: "CASH" | "ATM_CARD" | "BANK_TRANSFER" | "MOBILE_MONEY"
+          ) => setPaymentMethod(value)}
+          className="flex flex-wrap gap-4"
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="cash" id="cash" />
-            <Label htmlFor="cash">Cash</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="bank" id="bank" />
-            <Label htmlFor="bank">Bank</Label>
-          </div>
+          {transactionType === "Withdrawal" ? (
+            // Withdrawal: ATM_CARD, BANK_TRANSFER, MOBILE_MONEY (no CASH)
+            <>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ATM_CARD" id="atm-card" />
+                <Label htmlFor="atm-card">ATM Card</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="BANK_TRANSFER" id="bank-transfer" />
+                <Label htmlFor="bank-transfer">Bank Transfer</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="MOBILE_MONEY" id="mobile-money" />
+                <Label htmlFor="mobile-money">Mobile Money</Label>
+              </div>
+            </>
+          ) : transactionType === "Deposit" ? (
+            // Deposit: CASH, BANK_TRANSFER, MOBILE_MONEY (no ATM_CARD)
+            <>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="CASH" id="cash" />
+                <Label htmlFor="cash">Cash</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="BANK_TRANSFER" id="bank-transfer" />
+                <Label htmlFor="bank-transfer">Bank Transfer</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="MOBILE_MONEY" id="mobile-money" />
+                <Label htmlFor="mobile-money">Mobile Money</Label>
+              </div>
+            </>
+          ) : (
+            // Charge: All methods available
+            <>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="CASH" id="cash" />
+                <Label htmlFor="cash">Cash</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="ATM_CARD" id="atm-card" />
+                <Label htmlFor="atm-card">ATM Card</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="BANK_TRANSFER" id="bank-transfer" />
+                <Label htmlFor="bank-transfer">Bank Transfer</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="MOBILE_MONEY" id="mobile-money" />
+                <Label htmlFor="mobile-money">Mobile Money</Label>
+              </div>
+            </>
+          )}
         </RadioGroup>
       </div>
       <div>

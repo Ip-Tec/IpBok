@@ -182,7 +182,7 @@ const OwnerReportsView = () => {
                     <td className="px-6 py-4">{agent.agentName}</td>
                     <td className="px-6 py-4">{agent.transactions.toLocaleString()}</td>
                     <td className="px-6 py-4">{formatCurrency(agent.totalVolume)}</td>
-                    <td className="px-6 py-4 text-green-500">{agent.status}</td>
+                    <td className="px-6 py-4 text-green-500 dark:text-green-400">{agent.status}</td>
                   </tr>
                 ))
               )}

@@ -141,7 +141,7 @@ const OwnerReconciliationView = () => {
                   <td
                     className={cn(
                       "px-6 py-4",
-                      agent.difference < 0 ? "text-red-500" : "text-green-500"
+                      agent.difference < 0 ? "text-red-500 dark:text-red-400" : "text-green-500 dark:text-green-400"
                     )}
                   >
                     ₦{agent.difference.toLocaleString()}
@@ -151,8 +151,8 @@ const OwnerReconciliationView = () => {
                       className={cn(
                         "flex items-center",
                         agent.status === "Reconciled"
-                          ? "text-green-500"
-                          : "text-yellow-500"
+                          ? "text-green-500 dark:text-green-400"
+                          : "text-yellow-500 dark:text-yellow-400"
                       )}
                     >
                       {agent.status === "Reconciled" ? (

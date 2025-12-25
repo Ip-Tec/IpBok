@@ -82,8 +82,8 @@ export const authOptions: NextAuthOptions = {
       }
       return true; // Continue with the sign-in process
     },
-    async jwt({ token, user, account }) {
-      // On initial sign-in, the user object is passed in
+    async jwt({ token, user, account: _account }) {
+      // On initial sign-in, the user object is passed in.
       if (user) {
         token.sub = user.id;
       }
@@ -99,7 +99,6 @@ export const authOptions: NextAuthOptions = {
         if (dbUser) {
           token.role = dbUser.role;
           // For simplicity, we'll add the first business found.
-          // This can be expanded later for multi-business support.
           if (dbUser.memberships && dbUser.memberships.length > 0) {
             token.businessId = dbUser.memberships[0].businessId;
           }
@@ -109,12 +108,11 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Persist the data from the token to the session
       if (token) {
         session.user.id = token.sub!;
         session.user.role = token.role as string;
         if (token.businessId) {
-          session.user.businessId = token.businessId as string;
+            session.user.businessId = token.businessId as string;
         }
       }
       return session;

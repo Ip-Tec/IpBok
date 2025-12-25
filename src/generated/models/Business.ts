@@ -194,6 +194,7 @@ export type BusinessWhereInput = {
   accounts?: Prisma.FinancialAccountListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   dailySummaries?: Prisma.DailySummaryListRelationFilter
+  cashAdvances?: Prisma.CashAdvanceListRelationFilter
 }
 
 export type BusinessOrderByWithRelationInput = {
@@ -207,6 +208,7 @@ export type BusinessOrderByWithRelationInput = {
   accounts?: Prisma.FinancialAccountOrderByRelationAggregateInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   dailySummaries?: Prisma.DailySummaryOrderByRelationAggregateInput
+  cashAdvances?: Prisma.CashAdvanceOrderByRelationAggregateInput
   _relevance?: Prisma.BusinessOrderByRelevanceInput
 }
 
@@ -224,6 +226,7 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   accounts?: Prisma.FinancialAccountListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   dailySummaries?: Prisma.DailySummaryListRelationFilter
+  cashAdvances?: Prisma.CashAdvanceListRelationFilter
 }, "id">
 
 export type BusinessOrderByWithAggregationInput = {
@@ -261,6 +264,7 @@ export type BusinessCreateInput = {
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateInput = {
@@ -274,6 +278,7 @@ export type BusinessUncheckedCreateInput = {
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUpdateInput = {
@@ -287,6 +292,7 @@ export type BusinessUpdateInput = {
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateInput = {
@@ -300,6 +306,7 @@ export type BusinessUncheckedUpdateInput = {
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateManyInput = {
@@ -423,6 +430,20 @@ export type BusinessUpdateOneRequiredWithoutDailySummariesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutDailySummariesInput, Prisma.BusinessUpdateWithoutDailySummariesInput>, Prisma.BusinessUncheckedUpdateWithoutDailySummariesInput>
 }
 
+export type BusinessCreateNestedOneWithoutCashAdvancesInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutCashAdvancesInput, Prisma.BusinessUncheckedCreateWithoutCashAdvancesInput>
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutCashAdvancesInput
+  connect?: Prisma.BusinessWhereUniqueInput
+}
+
+export type BusinessUpdateOneRequiredWithoutCashAdvancesNestedInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutCashAdvancesInput, Prisma.BusinessUncheckedCreateWithoutCashAdvancesInput>
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutCashAdvancesInput
+  upsert?: Prisma.BusinessUpsertWithoutCashAdvancesInput
+  connect?: Prisma.BusinessWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutCashAdvancesInput, Prisma.BusinessUpdateWithoutCashAdvancesInput>, Prisma.BusinessUncheckedUpdateWithoutCashAdvancesInput>
+}
+
 export type BusinessCreateWithoutMembershipsInput = {
   id?: string
   name: string
@@ -433,6 +454,7 @@ export type BusinessCreateWithoutMembershipsInput = {
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutMembershipsInput = {
@@ -445,6 +467,7 @@ export type BusinessUncheckedCreateWithoutMembershipsInput = {
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutMembershipsInput = {
@@ -473,6 +496,7 @@ export type BusinessUpdateWithoutMembershipsInput = {
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutMembershipsInput = {
@@ -485,6 +509,7 @@ export type BusinessUncheckedUpdateWithoutMembershipsInput = {
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutAccountsInput = {
@@ -497,6 +522,7 @@ export type BusinessCreateWithoutAccountsInput = {
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutAccountsInput = {
@@ -509,6 +535,7 @@ export type BusinessUncheckedCreateWithoutAccountsInput = {
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutAccountsInput = {
@@ -537,6 +564,7 @@ export type BusinessUpdateWithoutAccountsInput = {
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutAccountsInput = {
@@ -549,6 +577,7 @@ export type BusinessUncheckedUpdateWithoutAccountsInput = {
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutTransactionsInput = {
@@ -561,6 +590,7 @@ export type BusinessCreateWithoutTransactionsInput = {
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutTransactionsInput = {
@@ -573,6 +603,7 @@ export type BusinessUncheckedCreateWithoutTransactionsInput = {
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutTransactionsInput = {
@@ -601,6 +632,7 @@ export type BusinessUpdateWithoutTransactionsInput = {
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutTransactionsInput = {
@@ -613,6 +645,7 @@ export type BusinessUncheckedUpdateWithoutTransactionsInput = {
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutDailySummariesInput = {
@@ -625,6 +658,7 @@ export type BusinessCreateWithoutDailySummariesInput = {
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutDailySummariesInput = {
@@ -637,6 +671,7 @@ export type BusinessUncheckedCreateWithoutDailySummariesInput = {
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutDailySummariesInput = {
@@ -665,6 +700,7 @@ export type BusinessUpdateWithoutDailySummariesInput = {
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutDailySummariesInput = {
@@ -677,6 +713,75 @@ export type BusinessUncheckedUpdateWithoutDailySummariesInput = {
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessCreateWithoutCashAdvancesInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
+  accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
+  dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessUncheckedCreateWithoutCashAdvancesInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
+  accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
+  dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessCreateOrConnectWithoutCashAdvancesInput = {
+  where: Prisma.BusinessWhereUniqueInput
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutCashAdvancesInput, Prisma.BusinessUncheckedCreateWithoutCashAdvancesInput>
+}
+
+export type BusinessUpsertWithoutCashAdvancesInput = {
+  update: Prisma.XOR<Prisma.BusinessUpdateWithoutCashAdvancesInput, Prisma.BusinessUncheckedUpdateWithoutCashAdvancesInput>
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutCashAdvancesInput, Prisma.BusinessUncheckedCreateWithoutCashAdvancesInput>
+  where?: Prisma.BusinessWhereInput
+}
+
+export type BusinessUpdateToOneWithWhereWithoutCashAdvancesInput = {
+  where?: Prisma.BusinessWhereInput
+  data: Prisma.XOR<Prisma.BusinessUpdateWithoutCashAdvancesInput, Prisma.BusinessUncheckedUpdateWithoutCashAdvancesInput>
+}
+
+export type BusinessUpdateWithoutCashAdvancesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
+  accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
+  dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessUncheckedUpdateWithoutCashAdvancesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
+  accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
+  dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 
@@ -689,6 +794,7 @@ export type BusinessCountOutputType = {
   accounts: number
   transactions: number
   dailySummaries: number
+  cashAdvances: number
 }
 
 export type BusinessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -696,6 +802,7 @@ export type BusinessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   accounts?: boolean | BusinessCountOutputTypeCountAccountsArgs
   transactions?: boolean | BusinessCountOutputTypeCountTransactionsArgs
   dailySummaries?: boolean | BusinessCountOutputTypeCountDailySummariesArgs
+  cashAdvances?: boolean | BusinessCountOutputTypeCountCashAdvancesArgs
 }
 
 /**
@@ -736,6 +843,13 @@ export type BusinessCountOutputTypeCountDailySummariesArgs<ExtArgs extends runti
   where?: Prisma.DailySummaryWhereInput
 }
 
+/**
+ * BusinessCountOutputType without action
+ */
+export type BusinessCountOutputTypeCountCashAdvancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CashAdvanceWhereInput
+}
+
 
 export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -748,6 +862,7 @@ export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   accounts?: boolean | Prisma.Business$accountsArgs<ExtArgs>
   transactions?: boolean | Prisma.Business$transactionsArgs<ExtArgs>
   dailySummaries?: boolean | Prisma.Business$dailySummariesArgs<ExtArgs>
+  cashAdvances?: boolean | Prisma.Business$cashAdvancesArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["business"]>
 
@@ -768,6 +883,7 @@ export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   accounts?: boolean | Prisma.Business$accountsArgs<ExtArgs>
   transactions?: boolean | Prisma.Business$transactionsArgs<ExtArgs>
   dailySummaries?: boolean | Prisma.Business$dailySummariesArgs<ExtArgs>
+  cashAdvances?: boolean | Prisma.Business$cashAdvancesArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -778,6 +894,7 @@ export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     accounts: Prisma.$FinancialAccountPayload<ExtArgs>[]
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
     dailySummaries: Prisma.$DailySummaryPayload<ExtArgs>[]
+    cashAdvances: Prisma.$CashAdvancePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1130,6 +1247,7 @@ export interface Prisma__BusinessClient<T, Null = never, ExtArgs extends runtime
   accounts<T extends Prisma.Business$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinancialAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transactions<T extends Prisma.Business$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dailySummaries<T extends Prisma.Business$dailySummariesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$dailySummariesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailySummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cashAdvances<T extends Prisma.Business$cashAdvancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$cashAdvancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashAdvancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1601,6 +1719,30 @@ export type Business$dailySummariesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.DailySummaryScalarFieldEnum | Prisma.DailySummaryScalarFieldEnum[]
+}
+
+/**
+ * Business.cashAdvances
+ */
+export type Business$cashAdvancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CashAdvance
+   */
+  select?: Prisma.CashAdvanceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CashAdvance
+   */
+  omit?: Prisma.CashAdvanceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CashAdvanceInclude<ExtArgs> | null
+  where?: Prisma.CashAdvanceWhereInput
+  orderBy?: Prisma.CashAdvanceOrderByWithRelationInput | Prisma.CashAdvanceOrderByWithRelationInput[]
+  cursor?: Prisma.CashAdvanceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CashAdvanceScalarFieldEnum | Prisma.CashAdvanceScalarFieldEnum[]
 }
 
 /**

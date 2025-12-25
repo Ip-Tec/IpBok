@@ -36,9 +36,16 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
     if (!user.businessId) return; // Don't fetch if business ID is not available
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/transactions?businessId=${user.businessId}`); // Pass businessId as a query parameter
+      const response = await fetch(
+        `/api/transactions?businessId=${user.businessId}`
+      ); // Pass businessId as a query parameter
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        toast({
+          title: "Error",
+          description: "Failed to load transactions.",
+          variant: "destructive",
+        });
+        // throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data: Transaction[] = await response.json();
       setTransactionsData(data);
@@ -77,12 +84,15 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
       try {
         for (const transaction of transactionsToProcess) {
           const transactionToSave = {
-            ...transaction,
+            type: transaction.type,
+            amount: transaction.amount,
+            paymentMethod: transaction.paymentMethod,
+            description: transaction.description || "",
             businessId: user.businessId,
             userId: user.id,
             date: new Date().toISOString(),
-            status: "pending",
           };
+          
           const response = await fetch("/api/transactions", {
             method: "POST",
             headers: {
@@ -92,27 +102,33 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json().catch(() => ({ message: "Failed to add transaction" }));
+            toast({
+              title: "Error",
+              description: errorData.message || "Failed to add transaction.",
+              variant: "destructive",
+            });
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
           }
         }
-        
+
         const description = chargeTransaction
           ? `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount} and a Charge of ${chargeTransaction.amount}.`
           : `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount}.`;
-        
+
         toast({
           title: `${mainTransaction.type} Added`,
           description: description,
         });
-        
+
         setIsFormOpen(false);
         setCurrentTransactionType(null);
         fetchTransactions(); // Re-fetch transactions to update the list
       } catch (error) {
         console.error("Failed to add transaction:", error);
         const description = chargeTransaction
-        ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
-        : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
+          ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
+          : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
         toast({
           title: "Error",
           description: description,
@@ -172,7 +188,6 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
               >
                 Add Withdrawal
               </Button>
-
             </div>
           </DialogContent>
         </Dialog>
@@ -184,7 +199,11 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
             Loading transactions...
           </p>
         ) : (
-          <AgentTransactionsTable transactions={transactionsData} />
+          <AgentTransactionsTable
+            transactions={transactionsData}
+            user={user}
+            onTransactionUpdate={fetchTransactions}
+          />
         )}
       </div>
 
@@ -198,7 +217,9 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
             <DialogTitle>Add Deposit</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
+            onAddTransaction={(mainTx, chargeTx) =>
+              handleAddTransaction(mainTx, chargeTx)
+            }
             transactionType="Deposit"
           />
         </DialogContent>
@@ -213,13 +234,13 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
             <DialogTitle>Add Withdrawal</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(mainTx, chargeTx) => handleAddTransaction(mainTx, chargeTx)}
+            onAddTransaction={(mainTx, chargeTx) =>
+              handleAddTransaction(mainTx, chargeTx)
+            }
             transactionType="Withdrawal"
           />
         </DialogContent>
       </Dialog>
-
-
     </div>
   );
 };

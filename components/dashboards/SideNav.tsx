@@ -1,4 +1,5 @@
 "use client";
+import { NotificationBell } from "@/components/NotificationBell";
 import { User } from "@/lib/types";
 import React from "react";
 import { LogOut, X } from "lucide-react";
@@ -87,9 +88,12 @@ const SideNav = ({
         )}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-            {user.name}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+              {user.name}
+            </h2>
+            <NotificationBell />
+          </div>
           <button
             className="p-2 text-gray-500 rounded-md lg:hidden hover:text-gray-600 focus:outline-none focus:ring"
             onClick={() => setIsSidebarOpen(false)}

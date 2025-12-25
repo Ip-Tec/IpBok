@@ -43,8 +43,8 @@ const AgentReconciliationView = ({ user }: AgentReconciliationViewProps) => {
 
       {isDayLocked ? (
         <div className="mt-8 flex flex-col items-center justify-center text-center p-12 bg-green-50 dark:bg-green-900/20 rounded-lg">
-          <Lock className="w-16 h-16 text-green-500" />
-          <h2 className="mt-4 text-2xl font-bold">Day Locked</h2>
+          <Lock className="w-16 h-16 text-green-500 dark:text-green-400" />
+          <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Day Locked</h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Your reconciliation has been submitted for today.
           </p>
@@ -87,8 +87,8 @@ const AgentReconciliationView = ({ user }: AgentReconciliationViewProps) => {
                   readOnly
                   className={`bg-gray-100 dark:bg-gray-700 cursor-not-allowed ${
                     reconciliationDifference < 0
-                      ? "text-red-500"
-                      : "text-green-500"
+                      ? "text-red-500 dark:text-red-400"
+                      : "text-green-500 dark:text-green-400"
                   }`}
                 />
               </div>

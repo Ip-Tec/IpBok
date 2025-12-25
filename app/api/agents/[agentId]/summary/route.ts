@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/src/generated/enums";
+import { TransactionStatus } from "@/src/generated/enums";
 
 // A helper function to get the start and end of the current day
 const getTodayDateRange = () => {
@@ -166,6 +167,29 @@ export async function GET(
     // Determine pending reconciliation status (simplified for now, based on if there are any transactions today)
     const pendingReconciliationStatus = todayTransactions.length > 0 ? "Pending" : "Reconciled";
 
+    const pendingCashAdvance = await prisma.cashAdvance.findFirst({
+        where: {
+            receivedById: agentId,
+            status: 'PENDING'
+        },
+        include: {
+            givenBy: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    });
+
+    const business = await prisma.business.findUnique({
+        where: {
+            id: targetBusinessId
+        },
+        select: {
+            phone: true
+        }
+    });
+
 
     const summaryData = {
       todayTotalCollected,
@@ -173,6 +197,8 @@ export async function GET(
       bankCollectedToday,
       pendingReconciliationStatus,
       yesterdayBalance,
+      pendingCashAdvance,
+      businessPhone: business?.phone
     };
 
     console.log(`Successfully processed summary data for agent ${agentId}.`);

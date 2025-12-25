@@ -97,6 +97,7 @@ export async function GET(req: NextRequest) {
         const dailyTransactionCount = await prisma.transaction.count({
           where: {
             recordedById: m.userId,
+            businessId: businessId,
             createdAt: {
               gte: today,
               lt: tomorrow,

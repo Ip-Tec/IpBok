@@ -578,10 +578,6 @@ export type DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput = {
   deleteMany?: Prisma.DailySummaryScalarWhereInput | Prisma.DailySummaryScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type DailySummaryCreateWithoutBusinessInput = {
   id?: string
   date: Date | string

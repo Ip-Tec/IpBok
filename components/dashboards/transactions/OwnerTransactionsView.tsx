@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,6 +15,7 @@ import {
 import { DateRange } from "react-day-picker";
 import { DatePickerWithRange } from "@/components/ui/DatePickerWithRange";
 import { Transaction } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const OwnerTransactionsView = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -24,13 +26,15 @@ const OwnerTransactionsView = () => {
     type: string;
     paymentMethod: string;
     dateRange: DateRange | undefined;
+    status: string;
   }>({
     type: "all",
     paymentMethod: "all",
     dateRange: undefined,
+    status: "all",
   });
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!session?.user?.businessId) return;
     setIsLoading(true);
     try {
@@ -49,13 +53,36 @@ const OwnerTransactionsView = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
     if (session) {
       fetchTransactions();
     }
-  }, [session]);
+  }, [session, fetchTransactions]);
+
+  const handleApprove = async (transactionId: string) => {
+    try {
+      const response = await fetch(
+        `/api/owner/transactions/${transactionId}/approve`,
+        {
+          method: "POST",
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to approve transaction");
+      }
+      toast.success("Transaction approved successfully!");
+      fetchTransactions(); // Refresh data
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred during approval.");
+      }
+    }
+  };
 
   const filteredTransactions = transactions.filter((transaction) => {
     const searchMatch =
@@ -69,6 +96,9 @@ const OwnerTransactionsView = () => {
     const typeMatch =
       filters.type === "all" || transaction.type.name === filters.type;
 
+    const statusMatch =
+      filters.status === "all" || transaction.status === filters.status;
+
     const paymentMethodMatch =
       filters.paymentMethod === "all" ||
       transaction.paymentMethod === filters.paymentMethod;
@@ -80,7 +110,9 @@ const OwnerTransactionsView = () => {
         new Date(transaction.date) >= filters.dateRange.from &&
         new Date(transaction.date) <= filters.dateRange.to);
 
-    return searchMatch && typeMatch && paymentMethodMatch && dateMatch;
+    return (
+      searchMatch && typeMatch && paymentMethodMatch && dateMatch && statusMatch
+    );
   });
 
   return (
@@ -96,7 +128,7 @@ const OwnerTransactionsView = () => {
         </div>
       </header>
 
-      <div className="flex items-center justify-between my-6 gap-4">
+      <div className="flex flex-wrap items-center justify-between my-6 gap-4">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
@@ -106,19 +138,37 @@ const OwnerTransactionsView = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <Select
+            value={filters.status}
+            onValueChange={(value: string) =>
+              setFilters({ ...filters, status: value })
+            }
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+              <SelectItem value="CANCELLED">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
           <Select
             value={filters.type}
-            onValueChange={(value: string) => setFilters({ ...filters, type: value })}
+            onValueChange={(value: string) =>
+              setFilters({ ...filters, type: value })
+            }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Transaction Type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="Deposit">Deposit</SelectItem>
               <SelectItem value="Withdrawal">Withdrawal</SelectItem>
-              <SelectItem value="Expense">Expense</SelectItem>
+              <SelectItem value="Cash Advance">Cash Advance</SelectItem>
               <SelectItem value="Charge">Charge</SelectItem>
             </SelectContent>
           </Select>
@@ -128,20 +178,19 @@ const OwnerTransactionsView = () => {
               setFilters({ ...filters, paymentMethod: value })
             }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Payment Method" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Methods</SelectItem>
               <SelectItem value="CASH">Cash</SelectItem>
-              <SelectItem value="BANK">Bank</SelectItem>
+              <SelectItem value="ATM_CARD">ATM Card</SelectItem>
+              <SelectItem value="TRANSFER">Transfer</SelectItem>
             </SelectContent>
           </Select>
           <DatePickerWithRange
             date={filters.dateRange}
-            onDateChange={(dateRange) =>
-              setFilters({ ...filters, dateRange })
-            }
+            onDateChange={(dateRange) => setFilters({ ...filters, dateRange })}
           />
         </div>
       </div>
@@ -163,10 +212,10 @@ const OwnerTransactionsView = () => {
                 Amount
               </th>
               <th scope="col" className="px-6 py-3">
-                Payment Method
+                Status
               </th>
               <th scope="col" className="px-6 py-3">
-                Description
+                Actions
               </th>
             </tr>
           </thead>
@@ -196,14 +245,49 @@ const OwnerTransactionsView = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    {new Date(transaction.date).toLocaleDateString()}
+                    {new Date(transaction.date).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
                   </td>
                   <td className="px-6 py-4">{transaction.type.name}</td>
-                  <td className="px-6 py-4">
-                    {transaction.amount.toLocaleString()}
+                  <td className="px-6 py-4 font-medium">
+                    {new Intl.NumberFormat("en-NG", {
+                      style: "currency",
+                      currency: "NGN",
+                    }).format(transaction.amount)}
                   </td>
-                  <td className="px-6 py-4">{transaction.paymentMethod}</td>
-                  <td className="px-6 py-4">{transaction.description}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={cn(
+                        "px-2 py-1 text-xs font-semibold rounded-full",
+                        {
+                          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300":
+                            transaction.status === "PENDING",
+                          "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300":
+                            transaction.status === "CONFIRMED",
+                          "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300":
+                            transaction.status === "CANCELLED",
+                        }
+                      )}
+                    >
+                      {transaction.status.toLowerCase()}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {transaction.status === "PENDING" && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleApprove(transaction.id)}
+                      >
+                        Approve
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               ))
             )}

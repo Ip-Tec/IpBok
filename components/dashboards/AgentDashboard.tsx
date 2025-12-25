@@ -1,9 +1,9 @@
-"use client";
 import {
   User,
   AgentSummaryCards,
   AgentTaskStatus,
   Transaction,
+  CashAdvance,
 } from "@/lib/types";
 import React, { useState, useEffect, useCallback } from "react";
 import {
@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AddTransactionForm from "../agent/AddTransactionForm";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
+import { CashConfirmationCard } from "./agents/CashConfirmationCard";
 
 const AgentDashboard = (user: User) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,6 +46,9 @@ const AgentDashboard = (user: User) => {
     {} as AgentSummaryCards
   );
   const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
+  const [pendingCashAdvance, setPendingCashAdvance] = useState<CashAdvance | null>(null);
+  const [businessPhone, setBusinessPhone] = useState<string | null>(null);
+
 
   const fetchSummaryData = useCallback(async () => {
     if (!user.id) {
@@ -57,8 +61,10 @@ const AgentDashboard = (user: User) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data: AgentSummaryCards = await response.json();
+      const data = await response.json();
       setSummaryCardsData(data);
+      setPendingCashAdvance(data.pendingCashAdvance);
+      setBusinessPhone(data.businessPhone);
     } catch (error) {
       console.error("Failed to fetch summary data:", error);
       toast({
@@ -67,8 +73,6 @@ const AgentDashboard = (user: User) => {
         variant: "destructive",
       });
       setSummaryCardsData({} as AgentSummaryCards); // Reset on error
-    } finally {
-      setIsLoadingSummary(false);
     }
   }, [user.id, toast]);
 
@@ -141,24 +145,75 @@ const AgentDashboard = (user: User) => {
     },
   ];
 
-  const handleAddTransaction = (
-    newTransaction: Omit<
+  const handleAddTransaction = async (
+    mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status"
-    >
+      "id" | "businessId" | "userId" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" },
+    chargeTransaction?: Omit<
+      Transaction,
+      "id" | "businessId" | "userId" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" }
   ) => {
-    // In a real app, you'd send this to an API and then update state with the response
-    const transactionWithDefaults: Transaction = {
-      ...newTransaction,
-      id: uuidv4(),
-      businessId: user.businessId || "unknown", // Fallback if businessId is not available
-      userId: user.id,
-      date: new Date().toISOString(),
-      status: "pending", // New transactions are pending by default
-    };
-    setTransactionsData((prev) => [...prev, transactionWithDefaults]);
-    setIsFormOpen(false); // Close the dialog after adding
-    setCurrentTransactionType(null);
+    const transactionsToProcess = [mainTransaction];
+    if (chargeTransaction) {
+      transactionsToProcess.push(chargeTransaction);
+    }
+
+    try {
+      for (const transaction of transactionsToProcess) {
+        const transactionToSave = {
+          type: transaction.type,
+          amount: transaction.amount,
+          paymentMethod: transaction.paymentMethod,
+          description: transaction.description || "",
+          businessId: user.businessId,
+          userId: user.id,
+          date: new Date().toISOString(),
+        };
+        
+        const response = await fetch("/api/transactions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(transactionToSave),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: "Failed to add transaction" }));
+          toast({
+            title: "Error",
+            description: errorData.message || "Failed to add transaction.",
+            variant: "destructive",
+          });
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+      }
+
+      const description = chargeTransaction
+        ? `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount} and a Charge of ${chargeTransaction.amount}.`
+        : `Successfully added a ${mainTransaction.type} of ${mainTransaction.amount}.`;
+
+      toast({
+        title: `${mainTransaction.type} Added`,
+        description: description,
+      });
+
+      setIsFormOpen(false);
+      setCurrentTransactionType(null);
+      fetchSummaryData(); // Refresh summary data
+    } catch (error) {
+      console.error("Failed to add transaction:", error);
+      const description = chargeTransaction
+        ? `Failed to add ${mainTransaction.type.toLowerCase()} and charge.`
+        : `Failed to add ${mainTransaction.type.toLowerCase()}.`;
+      toast({
+        title: "Error",
+        description: description,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -185,6 +240,13 @@ const AgentDashboard = (user: User) => {
         </header>
         <div className="p-3 text-gray-800 dark:text-gray-200">
 
+          {pendingCashAdvance && (
+            <CashConfirmationCard
+              cashAdvance={pendingCashAdvance}
+              businessPhone={businessPhone}
+              onConfirmation={fetchSummaryData}
+            />
+          )}
 
           {/* Grid for Summary, Task Status, Reconciliation, Notifications */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
@@ -330,13 +392,9 @@ const AgentDashboard = (user: User) => {
             <DialogTitle>Add Deposit</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(transaction) => {
-              handleAddTransaction(transaction);
-              toast({
-                title: "Deposit Added",
-                description: `Successfully added a deposit of ${transaction.amount}.`,
-              });
-            }}
+            onAddTransaction={(mainTx, chargeTx) =>
+              handleAddTransaction(mainTx, chargeTx)
+            }
             transactionType="Deposit"
           />
         </DialogContent>
@@ -354,13 +412,9 @@ const AgentDashboard = (user: User) => {
             <DialogTitle>Add Withdrawal</DialogTitle>
           </DialogHeader>
           <AddTransactionForm
-            onAddTransaction={(transaction) => {
-              handleAddTransaction(transaction);
-              toast({
-                title: "Withdrawal Added",
-                description: `Successfully added a withdrawal of ${transaction.amount}.`,
-              });
-            }}
+            onAddTransaction={(mainTx, chargeTx) =>
+              handleAddTransaction(mainTx, chargeTx)
+            }
             transactionType="Withdrawal"
           />
         </DialogContent>

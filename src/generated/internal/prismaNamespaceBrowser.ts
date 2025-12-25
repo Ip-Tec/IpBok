@@ -55,12 +55,14 @@ export const ModelName = {
   Session: 'Session',
   User: 'User',
   VerificationToken: 'VerificationToken',
+  Notification: 'Notification',
   Business: 'Business',
   Membership: 'Membership',
   FinancialAccount: 'FinancialAccount',
   TransactionType: 'TransactionType',
   Transaction: 'Transaction',
-  DailySummary: 'DailySummary'
+  DailySummary: 'DailySummary',
+  CashAdvance: 'CashAdvance'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -129,6 +131,18 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  message: 'message',
+  isRead: 'isRead',
+  link: 'link',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const BusinessScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -176,6 +190,8 @@ export const TransactionScalarFieldEnum = {
   typeId: 'typeId',
   paymentMethod: 'paymentMethod',
   recordedById: 'recordedById',
+  recipientId: 'recipientId',
+  status: 'status',
   businessId: 'businessId',
   accountId: 'accountId',
   date: 'date',
@@ -201,6 +217,23 @@ export const DailySummaryScalarFieldEnum = {
 } as const
 
 export type DailySummaryScalarFieldEnum = (typeof DailySummaryScalarFieldEnum)[keyof typeof DailySummaryScalarFieldEnum]
+
+
+export const CashAdvanceScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  description: 'description',
+  status: 'status',
+  businessId: 'businessId',
+  givenById: 'givenById',
+  receivedById: 'receivedById',
+  date: 'date',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CashAdvanceScalarFieldEnum = (typeof CashAdvanceScalarFieldEnum)[keyof typeof CashAdvanceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -264,6 +297,16 @@ export const VerificationTokenOrderByRelevanceFieldEnum = {
 export type VerificationTokenOrderByRelevanceFieldEnum = (typeof VerificationTokenOrderByRelevanceFieldEnum)[keyof typeof VerificationTokenOrderByRelevanceFieldEnum]
 
 
+export const NotificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  message: 'message',
+  link: 'link',
+  userId: 'userId'
+} as const
+
+export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
+
+
 export const BusinessOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
@@ -304,6 +347,7 @@ export const TransactionOrderByRelevanceFieldEnum = {
   id: 'id',
   typeId: 'typeId',
   recordedById: 'recordedById',
+  recipientId: 'recipientId',
   businessId: 'businessId',
   accountId: 'accountId',
   description: 'description'
@@ -318,4 +362,15 @@ export const DailySummaryOrderByRelevanceFieldEnum = {
 } as const
 
 export type DailySummaryOrderByRelevanceFieldEnum = (typeof DailySummaryOrderByRelevanceFieldEnum)[keyof typeof DailySummaryOrderByRelevanceFieldEnum]
+
+
+export const CashAdvanceOrderByRelevanceFieldEnum = {
+  id: 'id',
+  description: 'description',
+  businessId: 'businessId',
+  givenById: 'givenById',
+  receivedById: 'receivedById'
+} as const
+
+export type CashAdvanceOrderByRelevanceFieldEnum = (typeof CashAdvanceOrderByRelevanceFieldEnum)[keyof typeof CashAdvanceOrderByRelevanceFieldEnum]
 

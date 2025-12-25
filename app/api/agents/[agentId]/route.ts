@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { agentId: string } }
+  { params }: { params: { agentId: string } }
 ) {
   try {
     const url = new URL(req.url);

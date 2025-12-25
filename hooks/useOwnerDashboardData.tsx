@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 
 export const useOwnerDashboardData = () => {
@@ -6,29 +6,30 @@ export const useOwnerDashboardData = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/dashboard/owner");
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
-        const result = await response.json();
-        setData(result);
-      } catch (err: any) {
-        setError(err.message);
-        toast({
-          title: "Error",
-          description: "Failed to fetch dashboard data.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/dashboard/owner");
+      if (!response.ok) {
+        throw new Error("Failed to fetch dashboard data");
       }
-    };
-
-    fetchData();
+      const result = await response.json();
+      setData(result);
+    } catch (err: any) {
+      setError(err.message);
+      toast({
+        title: "Error",
+        description: "Failed to fetch dashboard data.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  return { data, isLoading, error };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, isLoading, error, refresh: fetchData };
 };

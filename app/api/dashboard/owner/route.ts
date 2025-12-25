@@ -176,24 +176,52 @@ export async function GET() {
     for (const agent of agents) {
       agentReconciliationMap.set(agent.id, {
         name: agent.name || "Unnamed Agent",
-        expected: 0,
-        submitted: 0,
+        cashGiven: 0, // Cash given to agent (Cash Advance transactions)
+        cashInAccount: 0, // Cash in account (from deposits)
+        charges: 0, // Profit from charges
       });
     }
 
+    // Calculate cash given to agents (Cash Advances that are CONFIRMED)
+    const cashAdvances = await prisma.cashAdvance.findMany({
+      where: {
+        businessId,
+        date: {
+          gte: today,
+        },
+        status: "CONFIRMED", // Only count confirmed cash advances
+      },
+      select: {
+        amount: true,
+        receivedById: true,
+      },
+    });
+
+    for (const cashAdvance of cashAdvances) {
+      if (cashAdvance.receivedById) {
+        const agentData = agentReconciliationMap.get(cashAdvance.receivedById);
+        if (agentData) {
+          agentData.cashGiven += cashAdvance.amount;
+        }
+      }
+    }
+
+    // Calculate cash in account and charges from today's transactions
     for (const transaction of todaysTransactions) {
       const agentData = agentReconciliationMap.get(transaction.recordedById);
       if (agentData) {
         if (transaction.type?.name) {
           const transactionTypeName = transaction.type.name.toLowerCase();
+          // Track charges (profit)
           if (transactionTypeName === "charge") {
-            agentData.expected += transaction.amount;
+            agentData.charges += transaction.amount;
           }
+          // Track cash deposits (cash in account)
           if (
             transactionTypeName === "deposit" &&
             transaction.paymentMethod === "CASH"
           ) {
-            agentData.submitted += transaction.amount;
+            agentData.cashInAccount += transaction.amount;
           }
         }
       }
@@ -201,9 +229,17 @@ export async function GET() {
 
     const dailyReconciliation = Array.from(agentReconciliationMap.values()).map(
       (data) => {
-        const difference = data.submitted - data.expected;
+        // Expected = Cash Given (what owner gave to agent)
+        // Submitted = Cash in Account (what agent has from deposits)
+        // Difference = Cash in Account - Cash Given (should match if reconciled)
+        const expected = data.cashGiven;
+        const submitted = data.cashInAccount;
+        const difference = submitted - expected;
         return {
-          ...data,
+          name: data.name,
+          expected,
+          submitted,
+          charges: data.charges, // Profit from charges
           difference,
           status: difference === 0 ? "Reconciled" : "Pending",
         };
@@ -236,14 +272,23 @@ export async function GET() {
           ],
         },
       },
-      recentTransactions: recentTransactions.map((tx) => ({
-        datetime: format(tx.createdAt, "yyyy-MM-dd HH:mm"),
-        agent: tx.recordedBy.name,
-        type: tx.type.name,
-        method: tx.paymentMethod,
-        amount: tx.amount,
-        status: "Completed",
-      })),
+      recentTransactions: recentTransactions.map((tx) => {
+        const date = new Date(tx.createdAt);
+        const formattedDate = format(date, "MMM dd, yyyy");
+        const formattedTime = date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+        return {
+          datetime: `${formattedDate} ${formattedTime}`,
+          agent: tx.recordedBy.name,
+          type: tx.type.name,
+          method: tx.paymentMethod,
+          amount: tx.amount,
+          status: "Completed",
+        };
+      }),
       dailyReconciliation,
     };
 

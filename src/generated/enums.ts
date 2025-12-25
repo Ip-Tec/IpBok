@@ -26,8 +26,29 @@ export type AccountType = (typeof AccountType)[keyof typeof AccountType]
 
 
 export const PaymentMethod = {
+  ATM_CARD: 'ATM_CARD',
+  BANK: 'BANK',
+  BANK_TRANSFER: 'BANK_TRANSFER',
   CASH: 'CASH',
-  BANK: 'BANK'
+  MOBILE_MONEY: 'MOBILE_MONEY'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const TransactionStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus]
+
+
+export const CashAdvanceStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type CashAdvanceStatus = (typeof CashAdvanceStatus)[keyof typeof CashAdvanceStatus]

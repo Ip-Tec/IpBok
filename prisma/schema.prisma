@@ -38,17 +38,21 @@ model Session {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String        @unique
-  emailVerified DateTime?
-  password      String?
-  role          Role      @default(AGENT)
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  memberships   Membership[]
-  transactions  Transaction[]
+  id                   String        @id @default(cuid())
+  name                 String?
+  email                String?       @unique
+  emailVerified        DateTime?
+  password             String?
+  role                 Role          @default(AGENT)
+  image                String?
+  accounts             Account[]
+  sessions             Session[]
+  memberships          Membership[]
+  transactions         Transaction[] @relation("RecordedTransactions")
+  receivedTransactions Transaction[] @relation("ReceivedTransactions")
+  notifications        Notification[]
+  cashAdvancesGiven    CashAdvance[] @relation("CashAdvanceGiver")
+  cashAdvancesReceived CashAdvance[] @relation("CashAdvanceReceiver")
 }
 
 model VerificationToken {
@@ -57,6 +61,17 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Notification model
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // IpBok models
@@ -76,6 +91,7 @@ model Business {
   accounts       FinancialAccount[]
   transactions   Transaction[]
   dailySummaries DailySummary[]
+  cashAdvances   CashAdvance[]
 }
 
 model Membership {
@@ -117,7 +133,10 @@ model Transaction {
   type          TransactionType   @relation(fields: [typeId], references: [id])
   paymentMethod PaymentMethod
   recordedById  String
-  recordedBy    User              @relation(fields: [recordedById], references: [id])
+  recordedBy    User              @relation("RecordedTransactions", fields: [recordedById], references: [id])
+  recipientId   String?
+  recipient     User?             @relation("ReceivedTransactions", fields: [recipientId], references: [id])
+  status        TransactionStatus @default(PENDING)
   businessId    String
   business      Business          @relation(fields: [businessId], references: [id])
   accountId     String?
@@ -128,8 +147,17 @@ model Transaction {
 }
 
 enum PaymentMethod {
-  CASH
+  ATM_CARD
   BANK
+  BANK_TRANSFER
+  CASH
+  MOBILE_MONEY
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
 }
 
 model DailySummary {
@@ -147,4 +175,27 @@ model DailySummary {
   createdAt        DateTime @default(now())
 
   @@unique([businessId, date])
+}
+
+model CashAdvance {
+  id            String            @id @default(cuid())
+  amount        Float
+  description   String?
+  status        CashAdvanceStatus @default(PENDING)
+  businessId    String
+  business      Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  givenById     String
+  givenBy       User              @relation("CashAdvanceGiver", fields: [givenById], references: [id])
+  receivedById  String
+  receivedBy    User              @relation("CashAdvanceReceiver", fields: [receivedById], references: [id])
+  date          DateTime          @default(now())
+  confirmedAt   DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+enum CashAdvanceStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
 }

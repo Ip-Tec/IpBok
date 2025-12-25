@@ -74,9 +74,18 @@ export async function POST(req: NextRequest) {
     } = body;
 
     // Basic validation
-    if (!type || !amount || !paymentMethod || !businessId || !userId || !date) {
+    if (!type || amount === undefined || amount === null || !paymentMethod || !businessId || !userId || !date) {
       return NextResponse.json(
-        { message: "Missing required fields" },
+        { message: "Missing required fields", details: { type, amount, paymentMethod, businessId, userId, date } },
+        { status: 400 }
+      );
+    }
+
+    // Validate payment method enum
+    const validPaymentMethods = ["CASH", "ATM_CARD", "BANK_TRANSFER", "MOBILE_MONEY", "BANK"];
+    if (!validPaymentMethods.includes(paymentMethod)) {
+      return NextResponse.json(
+        { message: `Invalid payment method: ${paymentMethod}. Must be one of: ${validPaymentMethods.join(", ")}` },
         { status: 400 }
       );
     }
@@ -112,30 +121,81 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Find the transaction type ID
-    const transactionType = await prisma.transactionType.findFirst({
+    // Find or create the transaction type
+    let transactionType = await prisma.transactionType.findFirst({
       where: { name: type },
     });
 
+    // If transaction type doesn't exist, create it
     if (!transactionType) {
+      try {
+        transactionType = await prisma.transactionType.create({
+          data: { name: type },
+        });
+        console.log(`Created missing transaction type: ${type}`);
+      } catch (error) {
+        console.error(`Failed to create transaction type ${type}:`, error);
+        return NextResponse.json(
+          { message: `Transaction type '${type}' not found and could not be created` },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Validate amount is a positive number
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
       return NextResponse.json(
-        { message: `Transaction type '${type}' not found` },
+        { message: "Amount must be a positive number" },
         { status: 400 }
       );
     }
 
     const newTransaction = await prisma.transaction.create({
       data: {
-        amount: parseFloat(amount),
-        paymentMethod: paymentMethod,
-        description: description,
+        amount: parsedAmount,
+        paymentMethod: paymentMethod as any, // Type assertion for enum
+        description: description || null,
         date: new Date(date),
         recordedById: session.user.id, // The user performing the action
         businessId: businessId,
         typeId: transactionType.id,
-        // status: "pending", // Default status for new transactions
+        // status defaults to PENDING from schema
       },
     });
+
+    // Create a notification for the business owner if an agent creates a transaction
+    if (session.user.role === Role.AGENT) {
+      try {
+        const owners = await prisma.user.findMany({
+          where: {
+            role: Role.OWNER,
+            memberships: {
+              some: {
+                businessId: businessId,
+              },
+            },
+          },
+        });
+
+        const message = `${session.user.name || 'An agent'} recorded a new ${
+          transactionType.name
+        } of ${amount}.`;
+
+        for (const owner of owners) {
+          await prisma.notification.create({
+            data: {
+              userId: owner.id,
+              message: message,
+              link: '/dashboard/transactions',
+            },
+          });
+        }
+      } catch (notificationError) {
+        console.error('Failed to create notification:', notificationError);
+        // Do not block the response for a notification failure
+      }
+    }
 
     return NextResponse.json(newTransaction, { status: 201 });
   } catch (error) {

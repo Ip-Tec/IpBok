@@ -22,3 +22,27 @@ export interface Transaction {
   } | null;
   status: string;
 }
+
+export interface CashAdvance {
+  id: string;
+  amount: number;
+  description: string | null;
+  recordedBy: {
+    name: string | null;
+  } | null;
+}
+
+export interface AgentSummaryCards {
+  todayTotalCollected: number;
+  cashCollectedToday: number;
+  bankCollectedToday: number;
+  pendingReconciliationStatus: string;
+  yesterdayBalance: number;
+}
+
+export interface AgentTaskStatus {
+  loggedIn: boolean;
+  transactionsRecorded: boolean;
+  reconciliationPending: boolean;
+  reconciled: boolean;
+}
