@@ -98,6 +98,7 @@ export const authOptions: NextAuthOptions = {
 
         if (dbUser) {
           token.role = dbUser.role;
+          token.transactionsPerPage = dbUser.transactionsPerPage;
           // For simplicity, we'll add the first business found.
           if (dbUser.memberships && dbUser.memberships.length > 0) {
             token.businessId = dbUser.memberships[0].businessId;
@@ -111,6 +112,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.sub!;
         session.user.role = token.role as string;
+        session.user.transactionsPerPage = token.transactionsPerPage as number;
         if (token.businessId) {
             session.user.businessId = token.businessId as string;
         }

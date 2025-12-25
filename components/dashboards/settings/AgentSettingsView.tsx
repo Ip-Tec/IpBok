@@ -2,6 +2,7 @@
 import React from "react";
 import UserProfileForm from "./UserProfileForm";
 import PasswordManagementForm from "./PasswordManagementForm";
+import TransactionSettingsForm from "./TransactionSettingsForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const AgentSettingsView = () => {
@@ -22,6 +23,9 @@ const AgentSettingsView = () => {
 
         {/* Password Management Section */}
         <PasswordManagementForm />
+
+        {/* Transaction Settings Section */}
+        <TransactionSettingsForm />
 
         {/* Theme Settings Section */}
         <div className="bg-white rounded-lg shadow dark:bg-gray-800 w-full">

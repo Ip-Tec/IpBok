@@ -144,6 +144,7 @@ const BusinessInformationForm = () => {
 
 import UserProfileForm from "./UserProfileForm";
 import PasswordManagementForm from "./PasswordManagementForm";
+import TransactionSettingsForm from "./TransactionSettingsForm";
 
 const OwnerSettingsView = () => {
   return (
@@ -166,6 +167,9 @@ const OwnerSettingsView = () => {
 
         {/* Password Management Section */}
         <PasswordManagementForm />
+
+        {/* Transaction Settings Section */}
+        <TransactionSettingsForm />
 
         {/* Theme Settings Section */}
         <div className="bg-white rounded-lg shadow dark:bg-gray-800 w-full">

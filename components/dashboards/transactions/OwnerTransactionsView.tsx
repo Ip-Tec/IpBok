@@ -33,6 +33,10 @@ const OwnerTransactionsView = () => {
     dateRange: undefined,
     status: "all",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [transactionsPerPage, setTransactionsPerPage] = useState(
+    session?.user?.transactionsPerPage || 10
+  );
 
   const fetchTransactions = useCallback(async () => {
     if (!session?.user?.businessId) return;
@@ -107,13 +111,22 @@ const OwnerTransactionsView = () => {
       !filters.dateRange ||
       (filters.dateRange.from &&
         filters.dateRange.to &&
-        new Date(transaction.date) >= filters.dateRange.from &&
-        new Date(transaction.date) <= filters.dateRange.to);
+        new Date(transaction.date) >= new Date(filters.dateRange.from) &&
+        new Date(transaction.date) <= new Date(filters.dateRange.to));
 
     return (
       searchMatch && typeMatch && paymentMethodMatch && dateMatch && statusMatch
     );
   });
+
+  const indexOfLastTransaction = currentPage * transactionsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+  const currentTransactions = filteredTransactions.slice(
+    indexOfFirstTransaction,
+    indexOfLastTransaction
+  );
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="p-8">
@@ -226,14 +239,14 @@ const OwnerTransactionsView = () => {
                   Loading transactions...
                 </td>
               </tr>
-            ) : filteredTransactions.length === 0 ? (
+            ) : currentTransactions.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-6 text-center">
                   No transactions found.
                 </td>
               </tr>
             ) : (
-              filteredTransactions.map((transaction) => (
+              currentTransactions.map((transaction) => (
                 <tr
                   key={transaction.id}
                   className="bg-white border-b last:border-b-0 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -293,6 +306,31 @@ const OwnerTransactionsView = () => {
             )}
           </tbody>
         </table>
+      </div>
+      <div className="flex justify-between items-center mt-4">
+        <div>
+          <p className="text-sm text-gray-700 dark:text-gray-400">
+            Showing {indexOfFirstTransaction + 1} to{" "}
+            {Math.min(indexOfLastTransaction, filteredTransactions.length)} of{" "}
+            {filteredTransactions.length} transactions
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={
+              indexOfLastTransaction >= filteredTransactions.length
+            }
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

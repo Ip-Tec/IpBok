@@ -17,23 +17,30 @@ export async function PUT(
 
   try {
     const body = await req.json();
-    const { firstName, lastName, email } = body;
+    const { firstName, lastName, email, transactionsPerPage } = body;
 
-    if (!firstName || !lastName || !email) {
+    const dataToUpdate: { name?: string; email?: string; transactionsPerPage?: number } = {};
+
+    if (firstName && lastName) {
+      dataToUpdate.name = `${firstName} ${lastName}`;
+    }
+    if (email) {
+      dataToUpdate.email = email;
+    }
+    if (transactionsPerPage) {
+      dataToUpdate.transactionsPerPage = transactionsPerPage;
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) {
       return NextResponse.json(
-        { message: "Missing required fields" },
+        { message: "No fields to update" },
         { status: 400 }
       );
     }
 
-    const name = `${firstName} ${lastName}`;
-
     const updatedUser = await prisma.user.update({
       where: { id: params.userId },
-      data: {
-        name,
-        email,
-      },
+      data: dataToUpdate,
     });
 
     // Exclude password from the returned user object

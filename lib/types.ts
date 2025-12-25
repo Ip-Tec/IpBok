@@ -5,6 +5,7 @@ export interface User {
   image?: string | null;
   role: string;
   businessId?: string;
+  transactionsPerPage?: number;
 }
 
 export interface Transaction {
