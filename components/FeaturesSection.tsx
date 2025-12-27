@@ -63,7 +63,7 @@ const FeaturesSection = () => {
       <div className="container mx-auto px-4 md:px-6">
         {/* Section header */}
         <div className="mb-16 text-center">
-          <span className="mb-4 inline-block rounded-full bg-primary-light px-4 py-1.5 text-sm font-medium text-primary">
+          <span className="mb-4 inline-block rounded-full bg-primary-light px-4 py-1.5 text-4xl font-medium text-primary">
             Features
           </span>
           <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
@@ -71,7 +71,7 @@ const FeaturesSection = () => {
             <span className="text-gradient">Stay Organized</span>
           </h2>
           <p className="mx-auto max-w-2xl text-muted-foreground">
-            Whether you're tracking personal expenses or running a growing business, 
+            Whether you&apos;re tracking personal expenses or running a growing business, 
             our tool simplifies bookkeeping and keeps you&apos;re financially organized.
           </p>
         </div>

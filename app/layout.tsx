@@ -3,8 +3,10 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Blue Ledger - Accounting Web App",
+  title: "Ipbok",
   description: "Your Simple Accounting Companion For Individuals & Small Businesses",
+  manifest: "/manifest.json",
+  themeColor: "#2A2A3D",
 };
 
 export default function RootLayout({

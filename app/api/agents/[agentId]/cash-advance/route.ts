@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { Role, PaymentMethod } from '@/src/generated/enums';
 // import { TransactionStatus } from '@/src/generated/client';
 
-export async function POST(req: Request, context: { params: { agentId:string } }) {
+export async function POST(req: Request, context: { params: Promise<{ agentId: string; }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -20,10 +20,11 @@ export async function POST(req: Request, context: { params: { agentId:string } }
     const body = await req.json();
     const { amount, description } = body;
     
+    const resolvedParams = await context.params;
     // Workaround for a bug where agentId may not be available in context.params
     const url = new URL(req.url);
     const pathSegments = url.pathname.split('/');
-    const agentId = pathSegments[3] || context.params.agentId;
+    const agentId = pathSegments[3] || resolvedParams.agentId;
 
     if (!amount) {
       return NextResponse.json(

@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
   if (startDate) {
     const from = new Date(startDate);
     from.setHours(0, 0, 0, 0);
-    let to = endDate ? new Date(endDate) : new Date(from);
+    const to = endDate ? new Date(endDate) : new Date(from);
     to.setHours(23, 59, 59, 999);
     where.AND.push({ date: { gte: from, lte: to } });
   }

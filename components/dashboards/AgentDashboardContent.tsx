@@ -397,7 +397,7 @@ const AgentDashboardContent = (user: User) => {
       {/* D. Agent – Today’s Transactions (Full width, separate from the above grid) */}
       <div className="mt-6">
         <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
-          <h3 className="text-lg font-semibold mb-4">Today’s Transactions</h3>
+          <h3 className="text-lg font-semibold mb-4">Today&apos;s Transactions</h3>
           {isLoadingTransactions ? (
             <p className="text-center text-gray-500 dark:text-gray-400">
               Loading transactions...
