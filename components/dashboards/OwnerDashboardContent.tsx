@@ -1,10 +1,9 @@
 "use client";
 import { User } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
-  ArrowRightLeft,
   FileCheck,
-  FileText,
   CheckCircle,
   AlertCircle,
   PlusCircle,
@@ -12,8 +11,6 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
-  ArrowUp,
-  ArrowDown,
   Activity,
   UserCheck,
 } from "lucide-react";
@@ -31,14 +28,12 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import KpiCard from "./KpiCard";
-import { useOwnerDashboardData } from "@/hooks/useOwnerDashboardData";
+import { Notification } from '@/src/generated/models';
 import { GiveCashDialog } from "./agents/GiveCashDialog";
-import {
-  Dialog,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { NotificationBell } from "@/components/NotificationBell";
 import { AgentProfitSummary } from "./agents/AgentProfitSummary";
+import { useOwnerDashboardData } from "@/hooks/useOwnerDashboardData";
 
 ChartJS.register(
   CategoryScale,
@@ -73,7 +68,24 @@ const TabButton = ({ name, activeTab, setActiveTab }: TabButtonProps) => (
 const OwnerDashboardContent = (user: User) => {
   const [activeTab, setActiveTab] = useState("Overview");
   const [isGiveCashDialogOpen, setIsGiveCashDialogOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const { data, isLoading, error, refresh } = useOwnerDashboardData();
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('/api/notifications');
+        if (response.ok) {
+          const data: Notification[] = await response.json();
+          setNotifications(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
 
   const chartOptions = {
     responsive: true,
@@ -83,7 +95,7 @@ const OwnerDashboardContent = (user: User) => {
       },
       title: {
         display: true,
-        text: "Chart.js Bar Chart",
+        text: "Bar Chart",
       },
     },
   };
@@ -91,7 +103,9 @@ const OwnerDashboardContent = (user: User) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="text-2xl font-semibold text-gray-900 dark:text-white">Loading...</div>
+        <div className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -121,6 +135,33 @@ const OwnerDashboardContent = (user: User) => {
   );
   const difference = totalSubmittedCash - totalExpectedCash;
 
+  const agentProfitData = {
+    labels: dailyReconciliation.map((agent: any) => agent.name),
+    datasets: [
+      {
+        label: "Profit",
+        data: dailyReconciliation.map((agent: any) => agent.charges || 0),
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(153, 102, 255, 0.5)",
+          "rgba(255, 159, 64, 0.5)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
     <>
       <header className="flex items-center justify-between p-4 bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -129,19 +170,25 @@ const OwnerDashboardContent = (user: User) => {
         </h1>
         <div className="flex items-center space-x-2">
           <NotificationBell />
-          <Dialog open={isGiveCashDialogOpen} onOpenChange={setIsGiveCashDialogOpen}>
+          <Dialog
+            open={isGiveCashDialogOpen}
+            onOpenChange={setIsGiveCashDialogOpen}
+          >
             <DialogTrigger asChild>
-              <Button variant="outline" onClick={() => setIsGiveCashDialogOpen(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsGiveCashDialogOpen(true)}
+              >
                 <PlusCircle className="w-4 h-4 mr-2" /> Cash Given to Agents
               </Button>
             </DialogTrigger>
-            <GiveCashDialog 
-              open={isGiveCashDialogOpen} 
-              onOpenChange={setIsGiveCashDialogOpen} 
+            <GiveCashDialog
+              open={isGiveCashDialogOpen}
+              onOpenChange={setIsGiveCashDialogOpen}
               onCashGiven={() => {
                 refresh();
                 setIsGiveCashDialogOpen(false);
-              }} 
+              }}
             />
           </Dialog>
           <Button>
@@ -221,7 +268,7 @@ const OwnerDashboardContent = (user: User) => {
                       <h4 className="text-md font-semibold text-center">
                         Revenue vs Expenses
                       </h4>
-                      <div className="h-64">
+                      <div className="h-80">
                         <Bar
                           options={chartOptions}
                           data={charts.revenueVsExpensesData}
@@ -230,10 +277,10 @@ const OwnerDashboardContent = (user: User) => {
                     </div>
                     <div>
                       <h4 className="text-md font-semibold text-center">
-                        Cash vs Bank Ratio
+                        Agent Profit Distribution
                       </h4>
-                      <div className="h-64">
-                        <Doughnut data={charts.cashVsBankData} />
+                      <div className="h-80">
+                        <Doughnut data={agentProfitData} />
                       </div>
                     </div>
                   </div>
@@ -246,17 +293,64 @@ const OwnerDashboardContent = (user: User) => {
                     Alerts & Notifications
                   </h3>
                   <ul className="mt-4 space-y-4">
-                    <li className="flex">
-                      <AlertCircle className="flex-shrink-0 w-5 h-5 mt-1 text-yellow-500" />
-                      <div className="ml-3">
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
-                          Feature coming soon
+                    <div className="flex flex-col max-h-96 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="p-4 text-sm text-gray-500">
+                          No notifications yet.
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          now
-                        </p>
-                      </div>
-                    </li>
+                      ) : (
+                        notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`p-4 border-b-4 ${
+                              !notification.isRead &&
+                              ""
+                            }`}
+                          >
+                            {notification.link ? (
+                              <Link
+                                href={notification.link}
+                                className="hover:underline"
+                              >
+                                <p className="text-sm">
+                                  {notification.message}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(
+                                    notification.createdAt
+                                  ).toLocaleString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  })}
+                                </p>
+                              </Link>
+                            ) : (
+                              <div>
+                                <p className="text-sm">
+                                  {notification.message}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(
+                                    notification.createdAt
+                                  ).toLocaleString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  })}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </ul>
                 </div>
               </div>
@@ -408,7 +502,7 @@ const OwnerDashboardContent = (user: User) => {
                         <td className="px-6 py-4">{tx.datetime}</td>
                         <td className="px-6 py-4">{tx.agent}</td>
                         <td className="px-6 py-4">{tx.type}</td>
-                        <td className="px-6 py-4">{tx.method}</td>
+                        <td className="px-6 py-4">{tx.method}.</td>
                         <td className="px-6 py-4">
                           ₦{tx.amount.toLocaleString()}
                         </td>

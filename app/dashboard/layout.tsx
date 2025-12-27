@@ -126,7 +126,7 @@ export default function DashboardLayout({
           </button>
           <NotificationBell />
         </header>
-        <div className="flex-1 p-4">{children}</div>
+        <div className="flex-1">{children}</div>
       </main>
     </div>
   );

@@ -24,7 +24,7 @@ const AgentSummaryCardsComponent: React.FC<AgentSummaryCardsProps> = ({ summary 
   } = summary || {};
 
   return (
-    <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-1 lg:grid-cols-4">
       <KpiCard
         title="Today's Total Collected"
         value={`₦${(todayTotalCollected || 0).toFixed(2)}`}

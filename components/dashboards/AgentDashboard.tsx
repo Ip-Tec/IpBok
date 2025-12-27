@@ -33,7 +33,6 @@ import { Label } from "@/components/ui/label";
 import AddTransactionForm from "../agent/AddTransactionForm";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
 import { CashConfirmationCard } from "./agents/CashConfirmationCard";
-import { NotificationBell } from "@/components/NotificationBell";
 
 const AgentDashboard = (user: User) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -238,8 +237,6 @@ const AgentDashboard = (user: User) => {
             onClick={() => setIsSidebarOpen(true)}
           >
             <Menu className="w-6 h-6" />
-
-            <NotificationBell />
           </button>
           <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
             Welcome, {user.name}

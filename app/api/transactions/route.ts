@@ -7,6 +7,14 @@ import { Role } from "@/src/generated/enums";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const businessId = searchParams.get("businessId");
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const searchQuery = searchParams.get("searchQuery");
+  const status = searchParams.get("status");
+  const type = searchParams.get("type");
+  const paymentMethod = searchParams.get("paymentMethod");
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
 
   if (!businessId) {
     return NextResponse.json(
@@ -15,11 +23,58 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const skip = (page - 1) * limit;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = {
+    businessId: businessId,
+    AND: [],
+  };
+
+  if (searchQuery) {
+    where.AND.push({
+      OR: [
+        {
+          recordedBy: {
+            name: { contains: searchQuery },
+          },
+        },
+        {
+          recordedBy: {
+            email: { contains: searchQuery },
+          },
+        },
+      ],
+    });
+  }
+
+  if (status && status !== "all") {
+    where.AND.push({ status: status });
+  }
+
+  if (type && type !== "all") {
+    where.AND.push({ type: { name: type } });
+  }
+
+  if (paymentMethod && paymentMethod !== "all") {
+    where.AND.push({ paymentMethod: paymentMethod });
+  }
+
+  if (startDate) {
+    const from = new Date(startDate);
+    from.setHours(0, 0, 0, 0);
+    let to = endDate ? new Date(endDate) : new Date(from);
+    to.setHours(23, 59, 59, 999);
+    where.AND.push({ date: { gte: from, lte: to } });
+  }
+
+  if (where.AND.length === 0) {
+    delete where.AND;
+  }
+
   try {
     const transactions = await prisma.transaction.findMany({
-      where: {
-        businessId: businessId,
-      },
+      where,
       include: {
         recordedBy: {
           select: {
@@ -37,9 +92,18 @@ export async function GET(req: NextRequest) {
       orderBy: {
         date: "desc",
       },
+      skip: skip,
+      take: limit,
     });
 
-    return NextResponse.json(transactions);
+    const totalTransactions = await prisma.transaction.count({
+      where,
+    });
+
+    return NextResponse.json({
+      transactions,
+      totalPages: Math.ceil(totalTransactions / limit),
+    });
   } catch (error) {
     console.error("Error fetching transactions:", error);
     return NextResponse.json(
@@ -74,18 +138,39 @@ export async function POST(req: NextRequest) {
     } = body;
 
     // Basic validation
-    if (!type || amount === undefined || amount === null || !paymentMethod || !businessId || !userId || !date) {
+    if (
+      !type ||
+      amount === undefined ||
+      amount === null ||
+      !paymentMethod ||
+      !businessId ||
+      !userId ||
+      !date
+    ) {
       return NextResponse.json(
-        { message: "Missing required fields", details: { type, amount, paymentMethod, businessId, userId, date } },
+        {
+          message: "Missing required fields",
+          details: { type, amount, paymentMethod, businessId, userId, date },
+        },
         { status: 400 }
       );
     }
 
     // Validate payment method enum
-    const validPaymentMethods = ["CASH", "ATM_CARD", "BANK_TRANSFER", "MOBILE_MONEY", "BANK"];
+    const validPaymentMethods = [
+      "CASH",
+      "ATM_CARD",
+      "BANK_TRANSFER",
+      "MOBILE_MONEY",
+      "BANK",
+    ];
     if (!validPaymentMethods.includes(paymentMethod)) {
       return NextResponse.json(
-        { message: `Invalid payment method: ${paymentMethod}. Must be one of: ${validPaymentMethods.join(", ")}` },
+        {
+          message: `Invalid payment method: ${paymentMethod}. Must be one of: ${validPaymentMethods.join(
+            ", "
+          )}`,
+        },
         { status: 400 }
       );
     }
@@ -136,7 +221,9 @@ export async function POST(req: NextRequest) {
       } catch (error) {
         console.error(`Failed to create transaction type ${type}:`, error);
         return NextResponse.json(
-          { message: `Transaction type '${type}' not found and could not be created` },
+          {
+            message: `Transaction type '${type}' not found and could not be created`,
+          },
           { status: 500 }
         );
       }
@@ -178,7 +265,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        const message = `${session.user.name || 'An agent'} recorded a new ${
+        const message = `${session.user.name || "An agent"} recorded a new ${
           transactionType.name
         } of ${amount}.`;
 
@@ -187,12 +274,12 @@ export async function POST(req: NextRequest) {
             data: {
               userId: owner.id,
               message: message,
-              link: '/dashboard/transactions',
+              link: "/dashboard/transactions",
             },
           });
         }
       } catch (notificationError) {
-        console.error('Failed to create notification:', notificationError);
+        console.error("Failed to create notification:", notificationError);
         // Do not block the response for a notification failure
       }
     }

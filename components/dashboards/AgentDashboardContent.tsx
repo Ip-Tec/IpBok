@@ -144,8 +144,8 @@ const AgentDashboardContent = (user: User) => {
           description: `HTTP error! status: ${response.status}`,
           variant: "destructive",
         });
-      const data: Transaction[] = await response.json();
-      setTransactionsData(data);
+      const data = await response.json();
+      setTransactionsData(data.transactions);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
       toast({
@@ -292,16 +292,16 @@ const AgentDashboardContent = (user: User) => {
 
   return (
     <>
-      <header className="flex items-center justify-between p-4 bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+      <header className="flex w-full items-center justify-between p-4 bg-white border-b dark:bg-gray-800 dark:border-gray-700">
         <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
           Welcome, {user.name}
         </h1>
       </header>
-      <div className="p-8 text-gray-800 dark:text-gray-200">
+      <div className="w-full p-8 text-gray-800 dark:text-gray-200">
         {/* Grid for Summary, Task Status, Reconciliation, Notifications */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* A. Agent – Top Summary Cards */}
-          <div className="md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
+          <div className="sm:col-span-1 md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
             {isLoadingSummary ? (
               <p className="text-center text-gray-500 dark:text-gray-400">

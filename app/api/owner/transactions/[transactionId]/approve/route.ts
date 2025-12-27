@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { Role } from '@/src/generated/enums';
 
-export async function POST(req: Request, { params }: { params: { transactionId: string } }) {
+export async function POST(req: Request, context: { params: { transactionId: string } }) {
   const session = await getServerSession(authOptions);
 
   // 1. Authenticate and authorize the user as an OWNER
@@ -17,7 +17,7 @@ export async function POST(req: Request, { params }: { params: { transactionId: 
   }
 
   try {
-    const { transactionId } = params;
+    const { transactionId } = context.params;
 
     // 2. Find the transaction and verify it belongs to the owner's business
     const transaction = await prisma.transaction.findFirst({

@@ -85,7 +85,7 @@ const SideNav = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 flex flex-col w-64 px-4 py-8 overflow-y-auto bg-white border-r transform lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700",
+          "fixed inset-y-0 left-0 z-30 flex flex-col w-80 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-white border-r transform lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

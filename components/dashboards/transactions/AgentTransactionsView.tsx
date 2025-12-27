@@ -47,8 +47,8 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
         });
         // throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data: Transaction[] = await response.json();
-      setTransactionsData(data);
+      const data = await response.json();
+      setTransactionsData(data.transactions);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
       toast({

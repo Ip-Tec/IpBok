@@ -16,6 +16,7 @@ import { DateRange } from "react-day-picker";
 import { DatePickerWithRange } from "@/components/ui/DatePickerWithRange";
 import { Transaction } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const OwnerTransactionsView = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -33,33 +34,67 @@ const OwnerTransactionsView = () => {
     dateRange: undefined,
     status: "all",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const transactionsPerPage = 10;
 
-  const fetchTransactions = useCallback(async () => {
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  const fetchTransactions = useCallback(async (page: number, query: string) => {
     if (!session?.user?.businessId) return;
     setIsLoading(true);
+
+    const params = new URLSearchParams({
+      businessId: session.user.businessId,
+      page: page.toString(),
+      limit: transactionsPerPage.toString(),
+    });
+
+    if (query) {
+      params.append("searchQuery", query);
+    }
+    if (filters.status !== "all") {
+      params.append("status", filters.status);
+    }
+    if (filters.type !== "all") {
+      params.append("type", filters.type);
+    }
+    if (filters.paymentMethod !== "all") {
+      params.append("paymentMethod", filters.paymentMethod);
+    }
+    if (filters.dateRange?.from) {
+      params.append("startDate", filters.dateRange.from.toISOString());
+    }
+    if (filters.dateRange?.to) {
+      params.append("endDate", filters.dateRange.to.toISOString());
+    }
+
     try {
-      const response = await fetch(
-        `/api/transactions?businessId=${session.user.businessId}`
-      );
+      const response = await fetch(`/api/transactions?${params.toString()}`);
       if (!response.ok) {
         toast.error("Could not fetch transactions.");
         throw new Error("Failed to fetch transactions");
       }
       const data = await response.json();
-      setTransactions(data);
+      setTransactions(data.transactions);
+      setTotalPages(data.totalPages);
     } catch (error) {
       console.error(error);
       toast.error("Could not fetch transactions.");
     } finally {
       setIsLoading(false);
     }
-  }, [session]);
+  }, [session, transactionsPerPage, filters]);
 
   useEffect(() => {
     if (session) {
-      fetchTransactions();
+      fetchTransactions(currentPage, debouncedSearchQuery);
     }
-  }, [session, fetchTransactions]);
+  }, [session, currentPage, debouncedSearchQuery, fetchTransactions, filters]);
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, filters]);
 
   const handleApprove = async (transactionId: string) => {
     try {
@@ -74,7 +109,7 @@ const OwnerTransactionsView = () => {
         throw new Error(errorData.message || "Failed to approve transaction");
       }
       toast.success("Transaction approved successfully!");
-      fetchTransactions(); // Refresh data
+      fetchTransactions(currentPage, debouncedSearchQuery); // Refresh data for the current page
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -84,36 +119,13 @@ const OwnerTransactionsView = () => {
     }
   };
 
-  const filteredTransactions = transactions.filter((transaction) => {
-    const searchMatch =
-      transaction.recordedBy?.name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      transaction.recordedBy?.email
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
 
-    const typeMatch =
-      filters.type === "all" || transaction.type.name === filters.type;
-
-    const statusMatch =
-      filters.status === "all" || transaction.status === filters.status;
-
-    const paymentMethodMatch =
-      filters.paymentMethod === "all" ||
-      transaction.paymentMethod === filters.paymentMethod;
-
-    const dateMatch =
-      !filters.dateRange ||
-      (filters.dateRange.from &&
-        filters.dateRange.to &&
-        new Date(transaction.date) >= filters.dateRange.from &&
-        new Date(transaction.date) <= filters.dateRange.to);
-
-    return (
-      searchMatch && typeMatch && paymentMethodMatch && dateMatch && statusMatch
-    );
-  });
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   return (
     <div className="p-8">
@@ -226,14 +238,14 @@ const OwnerTransactionsView = () => {
                   Loading transactions...
                 </td>
               </tr>
-            ) : filteredTransactions.length === 0 ? (
+            ) : transactions.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-6 text-center">
                   No transactions found.
                 </td>
               </tr>
             ) : (
-              filteredTransactions.map((transaction) => (
+              transactions.map((transaction) => (
                 <tr
                   key={transaction.id}
                   className="bg-white border-b last:border-b-0 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -293,6 +305,27 @@ const OwnerTransactionsView = () => {
             )}
           </tbody>
         </table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePreviousPage}
+          disabled={currentPage <= 1}
+        >
+          Previous
+        </Button>
+        <span className="text-sm">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleNextPage}
+          disabled={currentPage >= totalPages}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );
