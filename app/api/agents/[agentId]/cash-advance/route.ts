@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { Role, PaymentMethod } from '@/src/generated/enums';
 // import { TransactionStatus } from '@/src/generated/client';
 
-export async function POST(req: Request, context: { params: Promise<{ agentId: string; }> }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ agentId: string; }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
