@@ -3,11 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { agentId: string } }
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
   try {
-    const url = new URL(req.url);
-    const agentId = url.pathname.split("/").pop();
+    const { agentId } = await params;
     const body = await req.json();
     const { name, email } = body;
 
@@ -41,10 +40,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { agentId: string } }
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
   try {
-    const { agentId } = params;
+    const { agentId } = await params;
 
     // First, delete the membership associated with the agent
     await prisma.membership.deleteMany({

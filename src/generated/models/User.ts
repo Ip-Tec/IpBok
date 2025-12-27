@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  transactionsPerPage: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  transactionsPerPage: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -32,6 +42,7 @@ export type UserMinAggregateOutputType = {
   password: string | null
   role: $Enums.Role | null
   image: string | null
+  transactionsPerPage: number | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -42,6 +53,7 @@ export type UserMaxAggregateOutputType = {
   password: string | null
   role: $Enums.Role | null
   image: string | null
+  transactionsPerPage: number | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -52,9 +64,18 @@ export type UserCountAggregateOutputType = {
   password: number
   role: number
   image: number
+  transactionsPerPage: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  transactionsPerPage?: true
+}
+
+export type UserSumAggregateInputType = {
+  transactionsPerPage?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -64,6 +85,7 @@ export type UserMinAggregateInputType = {
   password?: true
   role?: true
   image?: true
+  transactionsPerPage?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -74,6 +96,7 @@ export type UserMaxAggregateInputType = {
   password?: true
   role?: true
   image?: true
+  transactionsPerPage?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -84,6 +107,7 @@ export type UserCountAggregateInputType = {
   password?: true
   role?: true
   image?: true
+  transactionsPerPage?: true
   _all?: true
 }
 
@@ -125,6 +149,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -155,6 +191,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -167,7 +205,10 @@ export type UserGroupByOutputType = {
   password: string | null
   role: $Enums.Role
   image: string | null
+  transactionsPerPage: number
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -198,6 +239,7 @@ export type UserWhereInput = {
   password?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   image?: Prisma.StringNullableFilter<"User"> | string | null
+  transactionsPerPage?: Prisma.IntFilter<"User"> | number
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   memberships?: Prisma.MembershipListRelationFilter
@@ -216,6 +258,7 @@ export type UserOrderByWithRelationInput = {
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
+  transactionsPerPage?: Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
@@ -238,6 +281,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   image?: Prisma.StringNullableFilter<"User"> | string | null
+  transactionsPerPage?: Prisma.IntFilter<"User"> | number
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   memberships?: Prisma.MembershipListRelationFilter
@@ -256,9 +300,12 @@ export type UserOrderByWithAggregationInput = {
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
+  transactionsPerPage?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -272,6 +319,7 @@ export type UserScalarWhereWithAggregatesInput = {
   password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  transactionsPerPage?: Prisma.IntWithAggregatesFilter<"User"> | number
 }
 
 export type UserCreateInput = {
@@ -282,6 +330,7 @@ export type UserCreateInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
@@ -300,6 +349,7 @@ export type UserUncheckedCreateInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
@@ -318,6 +368,7 @@ export type UserUpdateInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
@@ -336,6 +387,7 @@ export type UserUncheckedUpdateInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
@@ -354,6 +406,7 @@ export type UserCreateManyInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
 }
 
 export type UserUpdateManyMutationInput = {
@@ -364,6 +417,7 @@ export type UserUpdateManyMutationInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -374,6 +428,7 @@ export type UserUncheckedUpdateManyInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type UserScalarRelationFilter = {
@@ -395,6 +450,11 @@ export type UserCountOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   image?: Prisma.SortOrder
+  transactionsPerPage?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  transactionsPerPage?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -405,6 +465,7 @@ export type UserMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   image?: Prisma.SortOrder
+  transactionsPerPage?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -415,6 +476,11 @@ export type UserMinOrderByAggregateInput = {
   password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   image?: Prisma.SortOrder
+  transactionsPerPage?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  transactionsPerPage?: Prisma.SortOrder
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -456,6 +522,14 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type UserCreateNestedOneWithoutNotificationsInput = {
@@ -552,6 +626,7 @@ export type UserCreateWithoutAccountsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutRecordedByInput
@@ -569,6 +644,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutRecordedByInput
@@ -602,6 +678,7 @@ export type UserUpdateWithoutAccountsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutRecordedByNestedInput
@@ -619,6 +696,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutRecordedByNestedInput
@@ -636,6 +714,7 @@ export type UserCreateWithoutSessionsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutRecordedByInput
@@ -653,6 +732,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutRecordedByInput
@@ -686,6 +766,7 @@ export type UserUpdateWithoutSessionsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutRecordedByNestedInput
@@ -703,6 +784,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutRecordedByNestedInput
@@ -720,6 +802,7 @@ export type UserCreateWithoutNotificationsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
@@ -737,6 +820,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
@@ -770,6 +854,7 @@ export type UserUpdateWithoutNotificationsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
@@ -787,6 +872,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
@@ -804,6 +890,7 @@ export type UserCreateWithoutMembershipsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutRecordedByInput
@@ -821,6 +908,7 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutRecordedByInput
@@ -854,6 +942,7 @@ export type UserUpdateWithoutMembershipsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutRecordedByNestedInput
@@ -871,6 +960,7 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutRecordedByNestedInput
@@ -888,6 +978,7 @@ export type UserCreateWithoutTransactionsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
@@ -905,6 +996,7 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
@@ -927,6 +1019,7 @@ export type UserCreateWithoutReceivedTransactionsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
@@ -944,6 +1037,7 @@ export type UserUncheckedCreateWithoutReceivedTransactionsInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
@@ -977,6 +1071,7 @@ export type UserUpdateWithoutTransactionsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
@@ -994,6 +1089,7 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
@@ -1022,6 +1118,7 @@ export type UserUpdateWithoutReceivedTransactionsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
@@ -1039,6 +1136,7 @@ export type UserUncheckedUpdateWithoutReceivedTransactionsInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
@@ -1056,6 +1154,7 @@ export type UserCreateWithoutCashAdvancesGivenInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
@@ -1073,6 +1172,7 @@ export type UserUncheckedCreateWithoutCashAdvancesGivenInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
@@ -1095,6 +1195,7 @@ export type UserCreateWithoutCashAdvancesReceivedInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutUserInput
@@ -1112,6 +1213,7 @@ export type UserUncheckedCreateWithoutCashAdvancesReceivedInput = {
   password?: string | null
   role?: $Enums.Role
   image?: string | null
+  transactionsPerPage?: number
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutUserInput
@@ -1145,6 +1247,7 @@ export type UserUpdateWithoutCashAdvancesGivenInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
@@ -1162,6 +1265,7 @@ export type UserUncheckedUpdateWithoutCashAdvancesGivenInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
@@ -1190,6 +1294,7 @@ export type UserUpdateWithoutCashAdvancesReceivedInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutUserNestedInput
@@ -1207,6 +1312,7 @@ export type UserUncheckedUpdateWithoutCashAdvancesReceivedInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionsPerPage?: Prisma.IntFieldUpdateOperationsInput | number
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutUserNestedInput
@@ -1318,6 +1424,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   password?: boolean
   role?: boolean
   image?: boolean
+  transactionsPerPage?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>
@@ -1339,9 +1446,10 @@ export type UserSelectScalar = {
   password?: boolean
   role?: boolean
   image?: boolean
+  transactionsPerPage?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "password" | "role" | "image", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "password" | "role" | "image" | "transactionsPerPage", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
@@ -1374,6 +1482,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     password: string | null
     role: $Enums.Role
     image: string | null
+    transactionsPerPage: number
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1758,6 +1867,7 @@ export interface UserFieldRefs {
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly image: Prisma.FieldRef<"User", 'String'>
+  readonly transactionsPerPage: Prisma.FieldRef<"User", 'Int'>
 }
     
 

@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { startOfDay, subDays, format } from "date-fns";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user || session.user.role !== "OWNER") {

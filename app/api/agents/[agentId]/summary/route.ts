@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
@@ -29,12 +29,10 @@ const getYesterdayDateRange = () => {
 };
 
 export async function GET(
-  request: Request,
-  { params }: { params: { agentId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ agentId: string }> }
 ) {
-  const awaitedParams = await Promise.resolve(params); // Explicitly resolve the promise
-
-  const { agentId } = awaitedParams;
+  const { agentId } = await params;
 
   if (!agentId) {
     console.error("Agent Summary API Error: agentId is undefined.");

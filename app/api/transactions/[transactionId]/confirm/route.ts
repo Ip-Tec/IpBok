@@ -1,12 +1,12 @@
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { Role } from '@/src/generated/enums';
 import { TransactionStatus } from '@/src/generated/client';
 
-export async function POST(req: Request, { params }: { params: { transactionId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ transactionId: string }> }) {
   const session = await getServerSession(authOptions);
 
   // 1. Authenticate and authorize the user as an AGENT
@@ -19,7 +19,7 @@ export async function POST(req: Request, { params }: { params: { transactionId: 
   }
 
   try {
-    const { transactionId } = params;
+    const { transactionId } = await params;
 
     // 2. Find the transaction and verify the agent is the recipient
     const transaction = await prisma.transaction.findFirst({

@@ -53,6 +53,7 @@ model User {
   notifications        Notification[]
   cashAdvancesGiven    CashAdvance[] @relation("CashAdvanceGiver")
   cashAdvancesReceived CashAdvance[] @relation("CashAdvanceReceiver")
+  transactionsPerPage  Int           @default(10)
 }
 
 model VerificationToken {

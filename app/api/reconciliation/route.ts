@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +15,7 @@ const getTodayDateRange = () => {
   return { start, end };
 };
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   console.log("Attempting to fetch reconciliation data...");
 
   const session = await getServerSession(authOptions);

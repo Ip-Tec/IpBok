@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 
 // GET /api/notifications - Fetch all notifications for the logged-in user
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -30,7 +30,7 @@ export async function GET() {
 }
 
 // PUT /api/notifications - Mark all notifications as read for the logged-in user
-export async function PUT() {
+export async function PUT(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
