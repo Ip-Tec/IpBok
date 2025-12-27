@@ -13,11 +13,11 @@ interface AddTransactionFormProps {
   onAddTransaction: (
     mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status" | "type"
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
     > & { type: "Deposit" | "Withdrawal" | "Charge" },
     chargeTransaction?: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status" | "type"
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
     > & { type: "Deposit" | "Withdrawal" | "Charge" }
   ) => void;
   transactionType: "Deposit" | "Withdrawal" | "Charge";
