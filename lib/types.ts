@@ -22,6 +22,7 @@ export interface Transaction {
     email: string;
   } | null;
   status: string;
+  recipientId?: string;
 }
 
 export interface CashAdvance {

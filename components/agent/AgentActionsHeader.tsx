@@ -20,14 +20,18 @@ interface AgentActionsHeaderProps {
   setIsFormOpen: (isOpen: boolean) => void;
   isFormOpen: boolean;
   setCurrentTransactionType: (
-    type: "Deposit" | "Withdrawal" | null
+    type: "Deposit" | "Withdrawal" | "Charge" | null
   ) => void;
-  currentTransactionType: "Deposit" | "Withdrawal" | null;
+  currentTransactionType: "Deposit" | "Withdrawal" | "Charge" | null;
   onAddTransaction: (
-    newTransaction: Omit<
+    mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status"
-    >
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" },
+    chargeTransaction?: Omit<
+      Transaction,
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" }
   ) => void;
 }
 

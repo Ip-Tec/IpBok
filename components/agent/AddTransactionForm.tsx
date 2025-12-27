@@ -57,7 +57,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     let secondaryChargeTransaction:
       | (Omit<
           Transaction,
-          "id" | "businessId" | "userId" | "date" | "status" | "type"
+          "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
         > & { type: "Deposit" | "Withdrawal" | "Charge" })
       | undefined;
 

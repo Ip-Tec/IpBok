@@ -43,6 +43,8 @@ const AgentDashboard = (user: User) => {
     "Deposit" | "Withdrawal" | null
   >(null);
 
+
+
   const [summaryCardsData, setSummaryCardsData] = useState<AgentSummaryCards>(
     {} as AgentSummaryCards
   );
@@ -116,7 +118,6 @@ const AgentDashboard = (user: User) => {
   const [systemExpectedCash, _setSystemExpectedCash] = useState<number>(1000.0);
   const [agentEnteredCash, setAgentEnteredCash] = useState<number>(0);
   const [isDayLocked, setIsDayLocked] = useState<boolean>(false);
-  const { toast } = useToast();
 
   const reconciliationDifference = React.useMemo(() => {
     return systemExpectedCash - agentEnteredCash;
