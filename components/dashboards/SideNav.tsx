@@ -63,7 +63,6 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
   );
 };
 
-
 const SideNav = ({
   user,
   isSidebarOpen,
@@ -74,10 +73,13 @@ const SideNav = ({
     <>
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-black/80 bg-opacity-50 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
+        <>
+          <div
+            className="fixed inset-0 z-20 bg-black/80 bg-opacity-50 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          ></div>
+          <NotificationBell />
+        </>
       )}
 
       {/* Sidebar */}

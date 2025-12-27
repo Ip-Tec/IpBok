@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const ownerSidebarNavLinks = [
   {
@@ -123,6 +124,7 @@ export default function DashboardLayout({
           >
             <Menu className="w-6 h-6" />
           </button>
+          <NotificationBell />
         </header>
         <div className="flex-1 p-4">{children}</div>
       </main>

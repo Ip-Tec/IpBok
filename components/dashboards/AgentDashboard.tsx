@@ -33,11 +33,13 @@ import { Label } from "@/components/ui/label";
 import AddTransactionForm from "../agent/AddTransactionForm";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
 import { CashConfirmationCard } from "./agents/CashConfirmationCard";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const AgentDashboard = (user: User) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] = useState(false);
+  const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] =
+    useState(false);
   const [currentTransactionType, setCurrentTransactionType] = useState<
     "Deposit" | "Withdrawal" | null
   >(null);
@@ -46,9 +48,9 @@ const AgentDashboard = (user: User) => {
     {} as AgentSummaryCards
   );
   const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
-  const [pendingCashAdvance, setPendingCashAdvance] = useState<CashAdvance | null>(null);
+  const [pendingCashAdvance, setPendingCashAdvance] =
+    useState<CashAdvance | null>(null);
   const [businessPhone, setBusinessPhone] = useState<string | null>(null);
-
 
   const fetchSummaryData = useCallback(async () => {
     if (!user.id) {
@@ -117,7 +119,6 @@ const AgentDashboard = (user: User) => {
   const [isDayLocked, setIsDayLocked] = useState<boolean>(false);
   const { toast } = useToast();
 
-
   const reconciliationDifference = React.useMemo(() => {
     return systemExpectedCash - agentEnteredCash;
   }, [systemExpectedCash, agentEnteredCash]);
@@ -171,7 +172,7 @@ const AgentDashboard = (user: User) => {
           userId: user.id,
           date: new Date().toISOString(),
         };
-        
+
         const response = await fetch("/api/transactions", {
           method: "POST",
           headers: {
@@ -181,13 +182,17 @@ const AgentDashboard = (user: User) => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Failed to add transaction" }));
+          const errorData = await response
+            .json()
+            .catch(() => ({ message: "Failed to add transaction" }));
           toast({
             title: "Error",
             description: errorData.message || "Failed to add transaction.",
             variant: "destructive",
           });
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+          throw new Error(
+            errorData.message || `HTTP error! status: ${response.status}`
+          );
         }
       }
 
@@ -233,13 +238,14 @@ const AgentDashboard = (user: User) => {
             onClick={() => setIsSidebarOpen(true)}
           >
             <Menu className="w-6 h-6" />
+
+            <NotificationBell />
           </button>
           <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
             Welcome, {user.name}
           </h1>
         </header>
         <div className="p-3 text-gray-800 dark:text-gray-200">
-
           {pendingCashAdvance && (
             <CashConfirmationCard
               cashAdvance={pendingCashAdvance}
@@ -323,8 +329,6 @@ const AgentDashboard = (user: User) => {
           </Button>
         </div>
 
-
-
         {/* D. Agent – Today’s Transactions (Full width, separate from the above grid) */}
         <div className="mt-6">
           <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
@@ -335,7 +339,10 @@ const AgentDashboard = (user: User) => {
       </main>
 
       {/* Fixed Add Transaction Button */}
-      <Dialog open={isAddTransactionDialogOpen} onOpenChange={setIsAddTransactionDialogOpen}>
+      <Dialog
+        open={isAddTransactionDialogOpen}
+        onOpenChange={setIsAddTransactionDialogOpen}
+      >
         <DialogTrigger asChild>
           <Button
             className="fixed bottom-4 right-4 rounded-full p-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -374,7 +381,6 @@ const AgentDashboard = (user: User) => {
             >
               Add Withdrawal
             </Button>
-            
           </div>
         </DialogContent>
       </Dialog>
@@ -419,11 +425,8 @@ const AgentDashboard = (user: User) => {
           />
         </DialogContent>
       </Dialog>
-
-
     </div>
   );
 };
 
 export default AgentDashboard;
-

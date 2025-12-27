@@ -45,7 +45,6 @@ model User {
   password             String?
   role                 Role          @default(AGENT)
   image                String?
-  transactionsPerPage  Int           @default(10)
   accounts             Account[]
   sessions             Session[]
   memberships          Membership[]

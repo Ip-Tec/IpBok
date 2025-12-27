@@ -31,10 +31,6 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
 
   const [transactionsData, setTransactionsData] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [transactionsPerPage, setTransactionsPerPage] = useState(
-    user?.transactionsPerPage || 10
-  );
 
   const fetchTransactions = useCallback(async () => {
     if (!user.businessId) return; // Don't fetch if business ID is not available
@@ -145,15 +141,6 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
     [user.businessId, user.id, toast, fetchTransactions]
   );
 
-  const indexOfLastTransaction = currentPage * transactionsPerPage;
-  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const currentTransactions = transactionsData.slice(
-    indexOfFirstTransaction,
-    indexOfLastTransaction
-  );
-
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
   return (
     <div className="p-8">
       <header className="flex items-center justify-between pb-4 border-b">
@@ -213,36 +200,11 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
           </p>
         ) : (
           <AgentTransactionsTable
-            transactions={currentTransactions}
+            transactions={transactionsData}
             user={user}
             onTransactionUpdate={fetchTransactions}
           />
         )}
-      </div>
-      <div className="flex justify-between items-center mt-4">
-        <div>
-          <p className="text-sm text-gray-700 dark:text-gray-400">
-            Showing {indexOfFirstTransaction + 1} to{" "}
-            {Math.min(indexOfLastTransaction, transactionsData.length)} of{" "}
-            {transactionsData.length} transactions
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => paginate(currentPage + 1)}
-            disabled={
-              indexOfLastTransaction >= transactionsData.length
-            }
-          >
-            Next
-          </Button>
-        </div>
       </div>
 
       {/* Add Transaction Dialogs */}

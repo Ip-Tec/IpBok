@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import AddTransactionForm from "./AddTransactionForm";
-
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface AgentActionsHeaderProps {
   user: User;
@@ -19,9 +19,7 @@ interface AgentActionsHeaderProps {
   isSidebarOpen: boolean;
   setIsFormOpen: (isOpen: boolean) => void;
   isFormOpen: boolean;
-  setCurrentTransactionType: (
-    type: "Deposit" | "Withdrawal" | null
-  ) => void;
+  setCurrentTransactionType: (type: "Deposit" | "Withdrawal" | null) => void;
   currentTransactionType: "Deposit" | "Withdrawal" | null;
   onAddTransaction: (
     newTransaction: Omit<
@@ -49,6 +47,8 @@ const AgentActionsHeader: React.FC<AgentActionsHeaderProps> = ({
           onClick={() => setIsSidebarOpen(true)}
         >
           <Menu className="w-6 h-6" />
+
+          <NotificationBell />
         </button>
         <div className="flex-1">
           <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
