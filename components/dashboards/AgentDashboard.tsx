@@ -43,6 +43,8 @@ const AgentDashboard = (user: User) => {
     "Deposit" | "Withdrawal" | null
   >(null);
 
+  const { toast } = useToast();
+
 
 
   const [summaryCardsData, setSummaryCardsData] = useState<AgentSummaryCards>(
@@ -77,7 +79,7 @@ const AgentDashboard = (user: User) => {
       });
       setSummaryCardsData({} as AgentSummaryCards); // Reset on error
     }
-  }, [user.id, toast]);
+  }, [user.id]);
 
   useEffect(() => {
     fetchSummaryData();
@@ -94,19 +96,18 @@ const AgentDashboard = (user: User) => {
     {
       id: uuidv4(),
       businessId: user.businessId || "unknown",
-      userId: user.id,
-      type: "Deposit",
+      type: { name: "Deposit" },
       amount: 500.0,
       paymentMethod: "cash",
       date: new Date().toISOString(),
       status: "pending",
       description: "Initial cash deposit",
+      recordedBy: { name: user.name, email: user.email || '' },
     },
     {
       id: uuidv4(),
       businessId: user.businessId || "unknown",
-      userId: user.id,
-      type: "Withdrawal",
+      type: { name: "Withdrawal" },
       amount: 100.0,
       paymentMethod: "bank",
       date: new Date().toISOString(),

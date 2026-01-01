@@ -4,7 +4,7 @@ import { UserPlus, User, Search, Trash2, Pencil, DollarSign } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
-import { AddAgentDialog } from "./AddAgentDialog";
+import { AddMemberDialog } from "./AddMemberDialog";
 import { EditAgentDialog } from "./EditAgentDialog";
 import { GiveCashDialog } from "./GiveCashDialog";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ interface Agent {
   id: string;
   name: string | null;
   email: string;
+  role: string;
   status: string;
   dailyTransactionCount: number;
 }
@@ -44,14 +45,14 @@ const OwnerAgentsView = () => {
         `/api/agents?businessId=${session.user.businessId}`
       );
       if (!response.ok) {
-        toast.error("Could not fetch agents.");
+        toast.error("Could not fetch team members.");
         throw new Error("Failed to fetch agents");
       }
       const data = await response.json();
       setAgents(data);
     } catch (error) {
       console.error(error);
-      toast.error("Could not fetch agents.");
+      toast.error("Could not fetch team members.");
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +65,7 @@ const OwnerAgentsView = () => {
   }, [session]);
 
   const handleDelete = async (agentId: string) => {
-    if (!confirm("Are you sure you want to delete this agent?")) {
+    if (!confirm("Are you sure you want to delete this member?")) {
       return;
     }
 
@@ -75,10 +76,10 @@ const OwnerAgentsView = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete agent");
+        throw new Error(errorData.message || "Failed to delete member");
       }
 
-      toast.success("Agent deleted successfully!");
+      toast.success("Member deleted successfully!");
       fetchAgents(); // Refresh the list
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -104,13 +105,13 @@ const OwnerAgentsView = () => {
       <header className="flex items-center justify-between pb-4 border-b">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-            Manage Agents
+            Manage Team
           </h1>
           <p className="mt-1 text-gray-500 dark:text-gray-400">
-            View, add, and manage your agents.
+            View, add, and manage your team members.
           </p>
         </div>
-        <AddAgentDialog onAgentAdded={fetchAgents} />
+        <AddMemberDialog onMemberAdded={fetchAgents} />
       </header>
 
       <div className="flex items-center justify-between my-6">
@@ -130,7 +131,10 @@ const OwnerAgentsView = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Agent
+                Member
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Role
               </th>
               <th scope="col" className="px-6 py-3">
                 Today&apos;s Transactions
@@ -146,14 +150,14 @@ const OwnerAgentsView = () => {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={4} className="p-6 text-center">
-                  Loading agents...
+                <td colSpan={5} className="p-6 text-center">
+                  Loading team...
                 </td>
               </tr>
             ) : filteredAgents.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-6 text-center">
-                  No agents found. Add one to get started.
+                <td colSpan={5} className="p-6 text-center">
+                  No team members found. Add one to get started.
                 </td>
               </tr>
             ) : (
@@ -176,6 +180,11 @@ const OwnerAgentsView = () => {
                       </div>
                     </div>
                   </th>
+                  <td className="px-6 py-4">
+                     <span className="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                        {agent.role}
+                     </span>
+                  </td>
                   <td className="px-6 py-4">{agent.dailyTransactionCount}</td>
                   <td className="px-6 py-4">
                     <span
@@ -189,14 +198,17 @@ const OwnerAgentsView = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleGiveCash(agent)}
-                        aria-label="Give cash"
-                    >
-                        <DollarSign className="w-4 h-4 text-green-500 dark:text-green-400" />
-                    </Button>
+                    {/* Only show Give Cash for Agents */}
+                    {agent.role === "AGENT" && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleGiveCash(agent)}
+                            aria-label="Give cash"
+                        >
+                            <DollarSign className="w-4 h-4 text-green-500 dark:text-green-400" />
+                        </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"

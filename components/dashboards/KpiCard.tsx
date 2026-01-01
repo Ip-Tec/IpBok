@@ -4,22 +4,22 @@ import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
 const KpiCard = ({ title, value, description, icon: Icon, change, changeType }: { title: string, value: string, description?: string, icon: React.ElementType, change?: string, changeType?: 'increase' | 'decrease' }) => (
-  <div className="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+  <div className="p-4 bg-card rounded-lg shadow border border-border">
     <div className="flex items-center">
-      <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
-        <Icon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+      <div className="p-3 bg-primary/10 rounded-full">
+        <Icon className="w-6 h-6 text-primary" />
       </div>
       <div className="ml-4">
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <p className="text-sm font-medium text-muted-foreground">
           {title}
         </p>
-        <p className="text-xl font-bold text-gray-800 dark:text-white">
+        <p className="text-xl font-bold text-foreground">
           {value}
         </p>
       </div>
     </div>
     {description && (
-      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-2 text-sm text-muted-foreground">
         {description}
       </p>
     )}
@@ -38,7 +38,7 @@ const KpiCard = ({ title, value, description, icon: Icon, change, changeType }: 
           )}
           {change}
         </span>
-        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+        <span className="ml-2 text-sm text-muted-foreground">
           vs last period
         </span>
       </div>

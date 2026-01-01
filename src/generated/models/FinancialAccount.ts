@@ -40,6 +40,7 @@ export type FinancialAccountMinAggregateOutputType = {
   type: $Enums.AccountType | null
   balance: number | null
   businessId: string | null
+  holderId: string | null
 }
 
 export type FinancialAccountMaxAggregateOutputType = {
@@ -48,6 +49,7 @@ export type FinancialAccountMaxAggregateOutputType = {
   type: $Enums.AccountType | null
   balance: number | null
   businessId: string | null
+  holderId: string | null
 }
 
 export type FinancialAccountCountAggregateOutputType = {
@@ -56,6 +58,7 @@ export type FinancialAccountCountAggregateOutputType = {
   type: number
   balance: number
   businessId: number
+  holderId: number
   _all: number
 }
 
@@ -74,6 +77,7 @@ export type FinancialAccountMinAggregateInputType = {
   type?: true
   balance?: true
   businessId?: true
+  holderId?: true
 }
 
 export type FinancialAccountMaxAggregateInputType = {
@@ -82,6 +86,7 @@ export type FinancialAccountMaxAggregateInputType = {
   type?: true
   balance?: true
   businessId?: true
+  holderId?: true
 }
 
 export type FinancialAccountCountAggregateInputType = {
@@ -90,6 +95,7 @@ export type FinancialAccountCountAggregateInputType = {
   type?: true
   balance?: true
   businessId?: true
+  holderId?: true
   _all?: true
 }
 
@@ -185,6 +191,7 @@ export type FinancialAccountGroupByOutputType = {
   type: $Enums.AccountType
   balance: number
   businessId: string
+  holderId: string | null
   _count: FinancialAccountCountAggregateOutputType | null
   _avg: FinancialAccountAvgAggregateOutputType | null
   _sum: FinancialAccountSumAggregateOutputType | null
@@ -216,7 +223,9 @@ export type FinancialAccountWhereInput = {
   type?: Prisma.EnumAccountTypeFilter<"FinancialAccount"> | $Enums.AccountType
   balance?: Prisma.FloatFilter<"FinancialAccount"> | number
   businessId?: Prisma.StringFilter<"FinancialAccount"> | string
+  holderId?: Prisma.StringNullableFilter<"FinancialAccount"> | string | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
+  holder?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.TransactionListRelationFilter
 }
 
@@ -226,7 +235,9 @@ export type FinancialAccountOrderByWithRelationInput = {
   type?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   businessId?: Prisma.SortOrder
+  holderId?: Prisma.SortOrderInput | Prisma.SortOrder
   business?: Prisma.BusinessOrderByWithRelationInput
+  holder?: Prisma.UserOrderByWithRelationInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   _relevance?: Prisma.FinancialAccountOrderByRelevanceInput
 }
@@ -240,7 +251,9 @@ export type FinancialAccountWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.EnumAccountTypeFilter<"FinancialAccount"> | $Enums.AccountType
   balance?: Prisma.FloatFilter<"FinancialAccount"> | number
   businessId?: Prisma.StringFilter<"FinancialAccount"> | string
+  holderId?: Prisma.StringNullableFilter<"FinancialAccount"> | string | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
+  holder?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   transactions?: Prisma.TransactionListRelationFilter
 }, "id">
 
@@ -250,6 +263,7 @@ export type FinancialAccountOrderByWithAggregationInput = {
   type?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   businessId?: Prisma.SortOrder
+  holderId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FinancialAccountCountOrderByAggregateInput
   _avg?: Prisma.FinancialAccountAvgOrderByAggregateInput
   _max?: Prisma.FinancialAccountMaxOrderByAggregateInput
@@ -266,6 +280,7 @@ export type FinancialAccountScalarWhereWithAggregatesInput = {
   type?: Prisma.EnumAccountTypeWithAggregatesFilter<"FinancialAccount"> | $Enums.AccountType
   balance?: Prisma.FloatWithAggregatesFilter<"FinancialAccount"> | number
   businessId?: Prisma.StringWithAggregatesFilter<"FinancialAccount"> | string
+  holderId?: Prisma.StringNullableWithAggregatesFilter<"FinancialAccount"> | string | null
 }
 
 export type FinancialAccountCreateInput = {
@@ -274,6 +289,7 @@ export type FinancialAccountCreateInput = {
   type: $Enums.AccountType
   balance?: number
   business: Prisma.BusinessCreateNestedOneWithoutAccountsInput
+  holder?: Prisma.UserCreateNestedOneWithoutHeldAccountsInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutAccountInput
 }
 
@@ -283,6 +299,7 @@ export type FinancialAccountUncheckedCreateInput = {
   type: $Enums.AccountType
   balance?: number
   businessId: string
+  holderId?: string | null
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutAccountInput
 }
 
@@ -292,6 +309,7 @@ export type FinancialAccountUpdateInput = {
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
   business?: Prisma.BusinessUpdateOneRequiredWithoutAccountsNestedInput
+  holder?: Prisma.UserUpdateOneWithoutHeldAccountsNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutAccountNestedInput
 }
 
@@ -301,6 +319,7 @@ export type FinancialAccountUncheckedUpdateInput = {
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
   businessId?: Prisma.StringFieldUpdateOperationsInput | string
+  holderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutAccountNestedInput
 }
 
@@ -310,6 +329,7 @@ export type FinancialAccountCreateManyInput = {
   type: $Enums.AccountType
   balance?: number
   businessId: string
+  holderId?: string | null
 }
 
 export type FinancialAccountUpdateManyMutationInput = {
@@ -325,6 +345,7 @@ export type FinancialAccountUncheckedUpdateManyInput = {
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
   businessId?: Prisma.StringFieldUpdateOperationsInput | string
+  holderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FinancialAccountListRelationFilter = {
@@ -349,6 +370,7 @@ export type FinancialAccountCountOrderByAggregateInput = {
   type?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   businessId?: Prisma.SortOrder
+  holderId?: Prisma.SortOrder
 }
 
 export type FinancialAccountAvgOrderByAggregateInput = {
@@ -361,6 +383,7 @@ export type FinancialAccountMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   businessId?: Prisma.SortOrder
+  holderId?: Prisma.SortOrder
 }
 
 export type FinancialAccountMinOrderByAggregateInput = {
@@ -369,6 +392,7 @@ export type FinancialAccountMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   businessId?: Prisma.SortOrder
+  holderId?: Prisma.SortOrder
 }
 
 export type FinancialAccountSumOrderByAggregateInput = {
@@ -378,6 +402,48 @@ export type FinancialAccountSumOrderByAggregateInput = {
 export type FinancialAccountNullableScalarRelationFilter = {
   is?: Prisma.FinancialAccountWhereInput | null
   isNot?: Prisma.FinancialAccountWhereInput | null
+}
+
+export type FinancialAccountCreateNestedManyWithoutHolderInput = {
+  create?: Prisma.XOR<Prisma.FinancialAccountCreateWithoutHolderInput, Prisma.FinancialAccountUncheckedCreateWithoutHolderInput> | Prisma.FinancialAccountCreateWithoutHolderInput[] | Prisma.FinancialAccountUncheckedCreateWithoutHolderInput[]
+  connectOrCreate?: Prisma.FinancialAccountCreateOrConnectWithoutHolderInput | Prisma.FinancialAccountCreateOrConnectWithoutHolderInput[]
+  createMany?: Prisma.FinancialAccountCreateManyHolderInputEnvelope
+  connect?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+}
+
+export type FinancialAccountUncheckedCreateNestedManyWithoutHolderInput = {
+  create?: Prisma.XOR<Prisma.FinancialAccountCreateWithoutHolderInput, Prisma.FinancialAccountUncheckedCreateWithoutHolderInput> | Prisma.FinancialAccountCreateWithoutHolderInput[] | Prisma.FinancialAccountUncheckedCreateWithoutHolderInput[]
+  connectOrCreate?: Prisma.FinancialAccountCreateOrConnectWithoutHolderInput | Prisma.FinancialAccountCreateOrConnectWithoutHolderInput[]
+  createMany?: Prisma.FinancialAccountCreateManyHolderInputEnvelope
+  connect?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+}
+
+export type FinancialAccountUpdateManyWithoutHolderNestedInput = {
+  create?: Prisma.XOR<Prisma.FinancialAccountCreateWithoutHolderInput, Prisma.FinancialAccountUncheckedCreateWithoutHolderInput> | Prisma.FinancialAccountCreateWithoutHolderInput[] | Prisma.FinancialAccountUncheckedCreateWithoutHolderInput[]
+  connectOrCreate?: Prisma.FinancialAccountCreateOrConnectWithoutHolderInput | Prisma.FinancialAccountCreateOrConnectWithoutHolderInput[]
+  upsert?: Prisma.FinancialAccountUpsertWithWhereUniqueWithoutHolderInput | Prisma.FinancialAccountUpsertWithWhereUniqueWithoutHolderInput[]
+  createMany?: Prisma.FinancialAccountCreateManyHolderInputEnvelope
+  set?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  disconnect?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  delete?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  connect?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  update?: Prisma.FinancialAccountUpdateWithWhereUniqueWithoutHolderInput | Prisma.FinancialAccountUpdateWithWhereUniqueWithoutHolderInput[]
+  updateMany?: Prisma.FinancialAccountUpdateManyWithWhereWithoutHolderInput | Prisma.FinancialAccountUpdateManyWithWhereWithoutHolderInput[]
+  deleteMany?: Prisma.FinancialAccountScalarWhereInput | Prisma.FinancialAccountScalarWhereInput[]
+}
+
+export type FinancialAccountUncheckedUpdateManyWithoutHolderNestedInput = {
+  create?: Prisma.XOR<Prisma.FinancialAccountCreateWithoutHolderInput, Prisma.FinancialAccountUncheckedCreateWithoutHolderInput> | Prisma.FinancialAccountCreateWithoutHolderInput[] | Prisma.FinancialAccountUncheckedCreateWithoutHolderInput[]
+  connectOrCreate?: Prisma.FinancialAccountCreateOrConnectWithoutHolderInput | Prisma.FinancialAccountCreateOrConnectWithoutHolderInput[]
+  upsert?: Prisma.FinancialAccountUpsertWithWhereUniqueWithoutHolderInput | Prisma.FinancialAccountUpsertWithWhereUniqueWithoutHolderInput[]
+  createMany?: Prisma.FinancialAccountCreateManyHolderInputEnvelope
+  set?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  disconnect?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  delete?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  connect?: Prisma.FinancialAccountWhereUniqueInput | Prisma.FinancialAccountWhereUniqueInput[]
+  update?: Prisma.FinancialAccountUpdateWithWhereUniqueWithoutHolderInput | Prisma.FinancialAccountUpdateWithWhereUniqueWithoutHolderInput[]
+  updateMany?: Prisma.FinancialAccountUpdateManyWithWhereWithoutHolderInput | Prisma.FinancialAccountUpdateManyWithWhereWithoutHolderInput[]
+  deleteMany?: Prisma.FinancialAccountScalarWhereInput | Prisma.FinancialAccountScalarWhereInput[]
 }
 
 export type FinancialAccountCreateNestedManyWithoutBusinessInput = {
@@ -450,11 +516,68 @@ export type FinancialAccountUpdateOneWithoutTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FinancialAccountUpdateToOneWithWhereWithoutTransactionsInput, Prisma.FinancialAccountUpdateWithoutTransactionsInput>, Prisma.FinancialAccountUncheckedUpdateWithoutTransactionsInput>
 }
 
+export type FinancialAccountCreateWithoutHolderInput = {
+  id?: string
+  name: string
+  type: $Enums.AccountType
+  balance?: number
+  business: Prisma.BusinessCreateNestedOneWithoutAccountsInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutAccountInput
+}
+
+export type FinancialAccountUncheckedCreateWithoutHolderInput = {
+  id?: string
+  name: string
+  type: $Enums.AccountType
+  balance?: number
+  businessId: string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type FinancialAccountCreateOrConnectWithoutHolderInput = {
+  where: Prisma.FinancialAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.FinancialAccountCreateWithoutHolderInput, Prisma.FinancialAccountUncheckedCreateWithoutHolderInput>
+}
+
+export type FinancialAccountCreateManyHolderInputEnvelope = {
+  data: Prisma.FinancialAccountCreateManyHolderInput | Prisma.FinancialAccountCreateManyHolderInput[]
+  skipDuplicates?: boolean
+}
+
+export type FinancialAccountUpsertWithWhereUniqueWithoutHolderInput = {
+  where: Prisma.FinancialAccountWhereUniqueInput
+  update: Prisma.XOR<Prisma.FinancialAccountUpdateWithoutHolderInput, Prisma.FinancialAccountUncheckedUpdateWithoutHolderInput>
+  create: Prisma.XOR<Prisma.FinancialAccountCreateWithoutHolderInput, Prisma.FinancialAccountUncheckedCreateWithoutHolderInput>
+}
+
+export type FinancialAccountUpdateWithWhereUniqueWithoutHolderInput = {
+  where: Prisma.FinancialAccountWhereUniqueInput
+  data: Prisma.XOR<Prisma.FinancialAccountUpdateWithoutHolderInput, Prisma.FinancialAccountUncheckedUpdateWithoutHolderInput>
+}
+
+export type FinancialAccountUpdateManyWithWhereWithoutHolderInput = {
+  where: Prisma.FinancialAccountScalarWhereInput
+  data: Prisma.XOR<Prisma.FinancialAccountUpdateManyMutationInput, Prisma.FinancialAccountUncheckedUpdateManyWithoutHolderInput>
+}
+
+export type FinancialAccountScalarWhereInput = {
+  AND?: Prisma.FinancialAccountScalarWhereInput | Prisma.FinancialAccountScalarWhereInput[]
+  OR?: Prisma.FinancialAccountScalarWhereInput[]
+  NOT?: Prisma.FinancialAccountScalarWhereInput | Prisma.FinancialAccountScalarWhereInput[]
+  id?: Prisma.StringFilter<"FinancialAccount"> | string
+  name?: Prisma.StringFilter<"FinancialAccount"> | string
+  type?: Prisma.EnumAccountTypeFilter<"FinancialAccount"> | $Enums.AccountType
+  balance?: Prisma.FloatFilter<"FinancialAccount"> | number
+  businessId?: Prisma.StringFilter<"FinancialAccount"> | string
+  holderId?: Prisma.StringNullableFilter<"FinancialAccount"> | string | null
+}
+
 export type FinancialAccountCreateWithoutBusinessInput = {
   id?: string
   name: string
   type: $Enums.AccountType
   balance?: number
+  holder?: Prisma.UserCreateNestedOneWithoutHeldAccountsInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutAccountInput
 }
 
@@ -463,6 +586,7 @@ export type FinancialAccountUncheckedCreateWithoutBusinessInput = {
   name: string
   type: $Enums.AccountType
   balance?: number
+  holderId?: string | null
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutAccountInput
 }
 
@@ -492,23 +616,13 @@ export type FinancialAccountUpdateManyWithWhereWithoutBusinessInput = {
   data: Prisma.XOR<Prisma.FinancialAccountUpdateManyMutationInput, Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessInput>
 }
 
-export type FinancialAccountScalarWhereInput = {
-  AND?: Prisma.FinancialAccountScalarWhereInput | Prisma.FinancialAccountScalarWhereInput[]
-  OR?: Prisma.FinancialAccountScalarWhereInput[]
-  NOT?: Prisma.FinancialAccountScalarWhereInput | Prisma.FinancialAccountScalarWhereInput[]
-  id?: Prisma.StringFilter<"FinancialAccount"> | string
-  name?: Prisma.StringFilter<"FinancialAccount"> | string
-  type?: Prisma.EnumAccountTypeFilter<"FinancialAccount"> | $Enums.AccountType
-  balance?: Prisma.FloatFilter<"FinancialAccount"> | number
-  businessId?: Prisma.StringFilter<"FinancialAccount"> | string
-}
-
 export type FinancialAccountCreateWithoutTransactionsInput = {
   id?: string
   name: string
   type: $Enums.AccountType
   balance?: number
   business: Prisma.BusinessCreateNestedOneWithoutAccountsInput
+  holder?: Prisma.UserCreateNestedOneWithoutHeldAccountsInput
 }
 
 export type FinancialAccountUncheckedCreateWithoutTransactionsInput = {
@@ -517,6 +631,7 @@ export type FinancialAccountUncheckedCreateWithoutTransactionsInput = {
   type: $Enums.AccountType
   balance?: number
   businessId: string
+  holderId?: string | null
 }
 
 export type FinancialAccountCreateOrConnectWithoutTransactionsInput = {
@@ -541,9 +656,45 @@ export type FinancialAccountUpdateWithoutTransactionsInput = {
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
   business?: Prisma.BusinessUpdateOneRequiredWithoutAccountsNestedInput
+  holder?: Prisma.UserUpdateOneWithoutHeldAccountsNestedInput
 }
 
 export type FinancialAccountUncheckedUpdateWithoutTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  balance?: Prisma.FloatFieldUpdateOperationsInput | number
+  businessId?: Prisma.StringFieldUpdateOperationsInput | string
+  holderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type FinancialAccountCreateManyHolderInput = {
+  id?: string
+  name: string
+  type: $Enums.AccountType
+  balance?: number
+  businessId: string
+}
+
+export type FinancialAccountUpdateWithoutHolderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  balance?: Prisma.FloatFieldUpdateOperationsInput | number
+  business?: Prisma.BusinessUpdateOneRequiredWithoutAccountsNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutAccountNestedInput
+}
+
+export type FinancialAccountUncheckedUpdateWithoutHolderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
+  balance?: Prisma.FloatFieldUpdateOperationsInput | number
+  businessId?: Prisma.StringFieldUpdateOperationsInput | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type FinancialAccountUncheckedUpdateManyWithoutHolderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
@@ -556,6 +707,7 @@ export type FinancialAccountCreateManyBusinessInput = {
   name: string
   type: $Enums.AccountType
   balance?: number
+  holderId?: string | null
 }
 
 export type FinancialAccountUpdateWithoutBusinessInput = {
@@ -563,6 +715,7 @@ export type FinancialAccountUpdateWithoutBusinessInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
+  holder?: Prisma.UserUpdateOneWithoutHeldAccountsNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutAccountNestedInput
 }
 
@@ -571,6 +724,7 @@ export type FinancialAccountUncheckedUpdateWithoutBusinessInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
+  holderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutAccountNestedInput
 }
 
@@ -579,6 +733,7 @@ export type FinancialAccountUncheckedUpdateManyWithoutBusinessInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAccountTypeFieldUpdateOperationsInput | $Enums.AccountType
   balance?: Prisma.FloatFieldUpdateOperationsInput | number
+  holderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -618,7 +773,9 @@ export type FinancialAccountSelect<ExtArgs extends runtime.Types.Extensions.Inte
   type?: boolean
   balance?: boolean
   businessId?: boolean
+  holderId?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
+  holder?: boolean | Prisma.FinancialAccount$holderArgs<ExtArgs>
   transactions?: boolean | Prisma.FinancialAccount$transactionsArgs<ExtArgs>
   _count?: boolean | Prisma.FinancialAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["financialAccount"]>
@@ -631,11 +788,13 @@ export type FinancialAccountSelectScalar = {
   type?: boolean
   balance?: boolean
   businessId?: boolean
+  holderId?: boolean
 }
 
-export type FinancialAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "balance" | "businessId", ExtArgs["result"]["financialAccount"]>
+export type FinancialAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "balance" | "businessId" | "holderId", ExtArgs["result"]["financialAccount"]>
 export type FinancialAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
+  holder?: boolean | Prisma.FinancialAccount$holderArgs<ExtArgs>
   transactions?: boolean | Prisma.FinancialAccount$transactionsArgs<ExtArgs>
   _count?: boolean | Prisma.FinancialAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -644,6 +803,7 @@ export type $FinancialAccountPayload<ExtArgs extends runtime.Types.Extensions.In
   name: "FinancialAccount"
   objects: {
     business: Prisma.$BusinessPayload<ExtArgs>
+    holder: Prisma.$UserPayload<ExtArgs> | null
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -652,6 +812,7 @@ export type $FinancialAccountPayload<ExtArgs extends runtime.Types.Extensions.In
     type: $Enums.AccountType
     balance: number
     businessId: string
+    holderId: string | null
   }, ExtArgs["result"]["financialAccount"]>
   composites: {}
 }
@@ -993,6 +1154,7 @@ readonly fields: FinancialAccountFieldRefs;
 export interface Prisma__FinancialAccountClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   business<T extends Prisma.BusinessDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BusinessDefaultArgs<ExtArgs>>): Prisma.Prisma__BusinessClient<runtime.Types.Result.GetResult<Prisma.$BusinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  holder<T extends Prisma.FinancialAccount$holderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FinancialAccount$holderArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transactions<T extends Prisma.FinancialAccount$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FinancialAccount$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1028,6 +1190,7 @@ export interface FinancialAccountFieldRefs {
   readonly type: Prisma.FieldRef<"FinancialAccount", 'AccountType'>
   readonly balance: Prisma.FieldRef<"FinancialAccount", 'Float'>
   readonly businessId: Prisma.FieldRef<"FinancialAccount", 'String'>
+  readonly holderId: Prisma.FieldRef<"FinancialAccount", 'String'>
 }
     
 
@@ -1368,6 +1531,25 @@ export type FinancialAccountDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many FinancialAccounts to delete.
    */
   limit?: number
+}
+
+/**
+ * FinancialAccount.holder
+ */
+export type FinancialAccount$holderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

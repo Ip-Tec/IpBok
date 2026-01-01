@@ -32,14 +32,17 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
 
   return (
     <nav className="flex flex-col justify-between flex-1 mt-8">
-      <ul>
+      <ul className="space-y-1">
         {sidebarNavLinks.map((link) => (
           <li key={link.name}>
             <Link
               href={link.href}
               className={cn(
-                "flex items-center px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-700",
-                pathname === link.href ? "bg-gray-700" : ""
+                "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground",
+                pathname === link.href 
+                    ? "bg-primary/10 text-primary font-semibold" 
+                    : ""
               )}
             >
               {link.icon}
@@ -52,7 +55,7 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
         <li>
           <button
             onClick={() => signOut()}
-            className="flex items-center w-full px-4 py-2 text-sm font-medium text-left text-red-500 rounded-md hover:bg-gray-700"
+            className="flex items-center w-full px-4 py-2 text-sm font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
           >
             <LogOut className="w-5 h-5" />
             <span className="ml-3">Logout</span>
@@ -85,13 +88,13 @@ const SideNav = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 flex flex-col w-80 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-white border-r transform lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700",
+          "fixed inset-y-0 left-0 z-30 flex flex-col w-80 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-card border-r border-border transition-transform lg:translate-x-0 duration-300",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            <h2 className="text-xl font-bold text-foreground">
               {user.name}
             </h2>
             <NotificationBell />

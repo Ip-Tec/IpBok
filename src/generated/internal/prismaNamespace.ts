@@ -395,7 +395,8 @@ export const ModelName = {
   TransactionType: 'TransactionType',
   Transaction: 'Transaction',
   DailySummary: 'DailySummary',
-  CashAdvance: 'CashAdvance'
+  CashAdvance: 'CashAdvance',
+  Request: 'Request'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "user" | "verificationToken" | "notification" | "business" | "membership" | "financialAccount" | "transactionType" | "transaction" | "dailySummary" | "cashAdvance"
+    modelProps: "account" | "session" | "user" | "verificationToken" | "notification" | "business" | "membership" | "financialAccount" | "transactionType" | "transaction" | "dailySummary" | "cashAdvance" | "request"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1207,6 +1208,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Request: {
+      payload: Prisma.$RequestPayload<ExtArgs>
+      fields: Prisma.RequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>
+        }
+        findFirst: {
+          args: Prisma.RequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>
+        }
+        findMany: {
+          args: Prisma.RequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>[]
+        }
+        create: {
+          args: Prisma.RequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>
+        }
+        createMany: {
+          args: Prisma.RequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.RequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>
+        }
+        update: {
+          args: Prisma.RequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.RequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.RequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestPayload>
+        }
+        aggregate: {
+          args: Prisma.RequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRequest>
+        }
+        groupBy: {
+          args: Prisma.RequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RequestCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1314,6 +1381,7 @@ export const BusinessScalarFieldEnum = {
   name: 'name',
   address: 'address',
   phone: 'phone',
+  type: 'type',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1336,7 +1404,8 @@ export const FinancialAccountScalarFieldEnum = {
   name: 'name',
   type: 'type',
   balance: 'balance',
-  businessId: 'businessId'
+  businessId: 'businessId',
+  holderId: 'holderId'
 } as const
 
 export type FinancialAccountScalarFieldEnum = (typeof FinancialAccountScalarFieldEnum)[keyof typeof FinancialAccountScalarFieldEnum]
@@ -1400,6 +1469,22 @@ export const CashAdvanceScalarFieldEnum = {
 } as const
 
 export type CashAdvanceScalarFieldEnum = (typeof CashAdvanceScalarFieldEnum)[keyof typeof CashAdvanceScalarFieldEnum]
+
+
+export const RequestScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  type: 'type',
+  status: 'status',
+  description: 'description',
+  requesterId: 'requesterId',
+  approverId: 'approverId',
+  businessId: 'businessId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RequestScalarFieldEnum = (typeof RequestScalarFieldEnum)[keyof typeof RequestScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1495,7 +1580,8 @@ export type MembershipOrderByRelevanceFieldEnum = (typeof MembershipOrderByRelev
 export const FinancialAccountOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
-  businessId: 'businessId'
+  businessId: 'businessId',
+  holderId: 'holderId'
 } as const
 
 export type FinancialAccountOrderByRelevanceFieldEnum = (typeof FinancialAccountOrderByRelevanceFieldEnum)[keyof typeof FinancialAccountOrderByRelevanceFieldEnum]
@@ -1541,6 +1627,17 @@ export const CashAdvanceOrderByRelevanceFieldEnum = {
 export type CashAdvanceOrderByRelevanceFieldEnum = (typeof CashAdvanceOrderByRelevanceFieldEnum)[keyof typeof CashAdvanceOrderByRelevanceFieldEnum]
 
 
+export const RequestOrderByRelevanceFieldEnum = {
+  id: 'id',
+  description: 'description',
+  requesterId: 'requesterId',
+  approverId: 'approverId',
+  businessId: 'businessId'
+} as const
+
+export type RequestOrderByRelevanceFieldEnum = (typeof RequestOrderByRelevanceFieldEnum)[keyof typeof RequestOrderByRelevanceFieldEnum]
+
+
 
 /**
  * Field references
@@ -1583,6 +1680,13 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'BusinessType'
+ */
+export type EnumBusinessTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BusinessType'>
+    
+
+
+/**
  * Reference to a field of type 'AccountType'
  */
 export type EnumAccountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountType'>
@@ -1614,6 +1718,20 @@ export type EnumTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'CashAdvanceStatus'
  */
 export type EnumCashAdvanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashAdvanceStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RequestType'
+ */
+export type EnumRequestTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RequestType'>
+    
+
+
+/**
+ * Reference to a field of type 'RequestStatus'
+ */
+export type EnumRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RequestStatus'>
     
 
 /**
@@ -1723,6 +1841,7 @@ export type GlobalOmitConfig = {
   transaction?: Prisma.TransactionOmit
   dailySummary?: Prisma.DailySummaryOmit
   cashAdvance?: Prisma.CashAdvanceOmit
+  request?: Prisma.RequestOmit
 }
 
 /* Types for Logging */

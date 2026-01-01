@@ -29,6 +29,7 @@ export type BusinessMinAggregateOutputType = {
   name: string | null
   address: string | null
   phone: string | null
+  type: $Enums.BusinessType | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +39,7 @@ export type BusinessMaxAggregateOutputType = {
   name: string | null
   address: string | null
   phone: string | null
+  type: $Enums.BusinessType | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,6 +49,7 @@ export type BusinessCountAggregateOutputType = {
   name: number
   address: number
   phone: number
+  type: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,6 +61,7 @@ export type BusinessMinAggregateInputType = {
   name?: true
   address?: true
   phone?: true
+  type?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -67,6 +71,7 @@ export type BusinessMaxAggregateInputType = {
   name?: true
   address?: true
   phone?: true
+  type?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,6 +81,7 @@ export type BusinessCountAggregateInputType = {
   name?: true
   address?: true
   phone?: true
+  type?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -158,6 +164,7 @@ export type BusinessGroupByOutputType = {
   name: string
   address: string | null
   phone: string | null
+  type: $Enums.BusinessType | null
   createdAt: Date
   updatedAt: Date
   _count: BusinessCountAggregateOutputType | null
@@ -188,6 +195,7 @@ export type BusinessWhereInput = {
   name?: Prisma.StringFilter<"Business"> | string
   address?: Prisma.StringNullableFilter<"Business"> | string | null
   phone?: Prisma.StringNullableFilter<"Business"> | string | null
+  type?: Prisma.EnumBusinessTypeNullableFilter<"Business"> | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Business"> | Date | string
   memberships?: Prisma.MembershipListRelationFilter
@@ -195,6 +203,7 @@ export type BusinessWhereInput = {
   transactions?: Prisma.TransactionListRelationFilter
   dailySummaries?: Prisma.DailySummaryListRelationFilter
   cashAdvances?: Prisma.CashAdvanceListRelationFilter
+  requests?: Prisma.RequestListRelationFilter
 }
 
 export type BusinessOrderByWithRelationInput = {
@@ -202,6 +211,7 @@ export type BusinessOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
@@ -209,6 +219,7 @@ export type BusinessOrderByWithRelationInput = {
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   dailySummaries?: Prisma.DailySummaryOrderByRelationAggregateInput
   cashAdvances?: Prisma.CashAdvanceOrderByRelationAggregateInput
+  requests?: Prisma.RequestOrderByRelationAggregateInput
   _relevance?: Prisma.BusinessOrderByRelevanceInput
 }
 
@@ -220,6 +231,7 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Business"> | string
   address?: Prisma.StringNullableFilter<"Business"> | string | null
   phone?: Prisma.StringNullableFilter<"Business"> | string | null
+  type?: Prisma.EnumBusinessTypeNullableFilter<"Business"> | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Business"> | Date | string
   memberships?: Prisma.MembershipListRelationFilter
@@ -227,6 +239,7 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   transactions?: Prisma.TransactionListRelationFilter
   dailySummaries?: Prisma.DailySummaryListRelationFilter
   cashAdvances?: Prisma.CashAdvanceListRelationFilter
+  requests?: Prisma.RequestListRelationFilter
 }, "id">
 
 export type BusinessOrderByWithAggregationInput = {
@@ -234,6 +247,7 @@ export type BusinessOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BusinessCountOrderByAggregateInput
@@ -249,6 +263,7 @@ export type BusinessScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Business"> | string
   address?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  type?: Prisma.EnumBusinessTypeNullableWithAggregatesFilter<"Business"> | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Business"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Business"> | Date | string
 }
@@ -258,6 +273,7 @@ export type BusinessCreateInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
@@ -265,6 +281,7 @@ export type BusinessCreateInput = {
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateInput = {
@@ -272,6 +289,7 @@ export type BusinessUncheckedCreateInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -279,6 +297,7 @@ export type BusinessUncheckedCreateInput = {
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUpdateInput = {
@@ -286,6 +305,7 @@ export type BusinessUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
@@ -293,6 +313,7 @@ export type BusinessUpdateInput = {
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateInput = {
@@ -300,6 +321,7 @@ export type BusinessUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -307,6 +329,7 @@ export type BusinessUncheckedUpdateInput = {
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateManyInput = {
@@ -314,6 +337,7 @@ export type BusinessCreateManyInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -323,6 +347,7 @@ export type BusinessUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -332,6 +357,7 @@ export type BusinessUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -347,6 +373,7 @@ export type BusinessCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -356,6 +383,7 @@ export type BusinessMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -365,6 +393,7 @@ export type BusinessMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -372,6 +401,10 @@ export type BusinessMinOrderByAggregateInput = {
 export type BusinessScalarRelationFilter = {
   is?: Prisma.BusinessWhereInput
   isNot?: Prisma.BusinessWhereInput
+}
+
+export type NullableEnumBusinessTypeFieldUpdateOperationsInput = {
+  set?: $Enums.BusinessType | null
 }
 
 export type BusinessCreateNestedOneWithoutMembershipsInput = {
@@ -444,17 +477,33 @@ export type BusinessUpdateOneRequiredWithoutCashAdvancesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutCashAdvancesInput, Prisma.BusinessUpdateWithoutCashAdvancesInput>, Prisma.BusinessUncheckedUpdateWithoutCashAdvancesInput>
 }
 
+export type BusinessCreateNestedOneWithoutRequestsInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutRequestsInput, Prisma.BusinessUncheckedCreateWithoutRequestsInput>
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutRequestsInput
+  connect?: Prisma.BusinessWhereUniqueInput
+}
+
+export type BusinessUpdateOneRequiredWithoutRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutRequestsInput, Prisma.BusinessUncheckedCreateWithoutRequestsInput>
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutRequestsInput
+  upsert?: Prisma.BusinessUpsertWithoutRequestsInput
+  connect?: Prisma.BusinessWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutRequestsInput, Prisma.BusinessUpdateWithoutRequestsInput>, Prisma.BusinessUncheckedUpdateWithoutRequestsInput>
+}
+
 export type BusinessCreateWithoutMembershipsInput = {
   id?: string
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutMembershipsInput = {
@@ -462,12 +511,14 @@ export type BusinessUncheckedCreateWithoutMembershipsInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutMembershipsInput = {
@@ -491,12 +542,14 @@ export type BusinessUpdateWithoutMembershipsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutMembershipsInput = {
@@ -504,12 +557,14 @@ export type BusinessUncheckedUpdateWithoutMembershipsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutAccountsInput = {
@@ -517,12 +572,14 @@ export type BusinessCreateWithoutAccountsInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutAccountsInput = {
@@ -530,12 +587,14 @@ export type BusinessUncheckedCreateWithoutAccountsInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutAccountsInput = {
@@ -559,12 +618,14 @@ export type BusinessUpdateWithoutAccountsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutAccountsInput = {
@@ -572,12 +633,14 @@ export type BusinessUncheckedUpdateWithoutAccountsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutTransactionsInput = {
@@ -585,12 +648,14 @@ export type BusinessCreateWithoutTransactionsInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutTransactionsInput = {
@@ -598,12 +663,14 @@ export type BusinessUncheckedCreateWithoutTransactionsInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutTransactionsInput = {
@@ -627,12 +694,14 @@ export type BusinessUpdateWithoutTransactionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutTransactionsInput = {
@@ -640,12 +709,14 @@ export type BusinessUncheckedUpdateWithoutTransactionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutDailySummariesInput = {
@@ -653,12 +724,14 @@ export type BusinessCreateWithoutDailySummariesInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutDailySummariesInput = {
@@ -666,12 +739,14 @@ export type BusinessUncheckedCreateWithoutDailySummariesInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutDailySummariesInput = {
@@ -695,12 +770,14 @@ export type BusinessUpdateWithoutDailySummariesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutDailySummariesInput = {
@@ -708,12 +785,14 @@ export type BusinessUncheckedUpdateWithoutDailySummariesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutCashAdvancesInput = {
@@ -721,12 +800,14 @@ export type BusinessCreateWithoutCashAdvancesInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutCashAdvancesInput = {
@@ -734,12 +815,14 @@ export type BusinessUncheckedCreateWithoutCashAdvancesInput = {
   name: string
   address?: string | null
   phone?: string | null
+  type?: $Enums.BusinessType | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutCashAdvancesInput = {
@@ -763,12 +846,14 @@ export type BusinessUpdateWithoutCashAdvancesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutCashAdvancesInput = {
@@ -776,12 +861,90 @@ export type BusinessUncheckedUpdateWithoutCashAdvancesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessCreateWithoutRequestsInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  type?: $Enums.BusinessType | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
+  accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
+  dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessUncheckedCreateWithoutRequestsInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  type?: $Enums.BusinessType | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
+  accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
+  dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessCreateOrConnectWithoutRequestsInput = {
+  where: Prisma.BusinessWhereUniqueInput
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutRequestsInput, Prisma.BusinessUncheckedCreateWithoutRequestsInput>
+}
+
+export type BusinessUpsertWithoutRequestsInput = {
+  update: Prisma.XOR<Prisma.BusinessUpdateWithoutRequestsInput, Prisma.BusinessUncheckedUpdateWithoutRequestsInput>
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutRequestsInput, Prisma.BusinessUncheckedCreateWithoutRequestsInput>
+  where?: Prisma.BusinessWhereInput
+}
+
+export type BusinessUpdateToOneWithWhereWithoutRequestsInput = {
+  where?: Prisma.BusinessWhereInput
+  data: Prisma.XOR<Prisma.BusinessUpdateWithoutRequestsInput, Prisma.BusinessUncheckedUpdateWithoutRequestsInput>
+}
+
+export type BusinessUpdateWithoutRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
+  accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
+  dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessUncheckedUpdateWithoutRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
+  accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
+  dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 
@@ -795,6 +958,7 @@ export type BusinessCountOutputType = {
   transactions: number
   dailySummaries: number
   cashAdvances: number
+  requests: number
 }
 
 export type BusinessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -803,6 +967,7 @@ export type BusinessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   transactions?: boolean | BusinessCountOutputTypeCountTransactionsArgs
   dailySummaries?: boolean | BusinessCountOutputTypeCountDailySummariesArgs
   cashAdvances?: boolean | BusinessCountOutputTypeCountCashAdvancesArgs
+  requests?: boolean | BusinessCountOutputTypeCountRequestsArgs
 }
 
 /**
@@ -850,12 +1015,20 @@ export type BusinessCountOutputTypeCountCashAdvancesArgs<ExtArgs extends runtime
   where?: Prisma.CashAdvanceWhereInput
 }
 
+/**
+ * BusinessCountOutputType without action
+ */
+export type BusinessCountOutputTypeCountRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RequestWhereInput
+}
+
 
 export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   address?: boolean
   phone?: boolean
+  type?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   memberships?: boolean | Prisma.Business$membershipsArgs<ExtArgs>
@@ -863,6 +1036,7 @@ export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   transactions?: boolean | Prisma.Business$transactionsArgs<ExtArgs>
   dailySummaries?: boolean | Prisma.Business$dailySummariesArgs<ExtArgs>
   cashAdvances?: boolean | Prisma.Business$cashAdvancesArgs<ExtArgs>
+  requests?: boolean | Prisma.Business$requestsArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["business"]>
 
@@ -873,17 +1047,19 @@ export type BusinessSelectScalar = {
   name?: boolean
   address?: boolean
   phone?: boolean
+  type?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "phone" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
+export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "phone" | "type" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
 export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberships?: boolean | Prisma.Business$membershipsArgs<ExtArgs>
   accounts?: boolean | Prisma.Business$accountsArgs<ExtArgs>
   transactions?: boolean | Prisma.Business$transactionsArgs<ExtArgs>
   dailySummaries?: boolean | Prisma.Business$dailySummariesArgs<ExtArgs>
   cashAdvances?: boolean | Prisma.Business$cashAdvancesArgs<ExtArgs>
+  requests?: boolean | Prisma.Business$requestsArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -895,12 +1071,14 @@ export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
     dailySummaries: Prisma.$DailySummaryPayload<ExtArgs>[]
     cashAdvances: Prisma.$CashAdvancePayload<ExtArgs>[]
+    requests: Prisma.$RequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
     address: string | null
     phone: string | null
+    type: $Enums.BusinessType | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["business"]>
@@ -1248,6 +1426,7 @@ export interface Prisma__BusinessClient<T, Null = never, ExtArgs extends runtime
   transactions<T extends Prisma.Business$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dailySummaries<T extends Prisma.Business$dailySummariesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$dailySummariesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailySummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cashAdvances<T extends Prisma.Business$cashAdvancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$cashAdvancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashAdvancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  requests<T extends Prisma.Business$requestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$requestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1281,6 +1460,7 @@ export interface BusinessFieldRefs {
   readonly name: Prisma.FieldRef<"Business", 'String'>
   readonly address: Prisma.FieldRef<"Business", 'String'>
   readonly phone: Prisma.FieldRef<"Business", 'String'>
+  readonly type: Prisma.FieldRef<"Business", 'BusinessType'>
   readonly createdAt: Prisma.FieldRef<"Business", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Business", 'DateTime'>
 }
@@ -1743,6 +1923,30 @@ export type Business$cashAdvancesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.CashAdvanceScalarFieldEnum | Prisma.CashAdvanceScalarFieldEnum[]
+}
+
+/**
+ * Business.requests
+ */
+export type Business$requestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Request
+   */
+  select?: Prisma.RequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Request
+   */
+  omit?: Prisma.RequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RequestInclude<ExtArgs> | null
+  where?: Prisma.RequestWhereInput
+  orderBy?: Prisma.RequestOrderByWithRelationInput | Prisma.RequestOrderByWithRelationInput[]
+  cursor?: Prisma.RequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RequestScalarFieldEnum | Prisma.RequestScalarFieldEnum[]
 }
 
 /**

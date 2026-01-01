@@ -54,6 +54,9 @@ model User {
   cashAdvancesGiven    CashAdvance[] @relation("CashAdvanceGiver")
   cashAdvancesReceived CashAdvance[] @relation("CashAdvanceReceiver")
   transactionsPerPage  Int           @default(10)
+  heldAccounts         FinancialAccount[] @relation("AccountHolder")
+  requestsSent         Request[]     @relation("Requester")
+  requestsApproved     Request[]     @relation("Approver")
 }
 
 model VerificationToken {
@@ -79,6 +82,10 @@ model Notification {
 enum Role {
   OWNER
   AGENT
+  MANAGER
+  ACCOUNTANT
+  AUDITOR
+  FINANCE_OFFICER
 }
 
 model Business {
@@ -86,6 +93,7 @@ model Business {
   name           String
   address        String?
   phone          String?
+  type           BusinessType?      // No formatted default, forces onboarding.
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   memberships    Membership[]
@@ -93,6 +101,14 @@ model Business {
   transactions   Transaction[]
   dailySummaries DailySummary[]
   cashAdvances   CashAdvance[]
+  requests       Request[]
+}
+
+enum BusinessType {
+  POS
+  RETAIL
+  CORPORATE
+  PERSONAL
 }
 
 model Membership {
@@ -108,11 +124,13 @@ model Membership {
 
 model FinancialAccount {
   id           String        @id @default(cuid())
-  name         String // e.g., "Cash", "Bank Account"
+  name         String // e.g., "Cash", "Bank Account", "Agent A's Float"
   type         AccountType
   balance      Float         @default(0)
   businessId   String
   business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  holderId     String?       // Link to specific user (Agent)
+  holder       User?         @relation("AccountHolder", fields: [holderId], references: [id])
   transactions Transaction[]
 }
 
@@ -198,5 +216,36 @@ model CashAdvance {
 enum CashAdvanceStatus {
   PENDING
   CONFIRMED
+  REJECTED
+}
+
+model Request {
+  id          String        @id @default(cuid())
+  amount      Float
+  type        RequestType
+  status      RequestStatus @default(PENDING)
+  description String?
+  
+  requesterId String
+  requester   User   @relation("Requester", fields: [requesterId], references: [id])
+  
+  approverId  String?
+  approver    User?  @relation("Approver", fields: [approverId], references: [id])
+  
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum RequestType {
+  CASH_ADVANCE
+  EXPENSE_REIMBURSEMENT
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
   REJECTED
 }

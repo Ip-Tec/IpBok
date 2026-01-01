@@ -161,6 +161,18 @@ export async function GET(
         }
     }
 
+    // Fetch current balances from Financial Accounts
+    const accounts = await prisma.financialAccount.findMany({
+        where: {
+            holderId: agentId,
+            businessId: targetBusinessId
+        }
+    });
+
+    // Fallback to 0 if no account found (though they should exist now for new agents)
+    const currentCashBalance = accounts.find(a => a.type === 'CASH')?.balance || 0;
+    const currentBankBalance = accounts.find(a => a.type === 'BANK')?.balance || 0;
+
 
     // Determine pending reconciliation status (simplified for now, based on if there are any transactions today)
     const pendingReconciliationStatus = todayTransactions.length > 0 ? "Pending" : "Reconciled";
@@ -196,7 +208,9 @@ export async function GET(
       pendingReconciliationStatus,
       yesterdayBalance,
       pendingCashAdvance,
-      businessPhone: business?.phone
+      businessPhone: business?.phone,
+      currentCashBalance,
+      currentBankBalance
     };
 
     console.log(`Successfully processed summary data for agent ${agentId}.`);

@@ -13,6 +13,8 @@ import {
   TrendingDown,
   Activity,
   UserCheck,
+  Wallet,
+  Building,
 } from "lucide-react";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
@@ -28,7 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import KpiCard from "./KpiCard";
-import { Notification } from '@/src/generated/models';
+import { Notification } from "@/src/generated/client";
 import { GiveCashDialog } from "./agents/GiveCashDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -55,10 +57,10 @@ const TabButton = ({ name, activeTab, setActiveTab }: TabButtonProps) => (
   <button
     onClick={() => setActiveTab(name)}
     className={cn(
-      "px-4 py-2 text-sm font-medium rounded-md",
+      "px-4 py-2 text-sm font-medium rounded-md transition-colors",
       activeTab === name
-        ? "bg-indigo-600 text-white"
-        : "text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700"
+        ? "bg-primary text-primary-foreground shadow-sm"
+        : "text-muted-foreground hover:bg-muted hover:text-foreground"
     )}
   >
     {name}
@@ -91,7 +93,7 @@ const OwnerDashboardContent = (user: User) => {
     responsive: true,
     plugins: {
       legend: {
-        position: "top",
+        position: "top" as const,
       },
       title: {
         display: true,
@@ -102,8 +104,8 @@ const OwnerDashboardContent = (user: User) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="text-2xl font-semibold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-2xl font-semibold text-foreground">
           Loading...
         </div>
       </div>
@@ -112,8 +114,8 @@ const OwnerDashboardContent = (user: User) => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="text-2xl font-semibold text-red-500 dark:text-red-400">
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-2xl font-semibold text-destructive">
           Error: {error}
         </div>
       </div>
@@ -164,8 +166,8 @@ const OwnerDashboardContent = (user: User) => {
 
   return (
     <>
-      <header className="flex items-center justify-between p-4 bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
+      <header className="flex items-center justify-between p-4 bg-card border-b border-border">
+        <h1 className="text-xl font-semibold text-foreground">
           Owner Dashboard
         </h1>
         <div className="flex items-center space-x-2">
@@ -198,14 +200,14 @@ const OwnerDashboardContent = (user: User) => {
       </header>
 
       <div className="p-8">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+        <h2 className="text-3xl font-bold text-foreground">
           Welcome back, {user.name}!
         </h2>
-        <p className="mt-1 text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-muted-foreground">
           Here&apos;s your business snapshot.
         </p>
 
-        <div className="mt-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="mt-6 border-b border-border">
           <nav className="flex -mb-px space-x-4">
             <TabButton
               name="Overview"
@@ -242,6 +244,18 @@ const OwnerDashboardContent = (user: User) => {
                     icon={DollarSign}
                   />
                   <KpiCard
+                    title="Total Cash Float"
+                    value={`₦${kpis.cashBalance?.toLocaleString() ?? 0}`}
+                    description="Total cash with agents"
+                    icon={Wallet}
+                  />
+                  <KpiCard
+                    title="Total Bank Float"
+                    value={`₦${kpis.bankBalance?.toLocaleString() ?? 0}`}
+                    description="Total bank float with agents"
+                    icon={Building}
+                  />
+                  <KpiCard
                     title="Today's Net"
                     value={`₦${kpis.todaysNet.toLocaleString()}`}
                     description="Revenue - Expenses"
@@ -261,7 +275,7 @@ const OwnerDashboardContent = (user: User) => {
                   />
                 </div>
 
-                <div className="p-4 mt-8 bg-white rounded-lg shadow dark:bg-gray-800">
+                <div className="p-4 mt-8 bg-card rounded-lg shadow border border-border">
                   <h3 className="text-lg font-semibold">Charts</h3>
                   <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
@@ -288,7 +302,7 @@ const OwnerDashboardContent = (user: User) => {
               </div>
 
               <div className="lg:col-span-1">
-                <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
+                <div className="p-6 bg-card rounded-lg shadow border border-border">
                   <h3 className="text-lg font-semibold">
                     Alerts & Notifications
                   </h3>
@@ -382,16 +396,16 @@ const OwnerDashboardContent = (user: User) => {
                 />
               </div>
 
-              <div className="mt-4 bg-white rounded-lg shadow dark:bg-gray-800">
+              <div className="mt-4 bg-card rounded-lg shadow border border-border">
                 <div className="p-4">
                   <h4 className="text-md font-semibold">
                     Agent Reconciliation
                   </h4>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                      <tr>
+                  <table className="w-full text-sm text-left text-muted-foreground">
+                    <thead className="text-xs text-foreground uppercase bg-muted">
+                      <tr className="border-b border-border">
                         <th scope="col" className="px-6 py-3">
                           Agent Name
                         </th>
@@ -414,10 +428,10 @@ const OwnerDashboardContent = (user: User) => {
                     </thead>
                     <tbody>
                       {dailyReconciliation.map((agent: any, index: number) => (
-                        <tr
-                          key={index}
-                          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                        >
+                          <tr
+                            key={index}
+                            className="bg-card border-b border-border hover:bg-muted/50 transition-colors"
+                          >
                           <td className="px-6 py-4">{agent.name}</td>
                           <td className="px-6 py-4">
                             ₦{agent.expected.toLocaleString()}
@@ -470,9 +484,9 @@ const OwnerDashboardContent = (user: User) => {
                 <h4 className="text-md font-semibold">Recent Transactions</h4>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
+                <table className="w-full text-sm text-left text-muted-foreground">
+                  <thead className="text-xs text-foreground uppercase bg-muted">
+                    <tr className="border-b border-border">
                       <th scope="col" className="px-6 py-3">
                         Date & Time
                       </th>
@@ -497,7 +511,7 @@ const OwnerDashboardContent = (user: User) => {
                     {recentTransactions.map((tx: any, index: number) => (
                       <tr
                         key={index}
-                        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                        className="bg-card border-b border-border hover:bg-muted/50 transition-colors text-foreground"
                       >
                         <td className="px-6 py-4">{tx.datetime}</td>
                         <td className="px-6 py-4">{tx.agent}</td>

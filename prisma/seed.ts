@@ -9,6 +9,8 @@ async function main() {
     'Charge',
     'Cash Advance',
     'Reconciliation',
+    'Income',
+    'Expense',
   ];
 
   for (const typeName of transactionTypes) {

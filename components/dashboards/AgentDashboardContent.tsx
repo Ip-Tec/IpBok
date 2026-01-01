@@ -23,12 +23,14 @@ import { useToast } from "@/components/ui/use-toast"; // Assuming shadcn/ui toas
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AddTransactionForm from "../agent/AddTransactionForm";
+import { RequestCashDialog } from "../agent/RequestCashDialog";
 import { v4 as uuidv4 } from "uuid"; // For generating unique IDs
 
 const AgentDashboardContent = (user: User) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] =
     useState(false);
+  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
   const [currentTransactionType, setCurrentTransactionType] = useState<
     "Deposit" | "Withdrawal" | null
   >(null);
@@ -39,6 +41,8 @@ const AgentDashboardContent = (user: User) => {
     bankCollectedToday: 0,
     pendingReconciliationStatus: "N/A",
     yesterdayBalance: 0,
+    currentCashBalance: 0,
+    currentBankBalance: 0,
   });
   const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
 
@@ -84,6 +88,8 @@ const AgentDashboardContent = (user: User) => {
         bankCollectedToday: data.bankCollectedToday ?? 0,
         pendingReconciliationStatus: data.pendingReconciliationStatus ?? "N/A",
         yesterdayBalance: data.yesterdayBalance ?? 0,
+        currentCashBalance: data.currentCashBalance ?? 0,
+        currentBankBalance: data.currentBankBalance ?? 0,
       });
     } catch (error) {
       console.error("Failed to fetch summary data:", error);
@@ -99,6 +105,8 @@ const AgentDashboardContent = (user: User) => {
         bankCollectedToday: 0,
         pendingReconciliationStatus: "Error",
         yesterdayBalance: 0,
+        currentCashBalance: 0,
+        currentBankBalance: 0,
       });
     } finally {
       setIsLoadingSummary(false);
@@ -206,11 +214,11 @@ const AgentDashboardContent = (user: User) => {
     async (
       mainTransaction: Omit<
         Transaction,
-        "id" | "businessId" | "userId" | "date" | "status" | "type"
+        "id" | "businessId" | "userId" | "date" | "status" | "type" | "recordedBy"
       > & { type: "Deposit" | "Withdrawal" | "Charge" },
       chargeTransaction?: Omit<
         Transaction,
-        "id" | "businessId" | "userId" | "date" | "status" | "type"
+        "id" | "businessId" | "userId" | "date" | "status" | "type" | "recordedBy"
       > & { type: "Deposit" | "Withdrawal" | "Charge" }
     ) => {
       if (!user.id || !user.businessId) return;
@@ -292,17 +300,26 @@ const AgentDashboardContent = (user: User) => {
 
   return (
     <>
-      <header className="flex w-full items-center justify-between p-4 bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
+      <header className="flex w-full items-center justify-between p-4 bg-card border-b border-border">
+        <h1 className="text-xl font-semibold text-foreground">
           Welcome, {user.name}
         </h1>
+        <div className="flex items-center gap-2">
+            <RequestCashDialog 
+                open={isRequestDialogOpen} 
+                onOpenChange={setIsRequestDialogOpen} 
+                onSuccess={() => toast({ title: "Request Sent" })}
+            />
+            <Button variant="outline" onClick={() => setIsRequestDialogOpen(true)}>
+                Request Cash
+            </Button>
+        </div>
       </header>
       <div className="w-full p-8 text-gray-800 dark:text-gray-200">
         {/* Grid for Summary, Task Status, Reconciliation, Notifications */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {/* A. Agent – Top Summary Cards */}
-          <div className="sm:col-span-1 md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
-            <h3 className="text-lg font-semibold mb-4">Summary</h3>{" "}
+          <div className="sm:col-span-1 md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-card border border-border">
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Summary</h3>{" "}
             {isLoadingSummary ? (
               <p className="text-center text-gray-500 dark:text-gray-400">
                 Loading summary...
@@ -312,9 +329,8 @@ const AgentDashboardContent = (user: User) => {
             )}
           </div>
 
-          {/* B. Agent – Daily Task Status */}
-          <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
-            <h3 className="text-lg font-semibold mb-4">Daily Task Status</h3>
+          <div className="py-4 px-6 rounded-lg shadow-md bg-card border border-border">
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Daily Task Status</h3>
             {isLoadingTaskStatus ? (
               <p className="text-center text-gray-500 dark:text-gray-400">
                 Loading task status...
@@ -324,9 +340,8 @@ const AgentDashboardContent = (user: User) => {
             )}
           </div>
 
-          {/* E. Agent – Reconciliation Section (End of Day) */}
-          <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
-            <h3 className="text-lg font-semibold mb-4">
+          <div className="py-4 px-6 rounded-lg shadow-md bg-card border border-border">
+            <h3 className="text-lg font-semibold mb-4 text-foreground">
               Reconciliation (End of Day)
             </h3>
             {isLoadingReconciliation ? (
@@ -344,7 +359,7 @@ const AgentDashboardContent = (user: User) => {
                     type="number"
                     value={systemExpectedCash.toFixed(2)}
                     readOnly
-                    className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                    className="bg-muted cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -359,7 +374,7 @@ const AgentDashboardContent = (user: User) => {
                     readOnly={isDayLocked}
                     className={
                       isDayLocked
-                        ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        ? "bg-muted cursor-not-allowed"
                         : ""
                     }
                   />
@@ -371,7 +386,7 @@ const AgentDashboardContent = (user: User) => {
                     type="number"
                     value={reconciliationDifference.toFixed(2)}
                     readOnly
-                    className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                    className="bg-muted cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -394,10 +409,9 @@ const AgentDashboardContent = (user: User) => {
         </div>
       </div>
 
-      {/* D. Agent – Today’s Transactions (Full width, separate from the above grid) */}
       <div className="mt-6">
-        <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
-          <h3 className="text-lg font-semibold mb-4">Today&apos;s Transactions</h3>
+        <div className="py-4 px-6 rounded-lg shadow-md bg-card border border-border">
+          <h3 className="text-lg font-semibold mb-4 text-foreground">Today&apos;s Transactions</h3>
           {isLoadingTransactions ? (
             <p className="text-center text-gray-500 dark:text-gray-400">
               Loading transactions...

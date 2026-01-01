@@ -12,20 +12,31 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { Role } from "@/src/generated/enums";
 
-interface AddAgentDialogProps {
-  onAgentAdded: () => void;
+interface AddMemberDialogProps {
+  onMemberAdded: () => void;
 }
 
-export function AddAgentDialog({ onAgentAdded }: AddAgentDialogProps) {
+export function AddMemberDialog({ onMemberAdded }: AddMemberDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<string>(Role.AGENT); // Default to Agent
+  const [initialCash, setInitialCash] = useState("");
+  const [initialBank, setInitialBank] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: session } = useSession();
 
@@ -49,21 +60,27 @@ export function AddAgentDialog({ onAgentAdded }: AddAgentDialogProps) {
           name,
           email,
           password,
+          role,
           businessId: session.user.businessId,
+          initialCash: role === Role.AGENT ? (initialCash ? parseFloat(initialCash) : 0) : undefined,
+          initialBank: role === Role.AGENT ? (initialBank ? parseFloat(initialBank) : 0) : undefined,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create agent");
+        throw new Error(errorData.message || "Failed to create member");
       }
 
-      toast.success("Agent created successfully!");
-      onAgentAdded();
+      toast.success("Member created successfully!");
+      onMemberAdded();
       setIsOpen(false);
       setName("");
       setEmail("");
       setPassword("");
+      setRole(Role.AGENT);
+      setInitialCash("");
+      setInitialBank("");
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -79,12 +96,12 @@ export function AddAgentDialog({ onAgentAdded }: AddAgentDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <UserPlus className="w-4 h-4 mr-2" /> Add New Agent
+          <UserPlus className="w-4 h-4 mr-2" /> Add Team Member
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Agent</DialogTitle>
+          <DialogTitle>Add New Team Member</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
@@ -129,6 +146,62 @@ export function AddAgentDialog({ onAgentAdded }: AddAgentDialogProps) {
                 required
               />
             </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="role" className="text-right">
+                Role
+              </Label>
+              <div className="col-span-3">
+                  <Select value={role} onValueChange={setRole}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={Role.AGENT}>Agent</SelectItem>
+                      <SelectItem value={Role.MANAGER}>Manager</SelectItem>
+                      <SelectItem value={Role.ACCOUNTANT}>Accountant</SelectItem>
+                      <SelectItem value={Role.AUDITOR}>Auditor</SelectItem>
+                      <SelectItem value={Role.FINANCE_OFFICER}>Finance Officer</SelectItem>
+                    </SelectContent>
+                  </Select>
+              </div>
+            </div>
+            
+            {role === Role.AGENT && (
+                <div className="border-t pt-4 mt-4">
+                    <h4 className="text-sm font-medium mb-3">Initial Funds Assignment</h4>
+                    <div className="grid gap-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="initialCash" className="text-right">
+                            Cash Float
+                        </Label>
+                        <Input
+                            id="initialCash"
+                            type="number"
+                            value={initialCash}
+                            onChange={(e) => setInitialCash(e.target.value)}
+                            className="col-span-3"
+                            placeholder="0.00"
+                            min="0"
+                        />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="initialBank" className="text-right">
+                            Bank Float
+                        </Label>
+                        <Input
+                            id="initialBank"
+                            type="number"
+                            value={initialBank}
+                            onChange={(e) => setInitialBank(e.target.value)}
+                            className="col-span-3"
+                            placeholder="0.00"
+                            min="0"
+                        />
+                        </div>
+                    </div>
+                </div>
+            )}
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -137,7 +210,7 @@ export function AddAgentDialog({ onAgentAdded }: AddAgentDialogProps) {
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Agent"}
+              {isSubmitting ? "Creating..." : "Create Member"}
             </Button>
           </DialogFooter>
         </form>

@@ -27,14 +27,13 @@ export async function GET(req: NextRequest) {
       (sum, account) => sum + account.balance,
       0
     );
-    const cashBalance =
-      financialAccounts
-        .find((acc) => acc.type === "CASH")
-        ?.balance.toString() ?? "0";
-    const bankBalance =
-      financialAccounts
-        .find((acc) => acc.type === "BANK")
-        ?.balance.toString() ?? "0";
+    const cashBalance = financialAccounts
+        .filter((acc) => acc.type === "CASH")
+        .reduce((sum, acc) => sum + acc.balance, 0);
+
+    const bankBalance = financialAccounts
+        .filter((acc) => acc.type === "BANK")
+        .reduce((sum, acc) => sum + acc.balance, 0);
 
     const today = startOfDay(new Date());
     const todaysTransactions = await prisma.transaction.findMany({
@@ -249,6 +248,8 @@ export async function GET(req: NextRequest) {
     const data = {
       kpis: {
         totalBalance,
+        cashBalance,
+        bankBalance,
         todaysNet,
         activeAgents,
         pendingReconciliations,

@@ -99,3 +99,8 @@ export type DailySummary = Prisma.DailySummaryModel
  * 
  */
 export type CashAdvance = Prisma.CashAdvanceModel
+/**
+ * Model Request
+ * 
+ */
+export type Request = Prisma.RequestModel

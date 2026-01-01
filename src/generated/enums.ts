@@ -11,10 +11,24 @@
 
 export const Role = {
   OWNER: 'OWNER',
-  AGENT: 'AGENT'
+  AGENT: 'AGENT',
+  MANAGER: 'MANAGER',
+  ACCOUNTANT: 'ACCOUNTANT',
+  AUDITOR: 'AUDITOR',
+  FINANCE_OFFICER: 'FINANCE_OFFICER'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const BusinessType = {
+  POS: 'POS',
+  RETAIL: 'RETAIL',
+  CORPORATE: 'CORPORATE',
+  PERSONAL: 'PERSONAL'
+} as const
+
+export type BusinessType = (typeof BusinessType)[keyof typeof BusinessType]
 
 
 export const AccountType = {
@@ -52,3 +66,20 @@ export const CashAdvanceStatus = {
 } as const
 
 export type CashAdvanceStatus = (typeof CashAdvanceStatus)[keyof typeof CashAdvanceStatus]
+
+
+export const RequestType = {
+  CASH_ADVANCE: 'CASH_ADVANCE',
+  EXPENSE_REIMBURSEMENT: 'EXPENSE_REIMBURSEMENT'
+} as const
+
+export type RequestType = (typeof RequestType)[keyof typeof RequestType]
+
+
+export const RequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]

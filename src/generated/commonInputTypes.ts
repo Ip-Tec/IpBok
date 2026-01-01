@@ -219,6 +219,23 @@ export type BoolWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedBoolFilter<$PrismaModel>
 }
 
+export type EnumBusinessTypeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.BusinessType | Prisma.EnumBusinessTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.BusinessType[] | null
+  notIn?: $Enums.BusinessType[] | null
+  not?: Prisma.NestedEnumBusinessTypeNullableFilter<$PrismaModel> | $Enums.BusinessType | null
+}
+
+export type EnumBusinessTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BusinessType | Prisma.EnumBusinessTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.BusinessType[] | null
+  notIn?: $Enums.BusinessType[] | null
+  not?: Prisma.NestedEnumBusinessTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.BusinessType | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBusinessTypeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBusinessTypeNullableFilter<$PrismaModel>
+}
+
 export type EnumAccountTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.AccountType | Prisma.EnumAccountTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AccountType[]
@@ -312,6 +329,40 @@ export type EnumCashAdvanceStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCashAdvanceStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCashAdvanceStatusFilter<$PrismaModel>
+}
+
+export type EnumRequestTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestType | Prisma.EnumRequestTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestType[]
+  notIn?: $Enums.RequestType[]
+  not?: Prisma.NestedEnumRequestTypeFilter<$PrismaModel> | $Enums.RequestType
+}
+
+export type EnumRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestStatus | Prisma.EnumRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestStatus[]
+  notIn?: $Enums.RequestStatus[]
+  not?: Prisma.NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
+}
+
+export type EnumRequestTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestType | Prisma.EnumRequestTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestType[]
+  notIn?: $Enums.RequestType[]
+  not?: Prisma.NestedEnumRequestTypeWithAggregatesFilter<$PrismaModel> | $Enums.RequestType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRequestTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRequestTypeFilter<$PrismaModel>
+}
+
+export type EnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestStatus | Prisma.EnumRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestStatus[]
+  notIn?: $Enums.RequestStatus[]
+  not?: Prisma.NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRequestStatusFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -536,6 +587,23 @@ export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedBoolFilter<$PrismaModel>
 }
 
+export type NestedEnumBusinessTypeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.BusinessType | Prisma.EnumBusinessTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.BusinessType[] | null
+  notIn?: $Enums.BusinessType[] | null
+  not?: Prisma.NestedEnumBusinessTypeNullableFilter<$PrismaModel> | $Enums.BusinessType | null
+}
+
+export type NestedEnumBusinessTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.BusinessType | Prisma.EnumBusinessTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.BusinessType[] | null
+  notIn?: $Enums.BusinessType[] | null
+  not?: Prisma.NestedEnumBusinessTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.BusinessType | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumBusinessTypeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumBusinessTypeNullableFilter<$PrismaModel>
+}
+
 export type NestedEnumAccountTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.AccountType | Prisma.EnumAccountTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AccountType[]
@@ -618,6 +686,40 @@ export type NestedEnumCashAdvanceStatusWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCashAdvanceStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCashAdvanceStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRequestTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestType | Prisma.EnumRequestTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestType[]
+  notIn?: $Enums.RequestType[]
+  not?: Prisma.NestedEnumRequestTypeFilter<$PrismaModel> | $Enums.RequestType
+}
+
+export type NestedEnumRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestStatus | Prisma.EnumRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestStatus[]
+  notIn?: $Enums.RequestStatus[]
+  not?: Prisma.NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
+}
+
+export type NestedEnumRequestTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestType | Prisma.EnumRequestTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestType[]
+  notIn?: $Enums.RequestType[]
+  not?: Prisma.NestedEnumRequestTypeWithAggregatesFilter<$PrismaModel> | $Enums.RequestType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRequestTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRequestTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RequestStatus | Prisma.EnumRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RequestStatus[]
+  notIn?: $Enums.RequestStatus[]
+  not?: Prisma.NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRequestStatusFilter<$PrismaModel>
 }
 
 

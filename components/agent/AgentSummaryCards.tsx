@@ -6,6 +6,7 @@ import {
   Banknote,
   FileCheck,
   History,
+  Building,
 } from "lucide-react";
 import { AgentSummaryCards } from "@/lib/types";
 import KpiCard from "../../components/dashboards/KpiCard";
@@ -25,6 +26,16 @@ const AgentSummaryCardsComponent: React.FC<AgentSummaryCardsProps> = ({ summary 
 
   return (
     <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-1 lg:grid-cols-4">
+      <KpiCard
+        title="Current Cash Balance"
+        value={`₦${(summary?.currentCashBalance || 0).toFixed(2)}`}
+        icon={Wallet}
+      />
+      <KpiCard
+        title="Current Bank Balance"
+        value={`₦${(summary?.currentBankBalance || 0).toFixed(2)}`}
+        icon={Building}
+      />
       <KpiCard
         title="Today's Total Collected"
         value={`₦${(todayTotalCollected || 0).toFixed(2)}`}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Ipbok",
   description: "Your Simple Accounting Companion For Individuals & Small Businesses",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#2A2A3D",
 };
 

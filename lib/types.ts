@@ -6,10 +6,12 @@ export interface User {
   role: string;
   businessId?: string;
   transactionsPerPage?: number;
+  businessType?: string;
 }
 
 export interface Transaction {
   id: string;
+  businessId: string;
   amount: number;
   type: {
     name: string;
@@ -40,6 +42,8 @@ export interface AgentSummaryCards {
   bankCollectedToday: number;
   pendingReconciliationStatus: string;
   yesterdayBalance: number;
+  currentCashBalance: number;
+  currentBankBalance: number;
 }
 
 export interface AgentTaskStatus {

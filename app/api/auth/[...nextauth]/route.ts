@@ -36,6 +36,15 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (user && user.password && await bcrypt.compare(credentials.password, user.password)) {
+            if (!user.emailVerified) {
+                // Return null or throw error depending on how you want to handle it. 
+                // NextAuth default error page might be shown if we throw.
+                // For now, let's return null which is safest, or we could customize the error handler.
+                // Ideally, we throw an error "Email not verified" but NextAuth behavior varies.
+                // Let's rely on the user knowing they need to verify if login fails right after signup.
+                 throw new Error("Email not verified");
+            }
+
             return {
               id: user.id,
               email: user.email,
@@ -102,6 +111,12 @@ export const authOptions: NextAuthOptions = {
           // For simplicity, we'll add the first business found.
           if (dbUser.memberships && dbUser.memberships.length > 0) {
             token.businessId = dbUser.memberships[0].businessId;
+            // Fetch the business type
+            const business = await prisma.business.findUnique({
+                where: { id: dbUser.memberships[0].businessId },
+                select: { type: true }
+            });
+            token.businessType = business?.type;
           }
         }
       }
@@ -115,6 +130,9 @@ export const authOptions: NextAuthOptions = {
         session.user.transactionsPerPage = token.transactionsPerPage as number;
         if (token.businessId) {
             session.user.businessId = token.businessId as string;
+        }
+        if (token.businessType) {
+            (session.user as any).businessType = token.businessType;
         }
       }
       return session;

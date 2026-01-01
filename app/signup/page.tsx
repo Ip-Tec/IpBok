@@ -44,23 +44,15 @@ export default function Signup() {
       });
 
       if (res.ok) {
-        // Auto-login after registration
-        const result = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        });
-
-        if (result?.error) {
-          setError(
-            "Registration successful, but login failed. Please try logging in."
-          );
-        } else {
-          router.push("/dashboard");
-        }
+        setLoading(false);
+        // Show success message and redirect to login
+        setError(""); // Clear any errors
+        // You might want to use a toast or a dedicated success page
+        router.push("/login?message=check-email"); 
       } else {
         const data = await res.json();
         setError(data.message || "Registration failed");
+        setLoading(false);
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
