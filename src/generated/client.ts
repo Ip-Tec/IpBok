@@ -70,6 +70,11 @@ export type Notification = Prisma.NotificationModel
  */
 export type Business = Prisma.BusinessModel
 /**
+ * Model PricingPlan
+ * 
+ */
+export type PricingPlan = Prisma.PricingPlanModel
+/**
  * Model Membership
  * 
  */

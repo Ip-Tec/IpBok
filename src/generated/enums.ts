@@ -15,7 +15,9 @@ export const Role = {
   MANAGER: 'MANAGER',
   ACCOUNTANT: 'ACCOUNTANT',
   AUDITOR: 'AUDITOR',
-  FINANCE_OFFICER: 'FINANCE_OFFICER'
+  FINANCE_OFFICER: 'FINANCE_OFFICER',
+  SUPERADMIN: 'SUPERADMIN',
+  SUPPORT: 'SUPPORT'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
@@ -29,6 +31,16 @@ export const BusinessType = {
 } as const
 
 export type BusinessType = (typeof BusinessType)[keyof typeof BusinessType]
+
+
+export const SubscriptionStatus = {
+  TRIAL: 'TRIAL',
+  ACTIVE: 'ACTIVE',
+  EXPIRED: 'EXPIRED',
+  PAUSED: 'PAUSED'
+} as const
+
+export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]
 
 
 export const AccountType = {

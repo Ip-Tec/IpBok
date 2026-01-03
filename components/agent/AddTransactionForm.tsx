@@ -13,11 +13,11 @@ interface AddTransactionFormProps {
   onAddTransaction: (
     mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
     > & { type: "Deposit" | "Withdrawal" | "Charge" },
     chargeTransaction?: Omit<
       Transaction,
-      "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
     > & { type: "Deposit" | "Withdrawal" | "Charge" }
   ) => void;
   transactionType: "Deposit" | "Withdrawal" | "Charge";
@@ -57,7 +57,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({
     let secondaryChargeTransaction:
       | (Omit<
           Transaction,
-          "id" | "businessId" | "recordedBy" | "date" | "status" | "type"
+          "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
         > & { type: "Deposit" | "Withdrawal" | "Charge" })
       | undefined;
 

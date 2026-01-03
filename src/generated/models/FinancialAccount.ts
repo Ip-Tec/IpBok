@@ -492,14 +492,6 @@ export type EnumAccountTypeFieldUpdateOperationsInput = {
   set?: $Enums.AccountType
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type FinancialAccountCreateNestedOneWithoutTransactionsInput = {
   create?: Prisma.XOR<Prisma.FinancialAccountCreateWithoutTransactionsInput, Prisma.FinancialAccountUncheckedCreateWithoutTransactionsInput>
   connectOrCreate?: Prisma.FinancialAccountCreateOrConnectWithoutTransactionsInput

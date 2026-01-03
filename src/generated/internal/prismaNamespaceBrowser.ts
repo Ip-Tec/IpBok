@@ -57,12 +57,14 @@ export const ModelName = {
   VerificationToken: 'VerificationToken',
   Notification: 'Notification',
   Business: 'Business',
+  PricingPlan: 'PricingPlan',
   Membership: 'Membership',
   FinancialAccount: 'FinancialAccount',
   TransactionType: 'TransactionType',
   Transaction: 'Transaction',
   DailySummary: 'DailySummary',
-  CashAdvance: 'CashAdvance'
+  CashAdvance: 'CashAdvance',
+  Request: 'Request'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -149,11 +151,28 @@ export const BusinessScalarFieldEnum = {
   name: 'name',
   address: 'address',
   phone: 'phone',
+  type: 'type',
+  subscriptionStatus: 'subscriptionStatus',
+  trialEndsAt: 'trialEndsAt',
+  subscriptionEndsAt: 'subscriptionEndsAt',
+  planId: 'planId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type BusinessScalarFieldEnum = (typeof BusinessScalarFieldEnum)[keyof typeof BusinessScalarFieldEnum]
+
+
+export const PricingPlanScalarFieldEnum = {
+  id: 'id',
+  businessType: 'businessType',
+  monthlyPrice: 'monthlyPrice',
+  trialDays: 'trialDays',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PricingPlanScalarFieldEnum = (typeof PricingPlanScalarFieldEnum)[keyof typeof PricingPlanScalarFieldEnum]
 
 
 export const MembershipScalarFieldEnum = {
@@ -171,7 +190,8 @@ export const FinancialAccountScalarFieldEnum = {
   name: 'name',
   type: 'type',
   balance: 'balance',
-  businessId: 'businessId'
+  businessId: 'businessId',
+  holderId: 'holderId'
 } as const
 
 export type FinancialAccountScalarFieldEnum = (typeof FinancialAccountScalarFieldEnum)[keyof typeof FinancialAccountScalarFieldEnum]
@@ -235,6 +255,22 @@ export const CashAdvanceScalarFieldEnum = {
 } as const
 
 export type CashAdvanceScalarFieldEnum = (typeof CashAdvanceScalarFieldEnum)[keyof typeof CashAdvanceScalarFieldEnum]
+
+
+export const RequestScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  type: 'type',
+  status: 'status',
+  description: 'description',
+  requesterId: 'requesterId',
+  approverId: 'approverId',
+  businessId: 'businessId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RequestScalarFieldEnum = (typeof RequestScalarFieldEnum)[keyof typeof RequestScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -312,10 +348,18 @@ export const BusinessOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
   address: 'address',
-  phone: 'phone'
+  phone: 'phone',
+  planId: 'planId'
 } as const
 
 export type BusinessOrderByRelevanceFieldEnum = (typeof BusinessOrderByRelevanceFieldEnum)[keyof typeof BusinessOrderByRelevanceFieldEnum]
+
+
+export const PricingPlanOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type PricingPlanOrderByRelevanceFieldEnum = (typeof PricingPlanOrderByRelevanceFieldEnum)[keyof typeof PricingPlanOrderByRelevanceFieldEnum]
 
 
 export const MembershipOrderByRelevanceFieldEnum = {
@@ -330,7 +374,8 @@ export type MembershipOrderByRelevanceFieldEnum = (typeof MembershipOrderByRelev
 export const FinancialAccountOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
-  businessId: 'businessId'
+  businessId: 'businessId',
+  holderId: 'holderId'
 } as const
 
 export type FinancialAccountOrderByRelevanceFieldEnum = (typeof FinancialAccountOrderByRelevanceFieldEnum)[keyof typeof FinancialAccountOrderByRelevanceFieldEnum]
@@ -374,4 +419,15 @@ export const CashAdvanceOrderByRelevanceFieldEnum = {
 } as const
 
 export type CashAdvanceOrderByRelevanceFieldEnum = (typeof CashAdvanceOrderByRelevanceFieldEnum)[keyof typeof CashAdvanceOrderByRelevanceFieldEnum]
+
+
+export const RequestOrderByRelevanceFieldEnum = {
+  id: 'id',
+  description: 'description',
+  requesterId: 'requesterId',
+  approverId: 'approverId',
+  businessId: 'businessId'
+} as const
+
+export type RequestOrderByRelevanceFieldEnum = (typeof RequestOrderByRelevanceFieldEnum)[keyof typeof RequestOrderByRelevanceFieldEnum]
 

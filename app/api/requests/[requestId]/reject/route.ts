@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -7,13 +8,13 @@ import { User } from "@/lib/types";
 import { RequestStatus } from "@/src/generated/enums";
 import { createNotification } from "@/lib/notifications";
 
-export async function PATCH(req: NextRequest, { params }: { params: { requestId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ requestId: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const { requestId } = params;
+  const { requestId } = await params;
   const user = session.user as User;
 
   try {

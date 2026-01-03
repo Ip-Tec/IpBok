@@ -1,6 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated';
 
-const prisma = new PrismaClient();
+// @ts-ignore
+const prisma = new PrismaClient({ accelerateUrl: process.env.DATABASE_URL || "" });
 
 async function main() {
   const transactionTypes = [

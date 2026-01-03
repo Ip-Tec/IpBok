@@ -1,4 +1,6 @@
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
@@ -68,9 +70,9 @@ export async function GET(req: NextRequest) {
     }));
 
     // 4. Calculate Chart Data (Revenue vs Expenses for last 6 months)
-    const months = [];
-    const incomeData = [];
-    const expenseData = [];
+    const months: string[] = [];
+    const incomeData: number[] = [];
+    const expenseData: number[] = [];
     
     // Generate last 6 months labels
     for (let i = 5; i >= 0; i--) {

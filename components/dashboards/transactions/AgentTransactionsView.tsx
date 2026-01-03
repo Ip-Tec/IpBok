@@ -69,11 +69,11 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
     async (
       mainTransaction: Omit<
         Transaction,
-        "id" | "businessId" | "userId" | "date" | "status" | "type"
+        "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
       > & { type: "Deposit" | "Withdrawal" | "Charge" },
       chargeTransaction?: Omit<
         Transaction,
-        "id" | "businessId" | "userId" | "date" | "status" | "type"
+        "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
       > & { type: "Deposit" | "Withdrawal" | "Charge" }
     ) => {
       setIsLoading(true);

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+// @ts-ignore
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
@@ -7,4 +8,4 @@ const nextConfig: NextConfig = {
 
 export default withPWA({
   dest: "public",
-})(nextConfig);
+})(nextConfig as any);

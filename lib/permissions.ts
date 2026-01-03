@@ -37,6 +37,8 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     Permission.VIEW_FINANCIALS,
   ],
   [Role.AGENT]: [], // Agents have basic access handled by UI context
+  [Role.SUPERADMIN]: Object.values(Permission),
+  [Role.SUPPORT]: [Permission.VIEW_DASHBOARD, Permission.AUDIT_READ],
 };
 
 export function hasPermission(user: User, permission: Permission): boolean {

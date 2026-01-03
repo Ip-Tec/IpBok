@@ -31,6 +31,7 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  ChartOptions
 } from "chart.js";
 
 import SideNav from "./SideNav";
@@ -155,7 +156,7 @@ const OwnerDashboard = (user: User) => {
     },
   ];
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<"bar"> = {
     responsive: true,
     plugins: {
       legend: {

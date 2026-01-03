@@ -102,7 +102,7 @@ const AgentDashboard = (user: User) => {
       date: new Date().toISOString(),
       status: "pending",
       description: "Initial cash deposit",
-      recordedBy: { name: user.name, email: user.email || '' },
+      recordedBy: { name: user.name ?? null, email: user.email ?? null },
     },
     {
       id: uuidv4(),
@@ -113,6 +113,8 @@ const AgentDashboard = (user: User) => {
       date: new Date().toISOString(),
       status: "pending",
       description: "Bank withdrawal for expenses",
+      recordedBy: null,
+      recipientId: undefined,
     },
   ]);
 
@@ -150,11 +152,11 @@ const AgentDashboard = (user: User) => {
   const handleAddTransaction = async (
     mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status" | "type"
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
     > & { type: "Deposit" | "Withdrawal" | "Charge" },
     chargeTransaction?: Omit<
       Transaction,
-      "id" | "businessId" | "userId" | "date" | "status" | "type"
+      "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
     > & { type: "Deposit" | "Withdrawal" | "Charge" }
   ) => {
     const transactionsToProcess = [mainTransaction];
@@ -332,7 +334,11 @@ const AgentDashboard = (user: User) => {
         <div className="mt-6">
           <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Today’s Transactions</h3>
-            <AgentTransactionsTable transactions={transactionsData} />
+            <AgentTransactionsTable 
+              transactions={transactionsData} 
+              user={user} 
+              onTransactionUpdate={fetchSummaryData} 
+            />
           </div>
         </div>
       </main>

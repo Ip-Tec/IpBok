@@ -5,7 +5,14 @@ import { Bell } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Notification } from '@/src/generated/models'; // Assuming generated types
+interface Notification {
+  id: string;
+  message: string;
+  isRead: boolean;
+  link: string | null;
+  createdAt: Date | string;
+  userId: string;
+}
 
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

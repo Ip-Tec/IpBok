@@ -10,25 +10,33 @@ declare global {
 }
 
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DATABASE_URL environment variable is not set");
-}
-const url = new URL(connectionString);
+let adapter: any;
 
-const adapter = new PrismaMariaDb({
-  host: url.hostname,
-  port: parseInt(url.port, 10),
-  user: url.username,
-  password: url.password,
-  database: url.pathname.substring(1), // remove leading '/'
-});
+if (connectionString) {
+  const url = new URL(connectionString);
+  adapter = new PrismaMariaDb({
+    host: url.hostname,
+    port: parseInt(url.port, 10),
+    user: url.username,
+    password: url.password,
+    database: url.pathname.substring(1), // remove leading '/'
+  });
+} else {
+  console.warn("⚠️ DATABASE_URL environment variable is not set. Prisma will not be initialized.");
+}
 
 
 export const prisma =
   global.prisma ||
+  // @ts-ignore - Broken generated types require adapter even when using accelerateUrl
   new PrismaClient({
-    adapter,
     log: ["query", "info", "warn", "error"],
+    ...(adapter 
+      ? { adapter } 
+      : { 
+          accelerateUrl: process.env.DATABASE_URL || "" 
+        }
+    ),
   });
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;

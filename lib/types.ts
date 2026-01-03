@@ -21,7 +21,7 @@ export interface Transaction {
   date: string;
   recordedBy: {
     name: string | null;
-    email: string;
+    email: string | null;
   } | null;
   status: string;
   recipientId?: string;

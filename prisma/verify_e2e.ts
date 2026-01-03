@@ -1,8 +1,9 @@
-import { PrismaClient } from '../src/generated'; 
+import { PrismaClient } from '../src/generated/client'; 
 // Trying relative path to generated client since @prisma/client might be an alias handling issue in standalone script
 // If this fails, we will try @prisma/client
 
-const prisma = new PrismaClient();
+// @ts-ignore
+const prisma = new PrismaClient({ accelerateUrl: process.env.DATABASE_URL || "" });
 
 async function main() {
   console.log("🚀 Starting End-to-End Logic Verification (TS in Prisma Dir)...");

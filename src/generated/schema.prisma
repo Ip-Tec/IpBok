@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                   String             @id @default(cuid())
+  name                 String?
+  email                String?            @unique
+  emailVerified        DateTime?
+  password             String?
+  role                 Role               @default(AGENT)
+  image                String?
+  accounts             Account[]
+  sessions             Session[]
+  memberships          Membership[]
+  transactions         Transaction[]      @relation("RecordedTransactions")
+  receivedTransactions Transaction[]      @relation("ReceivedTransactions")
+  notifications        Notification[]
+  cashAdvancesGiven    CashAdvance[]      @relation("CashAdvanceGiver")
+  cashAdvancesReceived CashAdvance[]      @relation("CashAdvanceReceiver")
+  transactionsPerPage  Int                @default(10)
+  heldAccounts         FinancialAccount[] @relation("AccountHolder")
+  requestsSent         Request[]          @relation("Requester")
+  requestsApproved     Request[]          @relation("Approver")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Notification model
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// IpBok models
+enum Role {
+  OWNER
+  AGENT
+  MANAGER
+  ACCOUNTANT
+  AUDITOR
+  FINANCE_OFFICER
+  SUPERADMIN
+  SUPPORT
+}
+
+model Business {
+  id                 String             @id @default(cuid())
+  name               String
+  address            String?
+  phone              String?
+  type               BusinessType? // No formatted default, forces onboarding.
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  trialEndsAt        DateTime?
+  subscriptionEndsAt DateTime?
+  planId             String?
+  plan               PricingPlan?       @relation(fields: [planId], references: [id])
+
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  memberships    Membership[]
+  accounts       FinancialAccount[]
+  transactions   Transaction[]
+  dailySummaries DailySummary[]
+  cashAdvances   CashAdvance[]
+  requests       Request[]
+}
+
+enum BusinessType {
+  POS
+  RETAIL
+  CORPORATE
+  PERSONAL
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  PAUSED
+}
+
+model PricingPlan {
+  id           String       @id @default(cuid())
+  businessType BusinessType @unique
+  monthlyPrice Float        @default(0)
+  trialDays    Int          @default(30)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  businesses   Business[]
+}
+
+model Membership {
+  id         String   @id @default(cuid())
+  userId     String
+  businessId String
+  role       Role
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+}
+
+model FinancialAccount {
+  id           String        @id @default(cuid())
+  name         String // e.g., "Cash", "Bank Account", "Agent A's Float"
+  type         AccountType
+  balance      Float         @default(0)
+  businessId   String
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  holderId     String? // Link to specific user (Agent)
+  holder       User?         @relation("AccountHolder", fields: [holderId], references: [id])
+  transactions Transaction[]
+}
+
+enum AccountType {
+  CASH
+  BANK
+}
+
+model TransactionType {
+  id           String        @id @default(cuid())
+  name         String        @unique // e.g., "Deposit", "Withdrawal", "Expense", "Charge"
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  amount        Float
+  typeId        String
+  type          TransactionType   @relation(fields: [typeId], references: [id])
+  paymentMethod PaymentMethod
+  recordedById  String
+  recordedBy    User              @relation("RecordedTransactions", fields: [recordedById], references: [id])
+  recipientId   String?
+  recipient     User?             @relation("ReceivedTransactions", fields: [recipientId], references: [id])
+  status        TransactionStatus @default(PENDING)
+  businessId    String
+  business      Business          @relation(fields: [businessId], references: [id])
+  accountId     String?
+  account       FinancialAccount? @relation(fields: [accountId], references: [id])
+  date          DateTime          @default(now())
+  description   String?
+  createdAt     DateTime          @default(now())
+}
+
+enum PaymentMethod {
+  ATM_CARD
+  BANK
+  BANK_TRANSFER
+  CASH
+  MOBILE_MONEY
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model DailySummary {
+  id               String   @id @default(cuid())
+  businessId       String
+  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  date             DateTime @db.Date
+  openingBalance   Float
+  totalDeposits    Float    @default(0)
+  totalWithdrawals Float    @default(0)
+  totalExpenses    Float    @default(0)
+  totalCharges     Float    @default(0)
+  closingBalance   Float
+  reconciled       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  @@unique([businessId, date])
+}
+
+model CashAdvance {
+  id           String            @id @default(cuid())
+  amount       Float
+  description  String?
+  status       CashAdvanceStatus @default(PENDING)
+  businessId   String
+  business     Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  givenById    String
+  givenBy      User              @relation("CashAdvanceGiver", fields: [givenById], references: [id])
+  receivedById String
+  receivedBy   User              @relation("CashAdvanceReceiver", fields: [receivedById], references: [id])
+  date         DateTime          @default(now())
+  confirmedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+enum CashAdvanceStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+model Request {
+  id          String        @id @default(cuid())
+  amount      Float
+  type        RequestType
+  status      RequestStatus @default(PENDING)
+  description String?
+
+  requesterId String
+  requester   User   @relation("Requester", fields: [requesterId], references: [id])
+
+  approverId String?
+  approver   User?   @relation("Approver", fields: [approverId], references: [id])
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RequestType {
+  CASH_ADVANCE
+  EXPENSE_REIMBURSEMENT
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

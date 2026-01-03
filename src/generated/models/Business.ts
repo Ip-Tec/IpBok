@@ -30,6 +30,10 @@ export type BusinessMinAggregateOutputType = {
   address: string | null
   phone: string | null
   type: $Enums.BusinessType | null
+  subscriptionStatus: $Enums.SubscriptionStatus | null
+  trialEndsAt: Date | null
+  subscriptionEndsAt: Date | null
+  planId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -40,6 +44,10 @@ export type BusinessMaxAggregateOutputType = {
   address: string | null
   phone: string | null
   type: $Enums.BusinessType | null
+  subscriptionStatus: $Enums.SubscriptionStatus | null
+  trialEndsAt: Date | null
+  subscriptionEndsAt: Date | null
+  planId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +58,10 @@ export type BusinessCountAggregateOutputType = {
   address: number
   phone: number
   type: number
+  subscriptionStatus: number
+  trialEndsAt: number
+  subscriptionEndsAt: number
+  planId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -62,6 +74,10 @@ export type BusinessMinAggregateInputType = {
   address?: true
   phone?: true
   type?: true
+  subscriptionStatus?: true
+  trialEndsAt?: true
+  subscriptionEndsAt?: true
+  planId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -72,6 +88,10 @@ export type BusinessMaxAggregateInputType = {
   address?: true
   phone?: true
   type?: true
+  subscriptionStatus?: true
+  trialEndsAt?: true
+  subscriptionEndsAt?: true
+  planId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +102,10 @@ export type BusinessCountAggregateInputType = {
   address?: true
   phone?: true
   type?: true
+  subscriptionStatus?: true
+  trialEndsAt?: true
+  subscriptionEndsAt?: true
+  planId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -165,6 +189,10 @@ export type BusinessGroupByOutputType = {
   address: string | null
   phone: string | null
   type: $Enums.BusinessType | null
+  subscriptionStatus: $Enums.SubscriptionStatus
+  trialEndsAt: Date | null
+  subscriptionEndsAt: Date | null
+  planId: string | null
   createdAt: Date
   updatedAt: Date
   _count: BusinessCountAggregateOutputType | null
@@ -196,8 +224,13 @@ export type BusinessWhereInput = {
   address?: Prisma.StringNullableFilter<"Business"> | string | null
   phone?: Prisma.StringNullableFilter<"Business"> | string | null
   type?: Prisma.EnumBusinessTypeNullableFilter<"Business"> | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"Business"> | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  planId?: Prisma.StringNullableFilter<"Business"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+  plan?: Prisma.XOR<Prisma.PricingPlanNullableScalarRelationFilter, Prisma.PricingPlanWhereInput> | null
   memberships?: Prisma.MembershipListRelationFilter
   accounts?: Prisma.FinancialAccountListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
@@ -212,8 +245,13 @@ export type BusinessOrderByWithRelationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  planId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  plan?: Prisma.PricingPlanOrderByWithRelationInput
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
   accounts?: Prisma.FinancialAccountOrderByRelationAggregateInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
@@ -232,8 +270,13 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringNullableFilter<"Business"> | string | null
   phone?: Prisma.StringNullableFilter<"Business"> | string | null
   type?: Prisma.EnumBusinessTypeNullableFilter<"Business"> | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"Business"> | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  planId?: Prisma.StringNullableFilter<"Business"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+  plan?: Prisma.XOR<Prisma.PricingPlanNullableScalarRelationFilter, Prisma.PricingPlanWhereInput> | null
   memberships?: Prisma.MembershipListRelationFilter
   accounts?: Prisma.FinancialAccountListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
@@ -248,6 +291,10 @@ export type BusinessOrderByWithAggregationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  planId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BusinessCountOrderByAggregateInput
@@ -264,6 +311,10 @@ export type BusinessScalarWhereWithAggregatesInput = {
   address?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   type?: Prisma.EnumBusinessTypeNullableWithAggregatesFilter<"Business"> | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusWithAggregatesFilter<"Business"> | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Business"> | Date | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Business"> | Date | string | null
+  planId?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Business"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Business"> | Date | string
 }
@@ -274,8 +325,12 @@ export type BusinessCreateInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
@@ -290,6 +345,10 @@ export type BusinessUncheckedCreateInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -306,8 +365,12 @@ export type BusinessUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
@@ -322,6 +385,10 @@ export type BusinessUncheckedUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -338,6 +405,10 @@ export type BusinessCreateManyInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -348,6 +419,9 @@ export type BusinessUpdateManyMutationInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -358,6 +432,10 @@ export type BusinessUncheckedUpdateManyInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -374,6 +452,10 @@ export type BusinessCountOrderByAggregateInput = {
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrder
+  planId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -384,6 +466,10 @@ export type BusinessMaxOrderByAggregateInput = {
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrder
+  planId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -394,8 +480,22 @@ export type BusinessMinOrderByAggregateInput = {
   address?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  subscriptionStatus?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
+  subscriptionEndsAt?: Prisma.SortOrder
+  planId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BusinessListRelationFilter = {
+  every?: Prisma.BusinessWhereInput
+  some?: Prisma.BusinessWhereInput
+  none?: Prisma.BusinessWhereInput
+}
+
+export type BusinessOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type BusinessScalarRelationFilter = {
@@ -405,6 +505,52 @@ export type BusinessScalarRelationFilter = {
 
 export type NullableEnumBusinessTypeFieldUpdateOperationsInput = {
   set?: $Enums.BusinessType | null
+}
+
+export type EnumSubscriptionStatusFieldUpdateOperationsInput = {
+  set?: $Enums.SubscriptionStatus
+}
+
+export type BusinessCreateNestedManyWithoutPlanInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutPlanInput, Prisma.BusinessUncheckedCreateWithoutPlanInput> | Prisma.BusinessCreateWithoutPlanInput[] | Prisma.BusinessUncheckedCreateWithoutPlanInput[]
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutPlanInput | Prisma.BusinessCreateOrConnectWithoutPlanInput[]
+  createMany?: Prisma.BusinessCreateManyPlanInputEnvelope
+  connect?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+}
+
+export type BusinessUncheckedCreateNestedManyWithoutPlanInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutPlanInput, Prisma.BusinessUncheckedCreateWithoutPlanInput> | Prisma.BusinessCreateWithoutPlanInput[] | Prisma.BusinessUncheckedCreateWithoutPlanInput[]
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutPlanInput | Prisma.BusinessCreateOrConnectWithoutPlanInput[]
+  createMany?: Prisma.BusinessCreateManyPlanInputEnvelope
+  connect?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+}
+
+export type BusinessUpdateManyWithoutPlanNestedInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutPlanInput, Prisma.BusinessUncheckedCreateWithoutPlanInput> | Prisma.BusinessCreateWithoutPlanInput[] | Prisma.BusinessUncheckedCreateWithoutPlanInput[]
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutPlanInput | Prisma.BusinessCreateOrConnectWithoutPlanInput[]
+  upsert?: Prisma.BusinessUpsertWithWhereUniqueWithoutPlanInput | Prisma.BusinessUpsertWithWhereUniqueWithoutPlanInput[]
+  createMany?: Prisma.BusinessCreateManyPlanInputEnvelope
+  set?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  disconnect?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  delete?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  connect?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  update?: Prisma.BusinessUpdateWithWhereUniqueWithoutPlanInput | Prisma.BusinessUpdateWithWhereUniqueWithoutPlanInput[]
+  updateMany?: Prisma.BusinessUpdateManyWithWhereWithoutPlanInput | Prisma.BusinessUpdateManyWithWhereWithoutPlanInput[]
+  deleteMany?: Prisma.BusinessScalarWhereInput | Prisma.BusinessScalarWhereInput[]
+}
+
+export type BusinessUncheckedUpdateManyWithoutPlanNestedInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutPlanInput, Prisma.BusinessUncheckedCreateWithoutPlanInput> | Prisma.BusinessCreateWithoutPlanInput[] | Prisma.BusinessUncheckedCreateWithoutPlanInput[]
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutPlanInput | Prisma.BusinessCreateOrConnectWithoutPlanInput[]
+  upsert?: Prisma.BusinessUpsertWithWhereUniqueWithoutPlanInput | Prisma.BusinessUpsertWithWhereUniqueWithoutPlanInput[]
+  createMany?: Prisma.BusinessCreateManyPlanInputEnvelope
+  set?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  disconnect?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  delete?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  connect?: Prisma.BusinessWhereUniqueInput | Prisma.BusinessWhereUniqueInput[]
+  update?: Prisma.BusinessUpdateWithWhereUniqueWithoutPlanInput | Prisma.BusinessUpdateWithWhereUniqueWithoutPlanInput[]
+  updateMany?: Prisma.BusinessUpdateManyWithWhereWithoutPlanInput | Prisma.BusinessUpdateManyWithWhereWithoutPlanInput[]
+  deleteMany?: Prisma.BusinessScalarWhereInput | Prisma.BusinessScalarWhereInput[]
 }
 
 export type BusinessCreateNestedOneWithoutMembershipsInput = {
@@ -491,14 +637,99 @@ export type BusinessUpdateOneRequiredWithoutRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutRequestsInput, Prisma.BusinessUpdateWithoutRequestsInput>, Prisma.BusinessUncheckedUpdateWithoutRequestsInput>
 }
 
+export type BusinessCreateWithoutPlanInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
+  accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
+  dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessUncheckedCreateWithoutPlanInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
+  accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutBusinessInput
+  dailySummaries?: Prisma.DailySummaryUncheckedCreateNestedManyWithoutBusinessInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedCreateNestedManyWithoutBusinessInput
+  requests?: Prisma.RequestUncheckedCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessCreateOrConnectWithoutPlanInput = {
+  where: Prisma.BusinessWhereUniqueInput
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutPlanInput, Prisma.BusinessUncheckedCreateWithoutPlanInput>
+}
+
+export type BusinessCreateManyPlanInputEnvelope = {
+  data: Prisma.BusinessCreateManyPlanInput | Prisma.BusinessCreateManyPlanInput[]
+  skipDuplicates?: boolean
+}
+
+export type BusinessUpsertWithWhereUniqueWithoutPlanInput = {
+  where: Prisma.BusinessWhereUniqueInput
+  update: Prisma.XOR<Prisma.BusinessUpdateWithoutPlanInput, Prisma.BusinessUncheckedUpdateWithoutPlanInput>
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutPlanInput, Prisma.BusinessUncheckedCreateWithoutPlanInput>
+}
+
+export type BusinessUpdateWithWhereUniqueWithoutPlanInput = {
+  where: Prisma.BusinessWhereUniqueInput
+  data: Prisma.XOR<Prisma.BusinessUpdateWithoutPlanInput, Prisma.BusinessUncheckedUpdateWithoutPlanInput>
+}
+
+export type BusinessUpdateManyWithWhereWithoutPlanInput = {
+  where: Prisma.BusinessScalarWhereInput
+  data: Prisma.XOR<Prisma.BusinessUpdateManyMutationInput, Prisma.BusinessUncheckedUpdateManyWithoutPlanInput>
+}
+
+export type BusinessScalarWhereInput = {
+  AND?: Prisma.BusinessScalarWhereInput | Prisma.BusinessScalarWhereInput[]
+  OR?: Prisma.BusinessScalarWhereInput[]
+  NOT?: Prisma.BusinessScalarWhereInput | Prisma.BusinessScalarWhereInput[]
+  id?: Prisma.StringFilter<"Business"> | string
+  name?: Prisma.StringFilter<"Business"> | string
+  address?: Prisma.StringNullableFilter<"Business"> | string | null
+  phone?: Prisma.StringNullableFilter<"Business"> | string | null
+  type?: Prisma.EnumBusinessTypeNullableFilter<"Business"> | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFilter<"Business"> | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  subscriptionEndsAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  planId?: Prisma.StringNullableFilter<"Business"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+}
+
 export type BusinessCreateWithoutMembershipsInput = {
   id?: string
   name: string
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
@@ -512,6 +743,10 @@ export type BusinessUncheckedCreateWithoutMembershipsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.FinancialAccountUncheckedCreateNestedManyWithoutBusinessInput
@@ -543,8 +778,12 @@ export type BusinessUpdateWithoutMembershipsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
@@ -558,6 +797,10 @@ export type BusinessUncheckedUpdateWithoutMembershipsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
@@ -573,8 +816,12 @@ export type BusinessCreateWithoutAccountsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
@@ -588,6 +835,10 @@ export type BusinessUncheckedCreateWithoutAccountsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -619,8 +870,12 @@ export type BusinessUpdateWithoutAccountsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
@@ -634,6 +889,10 @@ export type BusinessUncheckedUpdateWithoutAccountsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -649,8 +908,12 @@ export type BusinessCreateWithoutTransactionsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   dailySummaries?: Prisma.DailySummaryCreateNestedManyWithoutBusinessInput
@@ -664,6 +927,10 @@ export type BusinessUncheckedCreateWithoutTransactionsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -695,8 +962,12 @@ export type BusinessUpdateWithoutTransactionsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
@@ -710,6 +981,10 @@ export type BusinessUncheckedUpdateWithoutTransactionsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -725,8 +1000,12 @@ export type BusinessCreateWithoutDailySummariesInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
@@ -740,6 +1019,10 @@ export type BusinessUncheckedCreateWithoutDailySummariesInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -771,8 +1054,12 @@ export type BusinessUpdateWithoutDailySummariesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
@@ -786,6 +1073,10 @@ export type BusinessUncheckedUpdateWithoutDailySummariesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -801,8 +1092,12 @@ export type BusinessCreateWithoutCashAdvancesInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
@@ -816,6 +1111,10 @@ export type BusinessUncheckedCreateWithoutCashAdvancesInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -847,8 +1146,12 @@ export type BusinessUpdateWithoutCashAdvancesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
@@ -862,6 +1165,10 @@ export type BusinessUncheckedUpdateWithoutCashAdvancesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -877,8 +1184,12 @@ export type BusinessCreateWithoutRequestsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  plan?: Prisma.PricingPlanCreateNestedOneWithoutBusinessesInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutBusinessInput
   accounts?: Prisma.FinancialAccountCreateNestedManyWithoutBusinessInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutBusinessInput
@@ -892,6 +1203,10 @@ export type BusinessUncheckedCreateWithoutRequestsInput = {
   address?: string | null
   phone?: string | null
   type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  planId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutBusinessInput
@@ -923,8 +1238,12 @@ export type BusinessUpdateWithoutRequestsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  plan?: Prisma.PricingPlanUpdateOneWithoutBusinessesNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
   accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
@@ -938,6 +1257,10 @@ export type BusinessUncheckedUpdateWithoutRequestsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
@@ -945,6 +1268,70 @@ export type BusinessUncheckedUpdateWithoutRequestsInput = {
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
   dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
   cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessCreateManyPlanInput = {
+  id?: string
+  name: string
+  address?: string | null
+  phone?: string | null
+  type?: $Enums.BusinessType | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  trialEndsAt?: Date | string | null
+  subscriptionEndsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type BusinessUpdateWithoutPlanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  memberships?: Prisma.MembershipUpdateManyWithoutBusinessNestedInput
+  accounts?: Prisma.FinancialAccountUpdateManyWithoutBusinessNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutBusinessNestedInput
+  dailySummaries?: Prisma.DailySummaryUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessUncheckedUpdateWithoutPlanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutBusinessNestedInput
+  accounts?: Prisma.FinancialAccountUncheckedUpdateManyWithoutBusinessNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutBusinessNestedInput
+  dailySummaries?: Prisma.DailySummaryUncheckedUpdateManyWithoutBusinessNestedInput
+  cashAdvances?: Prisma.CashAdvanceUncheckedUpdateManyWithoutBusinessNestedInput
+  requests?: Prisma.RequestUncheckedUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessUncheckedUpdateManyWithoutPlanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.NullableEnumBusinessTypeFieldUpdateOperationsInput | $Enums.BusinessType | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptionEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1029,8 +1416,13 @@ export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   address?: boolean
   phone?: boolean
   type?: boolean
+  subscriptionStatus?: boolean
+  trialEndsAt?: boolean
+  subscriptionEndsAt?: boolean
+  planId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  plan?: boolean | Prisma.Business$planArgs<ExtArgs>
   memberships?: boolean | Prisma.Business$membershipsArgs<ExtArgs>
   accounts?: boolean | Prisma.Business$accountsArgs<ExtArgs>
   transactions?: boolean | Prisma.Business$transactionsArgs<ExtArgs>
@@ -1048,12 +1440,17 @@ export type BusinessSelectScalar = {
   address?: boolean
   phone?: boolean
   type?: boolean
+  subscriptionStatus?: boolean
+  trialEndsAt?: boolean
+  subscriptionEndsAt?: boolean
+  planId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "phone" | "type" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
+export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "address" | "phone" | "type" | "subscriptionStatus" | "trialEndsAt" | "subscriptionEndsAt" | "planId" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
 export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  plan?: boolean | Prisma.Business$planArgs<ExtArgs>
   memberships?: boolean | Prisma.Business$membershipsArgs<ExtArgs>
   accounts?: boolean | Prisma.Business$accountsArgs<ExtArgs>
   transactions?: boolean | Prisma.Business$transactionsArgs<ExtArgs>
@@ -1066,6 +1463,7 @@ export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Business"
   objects: {
+    plan: Prisma.$PricingPlanPayload<ExtArgs> | null
     memberships: Prisma.$MembershipPayload<ExtArgs>[]
     accounts: Prisma.$FinancialAccountPayload<ExtArgs>[]
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
@@ -1079,6 +1477,10 @@ export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     address: string | null
     phone: string | null
     type: $Enums.BusinessType | null
+    subscriptionStatus: $Enums.SubscriptionStatus
+    trialEndsAt: Date | null
+    subscriptionEndsAt: Date | null
+    planId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["business"]>
@@ -1421,6 +1823,7 @@ readonly fields: BusinessFieldRefs;
  */
 export interface Prisma__BusinessClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  plan<T extends Prisma.Business$planArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$planArgs<ExtArgs>>): Prisma.Prisma__PricingPlanClient<runtime.Types.Result.GetResult<Prisma.$PricingPlanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   memberships<T extends Prisma.Business$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accounts<T extends Prisma.Business$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinancialAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transactions<T extends Prisma.Business$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1461,6 +1864,10 @@ export interface BusinessFieldRefs {
   readonly address: Prisma.FieldRef<"Business", 'String'>
   readonly phone: Prisma.FieldRef<"Business", 'String'>
   readonly type: Prisma.FieldRef<"Business", 'BusinessType'>
+  readonly subscriptionStatus: Prisma.FieldRef<"Business", 'SubscriptionStatus'>
+  readonly trialEndsAt: Prisma.FieldRef<"Business", 'DateTime'>
+  readonly subscriptionEndsAt: Prisma.FieldRef<"Business", 'DateTime'>
+  readonly planId: Prisma.FieldRef<"Business", 'String'>
   readonly createdAt: Prisma.FieldRef<"Business", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Business", 'DateTime'>
 }
@@ -1803,6 +2210,25 @@ export type BusinessDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Businesses to delete.
    */
   limit?: number
+}
+
+/**
+ * Business.plan
+ */
+export type Business$planArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PricingPlan
+   */
+  select?: Prisma.PricingPlanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PricingPlan
+   */
+  omit?: Prisma.PricingPlanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PricingPlanInclude<ExtArgs> | null
+  where?: Prisma.PricingPlanWhereInput
 }
 
 /**
