@@ -14,9 +14,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    let existingUser;
+    try {
+      existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+    } catch (checkError) {
+      console.error("Database connectivity error during registration check:", checkError);
+      return NextResponse.json({ error: "Cannot connect to the database. Please ensure your database is running and whitelisted." }, { status: 503 });
+    }
 
     if (existingUser) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
