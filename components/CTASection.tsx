@@ -44,9 +44,11 @@ const CTASection = () => {
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="heroOutline" size="lg">
-              View Pricing
-            </Button>
+            <Link href="/pricing">
+              <Button variant="heroOutline" size="lg">
+                View Pricing
+              </Button>
+            </Link>
           </div>
 
           {/* Trust indicators */}

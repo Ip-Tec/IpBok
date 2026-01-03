@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated"
 }
 
@@ -86,6 +86,8 @@ enum Role {
   ACCOUNTANT
   AUDITOR
   FINANCE_OFFICER
+  SUPERADMIN
+  SUPPORT
 }
 
 model Business {
@@ -94,6 +96,12 @@ model Business {
   address        String?
   phone          String?
   type           BusinessType?      // No formatted default, forces onboarding.
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  trialEndsAt        DateTime?
+  subscriptionEndsAt DateTime?
+  planId             String?
+  plan               PricingPlan?      @relation(fields: [planId], references: [id])
+
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   memberships    Membership[]
@@ -109,6 +117,23 @@ enum BusinessType {
   RETAIL
   CORPORATE
   PERSONAL
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  EXPIRED
+  PAUSED
+}
+
+model PricingPlan {
+  id            String       @id @default(cuid())
+  businessType  BusinessType @unique
+  monthlyPrice  Float        @default(0)
+  trialDays     Int          @default(30)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  businesses    Business[]
 }
 
 model Membership {

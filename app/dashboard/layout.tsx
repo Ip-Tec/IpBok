@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
+import TrialProtectionBanner from "@/components/SubscriptionBanner";
 
 const ownerSidebarNavLinks = [
   {
@@ -92,7 +93,15 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [subStatus, setSubStatus] = useState<string>("TRIAL");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/subscription/status")
+      .then(res => res.json())
+      .then(data => setSubStatus(data.status))
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -139,23 +148,26 @@ export default function DashboardLayout({
        // Verification: Owner links includes Accounting, Reconciliation, Reports.
   }
   
-  // Handling "Every tool shown":
-  // User wants specific tools hidden based on type. 
-  // If businessType is NOT SET, we should not be here (Redirect logic below).
-  
   if (isOwner && !businessType) {
-      // This will be handled by the effect below, but we can return null to avoid flash
+      // This will be handled by the effect, but we can return null to avoid flash
      return null; 
   }
+
+  // Feature Locking Logic: If EXPIRED, only show Settings/Billing
+  const isExpired = subStatus === "EXPIRED";
+  const finalNavLinks = isExpired 
+    ? navLinks.filter(l => l.href.includes("settings"))
+    : navLinks;
 
 
   return (
     <div className="flex h-screen bg-background text-foreground">
+      <TrialProtectionBanner />
       <SideNav
         user={user}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
-        sidebarNavLinks={navLinks}
+        sidebarNavLinks={finalNavLinks}
       />
       <main className="flex-1 flex flex-col lg:ml-64">
         <header className="flex items-center justify-between p-4 bg-card border-b border-border lg:hidden">

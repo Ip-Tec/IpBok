@@ -18,9 +18,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Invalid business type" }, { status: 400 });
     }
 
+    const plan = await prisma.pricingPlan.findUnique({
+      where: { businessType: type as BusinessType },
+    });
+
+    const trialEndsAt = new Date();
+    trialEndsAt.setDate(trialEndsAt.getDate() + (plan?.trialDays || 30));
+
     await prisma.business.update({
       where: { id: session.user.businessId },
-      data: { type: type as BusinessType },
+      data: { 
+        type: type as BusinessType,
+        trialEndsAt: trialEndsAt,
+        planId: plan?.id,
+        subscriptionStatus: "TRIAL"
+      },
     });
 
     return NextResponse.json({ message: "Business type updated successfully" });

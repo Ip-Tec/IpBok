@@ -49,7 +49,11 @@ export async function GET(req: NextRequest) {
     });
 
     const todaysNet = todaysTransactions.reduce((sum, tx) => {
-      if (tx.type.name === "Deposit" || tx.type.name === "Charge") {
+      if (
+        tx.type.name === "Deposit" ||
+        tx.type.name === "Charge" ||
+        tx.type.name === "Income"
+      ) {
         return sum + tx.amount;
       } else if (tx.type.name === "Withdrawal" || tx.type.name === "Expense") {
         return sum - tx.amount;
@@ -109,14 +113,18 @@ export async function GET(req: NextRequest) {
     last7DaysTransactions.forEach((tx) => {
       const formattedDate = format(tx.date, "yyyy-MM-dd");
       if (dailyData[formattedDate]) {
-        if (tx.type.name === "Deposit" || tx.type.name === "Charge") {
-          dailyData[formattedDate].revenue += tx.amount;
-        } else if (
-          tx.type.name === "Withdrawal" ||
-          tx.type.name === "Expense"
-        ) {
-          dailyData[formattedDate].expenses += tx.amount;
-        }
+      if (
+        tx.type.name === "Deposit" ||
+        tx.type.name === "Charge" ||
+        tx.type.name === "Income"
+      ) {
+        dailyData[formattedDate].revenue += tx.amount;
+      } else if (
+        tx.type.name === "Withdrawal" ||
+        tx.type.name === "Expense"
+      ) {
+        dailyData[formattedDate].expenses += tx.amount;
+      }
       }
     });
 
