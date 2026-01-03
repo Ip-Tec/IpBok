@@ -130,22 +130,22 @@ const AgentDashboard = (user: User) => {
     {
       name: "Dashboard",
       href: "/dashboard",
-      icon: <LayoutDashboard className="w-5 h-5" />,
+      icon: <LayoutDashboard className="w-6 h-6" />,
     },
     {
       name: "Transaction",
       href: "/dashboard/transactions",
-      icon: <ArrowRightLeft className="w-5 h-5" />,
+      icon: <ArrowRightLeft className="w-6 h-6" />,
     },
     {
       name: "Reconciliation",
       href: "/dashboard/reconciliation",
-      icon: <FileCheck className="w-5 h-5" />,
+      icon: <FileCheck className="w-6 h-6" />,
     },
     {
       name: "Setting",
       href: "/dashboard/settings",
-      icon: <Settings className="w-5 h-5" />,
+      icon: <Settings className="w-6 h-6" />,
     },
   ];
 

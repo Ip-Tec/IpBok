@@ -24,42 +24,42 @@ const ownerSidebarNavLinks = [
   {
     name: "Dashboard",
     href: "/dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
+    icon: <LayoutDashboard className="w-6 h-6" />,
   },
   {
     name: "Agents",
     href: "/dashboard/agents",
-    icon: <Users className="w-5 h-5" />,
+    icon: <Users className="w-6 h-6" />,
   },
   {
     name: "Transaction",
     href: "/dashboard/transactions",
-    icon: <ArrowRightLeft className="w-5 h-5" />,
+    icon: <ArrowRightLeft className="w-6 h-6" />,
   },
   {
     name: "Accounting",
     href: "/dashboard/accounting",
-    icon: <LayoutDashboard className="w-5 h-5" />,
+    icon: <LayoutDashboard className="w-6 h-6" />,
   },
   {
     name: "Reconciliation",
     href: "/dashboard/reconciliation",
-    icon: <FileCheck className="w-5 h-5" />,
+    icon: <FileCheck className="w-6 h-6" />,
   },
   {
     name: "Reports",
     href: "/dashboard/reports",
-    icon: <FileText className="w-5 h-5" />,
+    icon: <FileText className="w-6 h-6" />,
   },
   {
     name: "Setting",
     href: "/dashboard/settings",
-    icon: <Settings className="w-5 h-5" />,
+    icon: <Settings className="w-6 h-6" />,
   },
   {
     name: "Requests",
     href: "/dashboard/requests",
-    icon: <ArrowRightLeft className="w-5 h-5" />,
+    icon: <ArrowRightLeft className="w-6 h-6" />,
   },
 ];
 
@@ -67,22 +67,22 @@ const agentSidebarNavLinks = [
   {
     name: "Dashboard",
     href: "/dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
+    icon: <LayoutDashboard className="w-6 h-6" />,
   },
   {
     name: "Transaction",
     href: "/dashboard/transactions",
-    icon: <ArrowRightLeft className="w-5 h-5" />,
+    icon: <ArrowRightLeft className="w-6 h-6" />,
   },
   {
     name: "Reconciliation",
     href: "/dashboard/reconciliation",
-    icon: <FileCheck className="w-5 h-5" />,
+    icon: <FileCheck className="w-6 h-6" />,
   },
   {
     name: "Setting",
     href: "/dashboard/settings",
-    icon: <Settings className="w-5 h-5" />,
+    icon: <Settings className="w-6 h-6" />,
   },
 ];
 

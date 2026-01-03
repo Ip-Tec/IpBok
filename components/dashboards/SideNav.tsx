@@ -38,7 +38,7 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
             <Link
               href={link.href}
               className={cn(
-                "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                "flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors",
                 "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground",
                 pathname === link.href 
                     ? "bg-primary/10 text-primary font-semibold" 
@@ -55,9 +55,9 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
         <li>
           <button
             onClick={() => signOut()}
-            className="flex items-center w-full px-4 py-2 text-sm font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
+            className="flex items-center w-full px-4 py-3 text-base font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-6 h-6" />
             <span className="ml-3">Logout</span>
           </button>
         </li>
@@ -76,13 +76,10 @@ const SideNav = ({
     <>
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-20 bg-black/80 bg-opacity-50 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          ></div>
-          <NotificationBell />
-        </>
+        <div
+          className="fixed inset-0 z-20 bg-black/80 bg-opacity-50 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
       )}
 
       {/* Sidebar */}
