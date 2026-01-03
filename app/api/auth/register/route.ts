@@ -49,7 +49,10 @@ export async function POST(request: NextRequest) {
 
     // Send email
     try {
-      await sendVerificationEmail(email, token);
+      const protocol = request.nextUrl.protocol;
+      const host = request.headers.get("host");
+      const baseUrl = `${protocol}//${host}`;
+      await sendVerificationEmail(email, token, baseUrl);
     } catch (emailError) {
       console.error("Failed to send email:", emailError);
       return NextResponse.json({ error: "Failed to send verification email. Please check your email configuration." }, { status: 500 });

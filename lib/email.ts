@@ -9,8 +9,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmLink = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
+export const sendVerificationEmail = async (email: string, token: string, baseUrl?: string) => {
+  const host = baseUrl || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const confirmLink = `${host}/verify-email?token=${token}`;
 
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',

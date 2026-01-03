@@ -2,24 +2,31 @@
 
 import { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 
-export default function Login() {
+function Login() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
+  // Show success message if redirected from signup
+  const successMessage = message === "check-email" ? "Registration successful! Please check your email to verify your account." : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     const result = await signIn("credentials", {
       email,
@@ -30,16 +37,14 @@ export default function Login() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid credentials");
+      if (result.error === "Email not verified") {
+        setError("Your email is not verified. Please check your inbox for the verification link.");
+      } else {
+        setError("Invalid credentials");
+      }
     } else {
       // Get updated session to check role and business setup
       const session = await getSession();
-      // Logic: If user is owner but hasn't completed setup (e.g. business type not set), go to onboarding
-      // For now, we'll force onboarding link or check a flag. 
-      // Simplified: Go to dashboard, dashboard will redirect if needed, OR explicit check here.
-      // Let's rely on dashboard redirect or a specific check if we had the data.
-      // Since getSession might not have the updated business type immediately without a refresh or if it's not in the token.
-      
       router.push("/dashboard"); 
     }
   };
@@ -56,6 +61,21 @@ export default function Login() {
             Enter your credentials to access your account
           </p>
         </div>
+
+        {(successMessage || success) && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0" />
+            <p className="text-sm">{successMessage || success}</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium">
@@ -98,9 +118,6 @@ export default function Login() {
               </button>
             </div>
           </div>
-          {error && (
-            <div className="text-red-500 text-sm">{error}</div>
-          )}
           <div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing In..." : "Sign In"}
@@ -154,5 +171,15 @@ export default function Login() {
         </div>
       </div>
     </div>
+  );
+}
+
+import { Suspense } from "react";
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <Login />
+    </Suspense>
   );
 }
