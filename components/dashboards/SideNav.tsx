@@ -38,7 +38,7 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
             <Link
               href={link.href}
               className={cn(
-                "flex items-center px-4 py-4 text-lg font-medium rounded-md transition-colors",
+                "flex items-center px-4 py-4 text-lg md:text-base font-medium rounded-md transition-colors",
                 "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground",
                 pathname === link.href 
                     ? "bg-primary/10 text-primary font-semibold" 
@@ -55,7 +55,7 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
         <li>
           <button
             onClick={() => signOut()}
-            className="flex items-center w-full px-4 py-4 text-lg font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
+            className="flex items-center w-full px-4 py-4 text-lg md:text-base font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
           >
             <LogOut className="w-7 h-7" />
             <span className="ml-4">Logout</span>
@@ -85,7 +85,7 @@ const SideNav = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 flex flex-col w-80 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-card border-r border-border transition-transform lg:translate-x-0 duration-300",
+          "fixed inset-y-0 left-0 z-30 flex flex-col w-96 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-card border-r border-border transition-transform lg:translate-x-0 duration-300",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
