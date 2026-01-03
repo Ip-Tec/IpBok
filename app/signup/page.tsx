@@ -8,7 +8,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function Signup() {
+const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -227,4 +227,6 @@ export default function Signup() {
       </div>
     </div>
   );
-}
+};
+
+export default Signup;
