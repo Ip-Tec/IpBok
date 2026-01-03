@@ -51,7 +51,7 @@ export default function Signup() {
         router.push("/login?message=check-email"); 
       } else {
         const data = await res.json();
-        setError(data.message || "Registration failed");
+        setError(data.error || data.message || "Registration failed");
         setLoading(false);
       }
     } catch (error) {
