@@ -127,32 +127,32 @@ const OwnerDashboard = (user: User) => {
     {
       name: "Dashboard",
       href: "/dashboard",
-      icon: <LayoutDashboard className="w-6 h-6" />,
+      icon: <LayoutDashboard className="w-7 h-7" />,
     },
     {
       name: "Agents",
       href: "/dashboard/agents",
-      icon: <Users className="w-6 h-6" />,
+      icon: <Users className="w-7 h-7" />,
     },
     {
       name: "Transaction",
       href: "/dashboard/transactions",
-      icon: <ArrowRightLeft className="w-6 h-6" />,
+      icon: <ArrowRightLeft className="w-7 h-7" />,
     },
     {
       name: "Reconciliation",
       href: "/dashboard/reconciliation",
-      icon: <FileCheck className="w-6 h-6" />,
+      icon: <FileCheck className="w-7 h-7" />,
     },
     {
       name: "Reports",
       href: "/dashboard/reports",
-      icon: <FileText className="w-6 h-6" />,
+      icon: <FileText className="w-7 h-7" />,
     },
     {
       name: "Setting",
       href: "/dashboard/settings",
-      icon: <Settings className="w-6 h-6" />,
+      icon: <Settings className="w-7 h-7" />,
     },
   ];
 

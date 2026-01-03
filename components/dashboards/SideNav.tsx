@@ -38,7 +38,7 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
             <Link
               href={link.href}
               className={cn(
-                "flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors",
+                "flex items-center px-4 py-4 text-lg font-medium rounded-md transition-colors",
                 "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground",
                 pathname === link.href 
                     ? "bg-primary/10 text-primary font-semibold" 
@@ -46,7 +46,7 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
               )}
             >
               {link.icon}
-              <span className="ml-3">{link.name}</span>
+              <span className="ml-4">{link.name}</span>
             </Link>
           </li>
         ))}
@@ -55,10 +55,10 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
         <li>
           <button
             onClick={() => signOut()}
-            className="flex items-center w-full px-4 py-3 text-base font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
+            className="flex items-center w-full px-4 py-4 text-lg font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
           >
-            <LogOut className="w-6 h-6" />
-            <span className="ml-3">Logout</span>
+            <LogOut className="w-7 h-7" />
+            <span className="ml-4">Logout</span>
           </button>
         </li>
       </ul>
@@ -90,8 +90,8 @@ const SideNav = ({
         )}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-foreground">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-foreground">
               {user.name}
             </h2>
             <NotificationBell />
