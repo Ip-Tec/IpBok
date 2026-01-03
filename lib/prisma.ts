@@ -20,6 +20,9 @@ if (connectionString) {
     user: url.username,
     password: url.password,
     database: url.pathname.substring(1), // remove leading '/'
+    ssl: {
+      rejectUnauthorized: true,
+    },
   });
 } else {
   console.warn("⚠️ DATABASE_URL environment variable is not set. Prisma will not be initialized.");
