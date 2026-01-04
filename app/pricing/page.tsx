@@ -26,6 +26,7 @@ export default async function PricingPage() {
       case "PERSONAL":
         return ["Individual tracking", "Income & Expenses", "Basic Reports", "Mobile App Access"];
       case "POS":
+      case "SME":
         return ["Waiters & Staff Management", "Daily Sales Reports", "Inventory Tracking", "60 Days Free Trial"];
       case "RETAIL":
         return ["Multiple Cash Points", "Inventory Management", "Sales Tracking", "Audit Logs"];

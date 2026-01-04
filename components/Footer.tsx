@@ -19,10 +19,10 @@ const Footer = () => {
           <div className="">
             <h3>Contact</h3>
             <p className="mt-4 text-center text-sm text-muted-foreground md:text-left">
-              Email: contact@ipbok.com
+              Email: iptecdev@gmail.com
             </p>
             <p className="text-center text-sm text-muted-foreground md:text-left">
-              Phone: +1 (123) 456-7890
+              Phone: +234 (0) 903-379-8890
             </p>
             <h4 className="text-justify my-4">Social media</h4>
             <p className="mt-4 flex items-center gap-2 text-justify text-muted-foreground md:text-left">

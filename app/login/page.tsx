@@ -119,7 +119,7 @@ function Login() {
             </div>
           </div>
           <div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
               {loading ? "Signing In..." : "Sign In"}
             </Button>
           </div>

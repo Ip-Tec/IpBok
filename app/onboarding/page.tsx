@@ -4,7 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Building, ShoppingBag, Briefcase, User } from "lucide-react";
 
 export default function OnboardingPage() {
@@ -14,12 +20,13 @@ export default function OnboardingPage() {
 
   const businessTypes = [
     {
-      id: "POS",
-      title: "Point of Sale (POS)",
-      description: "For agents, money transfer, and daily floating cash management.",
+      id: "SME",
+      title: "SME / POS Business",
+      description:
+        "For small businesses, POS agents, money transfer, and daily floating cash management.",
       icon: ShoppingBag,
     },
-    {
+    /*   {
       id: "RETAIL",
       title: "Retail Business",
       description: "For shops managing inventory, sales, and simple expenses.",
@@ -31,14 +38,14 @@ export default function OnboardingPage() {
       description: "For service-based companies requiring accounting, invoices, and payroll.",
       icon: Briefcase,
     },
-    /*
+    */
+
     {
       id: "PERSONAL",
       title: "Personal Finance",
       description: "Track your personal income, expenses, and budget.",
       icon: User,
     },
-    */
   ];
 
   const handleSelectType = async (type: string) => {
@@ -69,7 +76,9 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div className="max-w-4xl w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome to IpBok</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Welcome to IpBok
+          </h1>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
             How would you like to use IpBok?
           </p>
@@ -82,8 +91,8 @@ export default function OnboardingPage() {
           {businessTypes.map((type) => {
             const Icon = type.icon;
             return (
-              <Card 
-                key={type.id} 
+              <Card
+                key={type.id}
                 className="cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all"
                 onClick={() => !isLoading && handleSelectType(type.id)}
               >

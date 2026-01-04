@@ -158,10 +158,11 @@ export function AddMemberDialog({ onMemberAdded }: AddMemberDialogProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={Role.AGENT}>Agent</SelectItem>
-                      <SelectItem value={Role.MANAGER}>Manager</SelectItem>
+                      {/* Hide other roles for now as per user request */}
+                      {/* <SelectItem value={Role.MANAGER}>Manager</SelectItem>
                       <SelectItem value={Role.ACCOUNTANT}>Accountant</SelectItem>
                       <SelectItem value={Role.AUDITOR}>Auditor</SelectItem>
-                      <SelectItem value={Role.FINANCE_OFFICER}>Finance Officer</SelectItem>
+                      <SelectItem value={Role.FINANCE_OFFICER}>Finance Officer</SelectItem> */}
                     </SelectContent>
                   </Select>
               </div>
