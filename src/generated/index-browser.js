@@ -393,7 +393,8 @@ exports.BusinessType = exports.$Enums.BusinessType = {
   POS: 'POS',
   RETAIL: 'RETAIL',
   CORPORATE: 'CORPORATE',
-  PERSONAL: 'PERSONAL'
+  PERSONAL: 'PERSONAL',
+  SME: 'SME'
 };
 
 exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {

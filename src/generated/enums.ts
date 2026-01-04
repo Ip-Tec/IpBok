@@ -27,7 +27,8 @@ export const BusinessType = {
   POS: 'POS',
   RETAIL: 'RETAIL',
   CORPORATE: 'CORPORATE',
-  PERSONAL: 'PERSONAL'
+  PERSONAL: 'PERSONAL',
+  SME: 'SME'
 } as const
 
 export type BusinessType = (typeof BusinessType)[keyof typeof BusinessType]

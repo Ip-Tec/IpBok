@@ -118,6 +118,7 @@ enum BusinessType {
   RETAIL
   CORPORATE
   PERSONAL
+  SME
 }
 
 enum SubscriptionStatus {

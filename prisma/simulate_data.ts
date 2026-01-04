@@ -44,6 +44,7 @@ async function main() {
   // 1b. Seed Pricing Plans
   const pricingPlans = [
     { type: 'POS' as const, price: 5000, trial: 60 },
+    { type: 'SME' as const, price: 5000, trial: 60 },
     { type: 'CORPORATE' as const, price: 10000, trial: 30 },
     { type: 'RETAIL' as const, price: 7500, trial: 30 },
     { type: 'PERSONAL' as const, price: 0, trial: 999 }
