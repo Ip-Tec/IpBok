@@ -6,6 +6,11 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Role } from "@/src/generated/enums";
 
 export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  }
   const { searchParams } = new URL(req.url);
   const businessId = searchParams.get("businessId");
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -21,6 +26,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       { message: "Business ID is required" },
       { status: 400 }
+    );
+  }
+
+  // Verify that the user is part of the business
+  const membership = await prisma.membership.findFirst({
+    where: {
+      userId: session.user.id,
+      businessId: businessId,
+    },
+  });
+
+  if (!membership) {
+    return NextResponse.json(
+      { message: "You are not a member of this business" },
+      { status: 403 }
     );
   }
 
