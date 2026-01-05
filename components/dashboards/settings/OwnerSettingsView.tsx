@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { toast } from "sonner";
-import { type BusinessModel as Business } from "@/src/generated/models/Business";
+import { Business } from "@/src/generated";
 
 // Helper function to fetch business data
 const getBusiness = async (businessId: string): Promise<Business> => {

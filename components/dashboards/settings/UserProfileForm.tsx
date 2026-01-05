@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { type UserModel as User } from "@/src/generated/models/User";
+import { User } from "@/src/generated";
 
 // Helper function to update user data
 const updateUser = async ({
@@ -73,7 +73,7 @@ const UserProfileForm = () => {
     };
     mutation.mutate(newData);
   };
-  
+
   const [firstName, lastName] = session?.user?.name?.split(" ") || ["", ""];
 
   return (
