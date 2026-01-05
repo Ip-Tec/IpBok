@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     if (!businessId) {
       return NextResponse.json(
         { message: "Business not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     const transactionSummary = await prisma.transaction.aggregate({
       where: {
         businessId: businessId,
-        ...( (startDate || endDate) && { date: dateFilter }),
+        ...((startDate || endDate) && { date: dateFilter }),
       },
       _sum: {
         amount: true,
@@ -49,27 +49,27 @@ export async function GET(req: NextRequest) {
     });
 
     const activeAgentsCount = await prisma.transaction.groupBy({
-        by: ['recordedById'],
-        where: {
-            businessId: businessId,
-            ...( (startDate || endDate) && { date: dateFilter }),
-        },
-        _count: {
-            recordedById: true
-        }
-    })
+      by: ["recordedById"],
+      where: {
+        businessId: businessId,
+        ...((startDate || endDate) && { date: dateFilter }),
+      },
+      _count: {
+        recordedById: true,
+      },
+    });
 
     const totalRevenue = transactionSummary._sum.amount || 0;
     const totalTransactions = transactionSummary._count.id || 0;
     const averageTransaction =
       totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
-    
+
     // Agent Performance Table data
     const agentPerformance = await prisma.transaction.groupBy({
       by: ["recordedById"],
       where: {
         businessId: businessId,
-        ...( (startDate || endDate) && { date: dateFilter }),
+        ...((startDate || endDate) && { date: dateFilter }),
       },
       _sum: {
         amount: true,
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const agentIds = agentPerformance.map((p) => p.recordedById);
+    const agentIds = agentPerformance.map((p: any) => p.recordedById);
     const agents = await prisma.user.findMany({
       where: {
         id: {
@@ -92,8 +92,8 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const agentPerformanceData = agentPerformance.map((p) => {
-      const agent = agents.find((a) => a.id === p.recordedById);
+    const agentPerformanceData = agentPerformance.map((p: any) => {
+      const agent = agents.find((a: any) => a.id === p.recordedById);
       return {
         agentId: p.recordedById,
         agentName: agent?.name || "Unknown Agent",
@@ -105,32 +105,37 @@ export async function GET(req: NextRequest) {
 
     // Revenue Over Time data
     const transactionsForChart = await prisma.transaction.findMany({
-        where: {
-            businessId: businessId,
-            ...( (startDate || endDate) && { date: dateFilter }),
-        },
-        select: {
-            date: true,
-            amount: true,
-        },
-        orderBy: {
-            date: 'asc',
-        }
+      where: {
+        businessId: businessId,
+        ...((startDate || endDate) && { date: dateFilter }),
+      },
+      select: {
+        date: true,
+        amount: true,
+      },
+      orderBy: {
+        date: "asc",
+      },
     });
 
-    const revenueOverTime = transactionsForChart.reduce((acc, transaction) => {
-        const date = transaction.date.toISOString().split('T')[0]; // Get YYYY-MM-DD
+    const revenueOverTime = transactionsForChart.reduce(
+      (acc: any, transaction: any) => {
+        const date = transaction.date.toISOString().split("T")[0]; // Get YYYY-MM-DD
         if (!acc[date]) {
-            acc[date] = 0;
+          acc[date] = 0;
         }
         acc[date] += transaction.amount;
         return acc;
-    }, {} as Record<string, number>);
+      },
+      {} as Record<string, number>,
+    );
 
-    const revenueOverTimeData = Object.entries(revenueOverTime).map(([date, revenue]) => ({
+    const revenueOverTimeData = Object.entries(revenueOverTime).map(
+      ([date, revenue]) => ({
         date,
         revenue,
-    }));
+      }),
+    );
 
     return NextResponse.json({
       totalRevenue,
@@ -144,7 +149,7 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching report data:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

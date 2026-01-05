@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     if (role === "OWNER") {
       // Use a transaction for consistency
       try {
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
           const newUser = await tx.user.create({
             data: {
               name,

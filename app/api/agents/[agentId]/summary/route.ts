@@ -193,9 +193,9 @@ export async function GET(
 
     // Fallback to 0 if no account found (though they should exist now for new agents)
     const currentCashBalance =
-      accounts.find((a) => a.type === "CASH")?.balance || 0;
+      accounts.find((a: any) => a.type === "CASH")?.balance || 0;
     const currentBankBalance =
-      accounts.find((a) => a.type === "BANK")?.balance || 0;
+      accounts.find((a: any) => a.type === "BANK")?.balance || 0;
 
     // Determine pending reconciliation status (simplified for now, based on if there are any transactions today)
     const pendingReconciliationStatus =

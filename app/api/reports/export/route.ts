@@ -17,7 +17,8 @@ function jsonToCsv(jsonData: any[]): string {
     .map((row) => {
       return keys
         .map((key) => {
-          let cell = row[key] === null || row[key] === undefined ? "" : row[key];
+          let cell =
+            row[key] === null || row[key] === undefined ? "" : row[key];
           cell = String(cell).replace(/"/g, '""');
           if (String(cell).includes(",")) {
             cell = `"${cell}"`;
@@ -56,16 +57,16 @@ export async function GET(req: NextRequest) {
     if (!businessId) {
       return NextResponse.json(
         { message: "Business not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
-    
+
     // Fetch Agent Performance data
     const agentPerformance = await prisma.transaction.groupBy({
       by: ["recordedById"],
       where: {
         businessId: businessId,
-        ...( (startDate || endDate) && { date: dateFilter }),
+        ...((startDate || endDate) && { date: dateFilter }),
       },
       _sum: {
         amount: true,
@@ -75,12 +76,12 @@ export async function GET(req: NextRequest) {
       },
       orderBy: {
         _sum: {
-            amount: 'desc'
-        }
-      }
+          amount: "desc",
+        },
+      },
     });
 
-    const agentIds = agentPerformance.map((p) => p.recordedById);
+    const agentIds = agentPerformance.map((p: any) => p.recordedById);
     const agents = await prisma.user.findMany({
       where: {
         id: {
@@ -93,13 +94,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const agentPerformanceData = agentPerformance.map((p) => {
-      const agent = agents.find((a) => a.id === p.recordedById);
+    const agentPerformanceData = agentPerformance.map((p: any) => {
+      const agent = agents.find((a: any) => a.id === p.recordedById);
       return {
         "Agent Name": agent?.name || "Unknown Agent",
-        "Transactions": p._count.id,
+        Transactions: p._count.id,
         "Total Volume": p._sum.amount,
-        "Status": "Active", // Placeholder
+        Status: "Active", // Placeholder
       };
     });
 
@@ -108,18 +109,17 @@ export async function GET(req: NextRequest) {
     const filename = `agent_performance_report_${date}.csv`;
 
     return new NextResponse(csv, {
-        status: 200,
-        headers: {
-            "Content-Disposition": `attachment; filename="${filename}"`, 
-            "Content-Type": "text/csv",
-        }
-    })
-
+      status: 200,
+      headers: {
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Type": "text/csv",
+      },
+    });
   } catch (error) {
     console.error("Error generating report:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

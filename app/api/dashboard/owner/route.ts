@@ -26,16 +26,16 @@ export async function GET(req: NextRequest) {
     });
 
     const totalBalance = financialAccounts.reduce(
-      (sum, account) => sum + account.balance,
-      0
+      (sum: number, account: any) => sum + account.balance,
+      0,
     );
     const cashBalance = financialAccounts
-        .filter((acc) => acc.type === "CASH")
-        .reduce((sum, acc) => sum + acc.balance, 0);
+      .filter((acc: any) => acc.type === "CASH")
+      .reduce((sum: number, acc: any) => sum + acc.balance, 0);
 
     const bankBalance = financialAccounts
-        .filter((acc) => acc.type === "BANK")
-        .reduce((sum, acc) => sum + acc.balance, 0);
+      .filter((acc: any) => acc.type === "BANK")
+      .reduce((sum: number, acc: any) => sum + acc.balance, 0);
 
     const today = startOfDay(new Date());
     const todaysTransactions = await prisma.transaction.findMany({
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const todaysNet = todaysTransactions.reduce((sum, tx) => {
+    const todaysNet = todaysTransactions.reduce((sum: number, tx: any) => {
       if (
         tx.type.name === "Deposit" ||
         tx.type.name === "Charge" ||
@@ -106,27 +106,30 @@ export async function GET(req: NextRequest) {
       end: today,
     });
     const labels = dateRange.map((date) => format(date, "EEE"));
-    const dailyData = dateRange.reduce((acc, date) => {
-      const formattedDate = format(date, "yyyy-MM-dd");
-      acc[formattedDate] = { revenue: 0, expenses: 0 };
-      return acc;
-    }, {} as Record<string, { revenue: number; expenses: number }>);
+    const dailyData = dateRange.reduce(
+      (acc, date) => {
+        const formattedDate = format(date, "yyyy-MM-dd");
+        acc[formattedDate] = { revenue: 0, expenses: 0 };
+        return acc;
+      },
+      {} as Record<string, { revenue: number; expenses: number }>,
+    );
 
-    last7DaysTransactions.forEach((tx) => {
+    last7DaysTransactions.forEach((tx: any) => {
       const formattedDate = format(tx.date, "yyyy-MM-dd");
       if (dailyData[formattedDate]) {
-      if (
-        tx.type.name === "Deposit" ||
-        tx.type.name === "Charge" ||
-        tx.type.name === "Income"
-      ) {
-        dailyData[formattedDate].revenue += tx.amount;
-      } else if (
-        tx.type.name === "Withdrawal" ||
-        tx.type.name === "Expense"
-      ) {
-        dailyData[formattedDate].expenses += tx.amount;
-      }
+        if (
+          tx.type.name === "Deposit" ||
+          tx.type.name === "Charge" ||
+          tx.type.name === "Income"
+        ) {
+          dailyData[formattedDate].revenue += tx.amount;
+        } else if (
+          tx.type.name === "Withdrawal" ||
+          tx.type.name === "Expense"
+        ) {
+          dailyData[formattedDate].expenses += tx.amount;
+        }
       }
     });
 
@@ -252,7 +255,7 @@ export async function GET(req: NextRequest) {
           difference,
           status: difference === 0 ? "Reconciled" : "Pending",
         };
-      }
+      },
     );
 
     const data = {
@@ -283,13 +286,13 @@ export async function GET(req: NextRequest) {
           ],
         },
       },
-      recentTransactions: recentTransactions.map((tx) => {
+      recentTransactions: recentTransactions.map((tx: any) => {
         const date = new Date(tx.createdAt);
         const formattedDate = format(date, "MMM dd, yyyy");
-        const formattedTime = date.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
         });
         return {
           datetime: `${formattedDate} ${formattedTime}`,

@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
           gte: startDate,
         },
         receivedById: {
-          in: agents.map(a => a.id),
+          in: agents.map((a: any) => a.id),
         },
       },
       select: {
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       where: {
         businessId: businessId,
         recordedById: {
-          in: agents.map(a => a.id),
+          in: agents.map((a: any) => a.id),
         },
         date: {
           gte: startDate,
@@ -86,22 +86,23 @@ export async function GET(req: NextRequest) {
     });
 
     // Calculate summary for each agent
-    const agentSummaries = agents.map(agent => {
+    const agentSummaries = agents.map((agent: any) => {
       const totalCashGiven = cashAdvances
-        .filter(ca => ca.receivedById === agent.id)
-        .reduce((sum, ca) => sum + ca.amount, 0);
+        .filter((ca: any) => ca.receivedById === agent.id)
+        .reduce((sum: any, ca: any) => sum + ca.amount, 0);
 
       const totalCharges = chargeTransactions
-        .filter(ct => ct.recordedById === agent.id)
-        .reduce((sum, ct) => sum + ct.amount, 0);
+        .filter((ct: any) => ct.recordedById === agent.id)
+        .reduce((sum: any, ct: any) => sum + ct.amount, 0);
 
       const profit = totalCharges - totalCashGiven;
-      const profitMargin = totalCashGiven > 0 ? (profit / totalCashGiven) * 100 : 0;
+      const profitMargin =
+        totalCashGiven > 0 ? (profit / totalCashGiven) * 100 : 0;
 
       // Get cash advances for this agent
       const agentCashAdvances = cashAdvances
-        .filter(ca => ca.receivedById === agent.id)
-        .map(ca => ({
+        .filter((ca: any) => ca.receivedById === agent.id)
+        .map((ca: any) => ({
           id: ca.id,
           amount: ca.amount,
           date: ca.date,
@@ -117,15 +118,26 @@ export async function GET(req: NextRequest) {
         profit,
         profitMargin: parseFloat(profitMargin.toFixed(2)),
         cashAdvances: agentCashAdvances,
-        transactionCount: chargeTransactions.filter(ct => ct.recordedById === agent.id).length,
+        transactionCount: chargeTransactions.filter(
+          (ct: any) => ct.recordedById === agent.id,
+        ).length,
       };
     });
 
     // Calculate overall totals
     const overallTotal = {
-      totalCashGiven: agentSummaries.reduce((sum, a) => sum + a.totalCashGiven, 0),
-      totalCharges: agentSummaries.reduce((sum, a) => sum + a.totalCharges, 0),
-      totalProfit: agentSummaries.reduce((sum, a) => sum + a.profit, 0),
+      totalCashGiven: agentSummaries.reduce(
+        (sum: any, a: any) => sum + a.totalCashGiven,
+        0,
+      ),
+      totalCharges: agentSummaries.reduce(
+        (sum: any, a: any) => sum + a.totalCharges,
+        0,
+      ),
+      totalProfit: agentSummaries.reduce(
+        (sum: any, a: any) => sum + a.profit,
+        0,
+      ),
       totalTransactions: chargeTransactions.length,
     };
 
@@ -143,4 +155,3 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
-
