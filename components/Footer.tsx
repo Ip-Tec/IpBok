@@ -1,4 +1,5 @@
 import { X, Linkedin, Github } from "lucide-react";
+import Link from "next/link";
 import Logo from "./Logo";
 
 const Footer = () => {
@@ -33,15 +34,24 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-            <a href="#" className="transition-colors hover:text-foreground">
+            <Link
+              href="/privacy"
+              className="transition-colors hover:text-foreground cursor-pointer"
+            >
               Privacy
-            </a>
-            <a href="#" className="transition-colors hover:text-foreground">
+            </Link>
+            <Link
+              href="/terms"
+              className="transition-colors hover:text-foreground cursor-pointer"
+            >
               Terms
-            </a>
-            <a href="#" className="transition-colors hover:text-foreground">
+            </Link>
+            <Link
+              href="/support"
+              className="transition-colors hover:text-foreground cursor-pointer"
+            >
               Support
-            </a>
+            </Link>
           </div>
         </div>
 

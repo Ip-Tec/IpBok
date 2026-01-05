@@ -11,7 +11,10 @@ export function ThemeToggle() {
 
   // Ensure component only renders after client mount to avoid SSR mismatch
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!mounted) {

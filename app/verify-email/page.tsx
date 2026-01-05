@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
@@ -10,14 +9,18 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading",
+  );
   const [message, setMessage] = useState("Verifying your email...");
 
   useEffect(() => {
     if (!token) {
-      setStatus("error");
-      setMessage("Invalid verification link.");
-      return;
+      const timer = setTimeout(() => {
+        setStatus("error");
+        setMessage("Invalid verification link.");
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const verify = async () => {
@@ -43,12 +46,14 @@ function VerifyEmailContent() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-        <div className="mb-8">
-            <Logo />
-        </div>
+      <div className="mb-8">
+        <Logo />
+      </div>
       <div className="max-w-md w-full bg-card border rounded-lg p-8 shadow-sm text-center">
         <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
-        <p className={`mb-6 ${status === "error" ? "text-red-500" : "text-muted-foreground"}`}>
+        <p
+          className={`mb-6 ${status === "error" ? "text-red-500" : "text-muted-foreground"}`}
+        >
           {message}
         </p>
 
@@ -59,15 +64,19 @@ function VerifyEmailContent() {
         )}
 
         {status === "error" && (
-          <Button onClick={() => router.push("/login")} variant="outline" className="w-full">
+          <Button
+            onClick={() => router.push("/login")}
+            variant="outline"
+            className="w-full"
+          >
             Back to Login
           </Button>
         )}
-        
+
         {status === "loading" && (
-             <div className="flex justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-             </div>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
         )}
       </div>
     </div>
@@ -75,9 +84,9 @@ function VerifyEmailContent() {
 }
 
 export default function VerifyEmailPage() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <VerifyEmailContent />
-        </Suspense>
-    )
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyEmailContent />
+    </Suspense>
+  );
 }
