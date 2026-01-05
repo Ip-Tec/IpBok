@@ -3,12 +3,23 @@
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // When the theme is not yet resolved, we can't render the correct icon.
-  // Returning a placeholder avoids the hydration mismatch.
+  // Ensure component only renders after client mount to avoid SSR mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Render nothing on the server side; will be replaced after mount
+    return null;
+  }
+
+  // When the theme is not yet resolved, show a placeholder button
   if (!resolvedTheme) {
     return <Button variant="ghost" size="icon" className="h-9 w-9" />;
   }
