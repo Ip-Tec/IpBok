@@ -1,8 +1,8 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 
 // Create a new agent
 export async function POST(req: NextRequest) {

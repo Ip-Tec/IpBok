@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { Bell } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 interface Notification {
   id: string;
   message: string;
@@ -21,46 +25,56 @@ export function NotificationBell() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('/api/notifications');
+      const response = await fetch("/api/notifications");
       if (response.ok) {
         const data: Notification[] = await response.json();
         setNotifications(data);
         setUnreadCount(data.filter((n) => !n.isRead).length);
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      console.error("Failed to fetch notifications:", error);
     }
   };
 
   useEffect(() => {
-    fetchNotifications();
+    // Defer initial fetch to avoid synchronous state update warning
+    const timer = setTimeout(() => {
+      fetchNotifications();
+    }, 0);
+
     // Poll for new notifications every 30 seconds for better responsiveness
     const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleMarkAsRead = async () => {
     if (unreadCount === 0) return;
 
     try {
-      const response = await fetch('/api/notifications', { method: 'PUT' });
+      const response = await fetch("/api/notifications", { method: "PUT" });
       if (response.ok) {
         setUnreadCount(0);
         // Optimistically update the UI
-        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+        setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
       }
     } catch (error) {
-      console.error('Failed to mark notifications as read:', error);
+      console.error("Failed to mark notifications as read:", error);
     }
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={(open) => {
+    <Popover
+      open={isOpen}
+      onOpenChange={(open) => {
         setIsOpen(open);
-        if(open) {
-            handleMarkAsRead();
+        if (open) {
+          handleMarkAsRead();
         }
-    }}>
+      }}
+    >
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
@@ -78,36 +92,49 @@ export function NotificationBell() {
             <p className="p-4 text-sm text-gray-500">No notifications yet.</p>
           ) : (
             notifications.map((notification) => (
-                <div key={notification.id} className={`p-4 border-b ${!notification.isRead && 'bg-blue-50 dark:bg-blue-900/20'}`}>
-                    {notification.link ? (
-                        <Link href={notification.link} className="hover:underline" onClick={() => setIsOpen(false)}>
-                            <p className="text-sm">{notification.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">
-                                {new Date(notification.createdAt).toLocaleString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                  hour12: true
-                                })}
-                            </p>
-                        </Link>
-                    ) : (
-                        <div>
-                            <p className="text-sm">{notification.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">
-                                {new Date(notification.createdAt).toLocaleString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                  hour12: true
-                                })}
-                            </p>
-                        </div>
-                    )}
+              <div
+                key={notification.id}
+                className={`p-4 border-b ${!notification.isRead && "bg-blue-50 dark:bg-blue-900/20"}`}
+              >
+                {notification.link ? (
+                  <Link
+                    href={notification.link}
+                    className="hover:underline"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <p className="text-sm">{notification.message}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(notification.createdAt).toLocaleString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        },
+                      )}
+                    </p>
+                  </Link>
+                ) : (
+                  <div>
+                    <p className="text-sm">{notification.message}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(notification.createdAt).toLocaleString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        },
+                      )}
+                    </p>
+                  </div>
+                )}
               </div>
             ))
           )}

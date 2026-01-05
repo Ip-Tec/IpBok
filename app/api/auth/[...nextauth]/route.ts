@@ -3,7 +3,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 import bcrypt from "bcryptjs";
 
 interface CustomUser {
@@ -14,7 +14,10 @@ interface CustomUser {
   businessId?: string;
 }
 
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -36,14 +39,18 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials.email },
           });
 
-          if (user && user.password && await bcrypt.compare(credentials.password, user.password)) {
+          if (
+            user &&
+            user.password &&
+            (await bcrypt.compare(credentials.password, user.password))
+          ) {
             if (!user.emailVerified) {
-                // Return null or throw error depending on how you want to handle it. 
-                // NextAuth default error page might be shown if we throw.
-                // For now, let's return null which is safest, or we could customize the error handler.
-                // Ideally, we throw an error "Email not verified" but NextAuth behavior varies.
-                // Let's rely on the user knowing they need to verify if login fails right after signup.
-                 throw new Error("Email not verified");
+              // Return null or throw error depending on how you want to handle it.
+              // NextAuth default error page might be shown if we throw.
+              // For now, let's return null which is safest, or we could customize the error handler.
+              // Ideally, we throw an error "Email not verified" but NextAuth behavior varies.
+              // Let's rely on the user knowing they need to verify if login fails right after signup.
+              throw new Error("Email not verified");
             }
 
             return {
@@ -114,8 +121,8 @@ export const authOptions: NextAuthOptions = {
             token.businessId = dbUser.memberships[0].businessId;
             // Fetch the business type
             const business = await prisma.business.findUnique({
-                where: { id: dbUser.memberships[0].businessId },
-                select: { type: true }
+              where: { id: dbUser.memberships[0].businessId },
+              select: { type: true },
             });
             token.businessType = business?.type;
           }
@@ -130,10 +137,10 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
         session.user.transactionsPerPage = token.transactionsPerPage as number;
         if (token.businessId) {
-            session.user.businessId = token.businessId as string;
+          session.user.businessId = token.businessId as string;
         }
         if (token.businessType) {
-            (session.user as any).businessType = token.businessType;
+          (session.user as any).businessType = token.businessType;
         }
       }
       return session;

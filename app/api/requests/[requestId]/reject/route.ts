@@ -5,10 +5,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { Permission, hasPermission } from "@/lib/permissions";
 import { User } from "@/lib/types";
-import { RequestStatus } from "@/src/generated/enums";
+import { RequestStatus } from "@/src/generated";
 import { createNotification } from "@/lib/notifications";
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ requestId: string }> }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ requestId: string }> },
+) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -19,40 +22,50 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ re
 
   try {
     const request = await prisma.request.findUnique({
-      where: { id: requestId }
+      where: { id: requestId },
     });
 
     if (!request) {
-      return NextResponse.json({ message: "Request not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Request not found" },
+        { status: 404 },
+      );
     }
 
     if (request.status !== RequestStatus.PENDING) {
-      return NextResponse.json({ message: "Request already processed" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Request already processed" },
+        { status: 400 },
+      );
     }
 
-    const canReject = hasPermission(user, Permission.APPROVE_REQUESTS_SMALL) || hasPermission(user, Permission.APPROVE_REQUESTS_LARGE);
-    
+    const canReject =
+      hasPermission(user, Permission.APPROVE_REQUESTS_SMALL) ||
+      hasPermission(user, Permission.APPROVE_REQUESTS_LARGE);
+
     if (!canReject) {
-         return NextResponse.json({ message: "Insufficient permissions" }, { status: 403 });
+      return NextResponse.json(
+        { message: "Insufficient permissions" },
+        { status: 403 },
+      );
     }
 
     await prisma.request.update({
-        where: { id: requestId },
-        data: {
-            status: RequestStatus.REJECTED,
-            approverId: user.id
-        }
+      where: { id: requestId },
+      data: {
+        status: RequestStatus.REJECTED,
+        approverId: user.id,
+      },
     });
 
     // Notify Requester
     await createNotification(
-        request.requesterId,
-        `Your request for ₦${request.amount} was rejected.`,
-        `/dashboard`
+      request.requesterId,
+      `Your request for ₦${request.amount} was rejected.`,
+      `/dashboard`,
     );
 
     return NextResponse.json({ message: "Rejected successfully" });
-
   } catch (error) {
     console.error("Error rejecting request:", error);
     return NextResponse.json({ message: "Internal Error" }, { status: 500 });

@@ -1,9 +1,9 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 
 // A helper function to get the start and end of the current day
 const getTodayDateRange = () => {

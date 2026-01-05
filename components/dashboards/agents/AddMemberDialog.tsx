@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Dialog,
@@ -23,7 +23,7 @@ import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 
 interface AddMemberDialogProps {
   onMemberAdded: () => void;

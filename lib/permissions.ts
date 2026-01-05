@@ -1,4 +1,4 @@
-import { Role } from "@/src/generated/enums";
+﻿import { Role } from "@/src/generated";
 import { User } from "@/lib/types";
 
 export enum Permission {

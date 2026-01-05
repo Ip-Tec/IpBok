@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 
 // A helper function to get the start and end of the current day
 const getTodayDateRange = () => {
@@ -18,19 +18,23 @@ const getTodayDateRange = () => {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ agentId: string }> }
+  { params }: { params: Promise<{ agentId: string }> },
 ) {
   const { agentId } = await params;
 
   if (!agentId) {
     console.error("Agent Reconciliation API Error: agentId is undefined.");
-    return NextResponse.json({ message: "Agent ID is required" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Agent ID is required" },
+      { status: 400 },
+    );
   }
 
-  console.log(`Attempting to fetch agent-specific reconciliation data for agentId: ${agentId}`);
+  console.log(
+    `Attempting to fetch agent-specific reconciliation data for agentId: ${agentId}`,
+  );
 
   const session = await getServerSession(authOptions);
-
 
   if (!session?.user?.id) {
     console.error("Agent Reconciliation API Error: No user session found.");
@@ -41,9 +45,12 @@ export async function GET(
   // An owner can view any agent's reconciliation data within their business.
   if (session.user.role === Role.AGENT && session.user.id !== agentId) {
     console.error(
-      `Agent Reconciliation API Error: Agent ${session.user.id} tried to access reconciliation data for another agent ${agentId}.`
+      `Agent Reconciliation API Error: Agent ${session.user.id} tried to access reconciliation data for another agent ${agentId}.`,
     );
-    return NextResponse.json({ message: "Unauthorized access" }, { status: 403 });
+    return NextResponse.json(
+      { message: "Unauthorized access" },
+      { status: 403 },
+    );
   }
 
   // If the user is an owner, ensure the agent belongs to their business
@@ -61,33 +68,49 @@ export async function GET(
     });
     if (!agentInBusiness) {
       console.error(
-        `Agent Reconciliation API Error: Owner ${session.user.id} tried to access reconciliation data for agent ${agentId} not in their business.`
+        `Agent Reconciliation API Error: Owner ${session.user.id} tried to access reconciliation data for agent ${agentId} not in their business.`,
       );
-      return NextResponse.json({ message: "Agent not found in your business" }, { status: 403 });
+      return NextResponse.json(
+        { message: "Agent not found in your business" },
+        { status: 403 },
+      );
     }
   } else if (session.user.role === Role.OWNER && !session.user.businessId) {
-    console.error("Agent Reconciliation API Error: Owner session missing businessId.");
-    return NextResponse.json({ message: "Owner session missing business ID" }, { status: 400 });
+    console.error(
+      "Agent Reconciliation API Error: Owner session missing businessId.",
+    );
+    return NextResponse.json(
+      { message: "Owner session missing business ID" },
+      { status: 400 },
+    );
   }
-  
+
   // For both AGENT and OWNER roles, we need a businessId for the agent.
   let targetBusinessId: string | undefined;
   if (session.user.role === Role.AGENT) {
-      targetBusinessId = session.user.businessId;
-  } else { // Role.OWNER
-      const agent = await prisma.user.findUnique({
-          where: { id: agentId },
-          select: { memberships: { select: { businessId: true } } }
-      });
-      targetBusinessId = agent?.memberships[0]?.businessId;
+    targetBusinessId = session.user.businessId;
+  } else {
+    // Role.OWNER
+    const agent = await prisma.user.findUnique({
+      where: { id: agentId },
+      select: { memberships: { select: { businessId: true } } },
+    });
+    targetBusinessId = agent?.memberships[0]?.businessId;
   }
 
   if (!targetBusinessId) {
-      console.error(`Agent Reconciliation API Error: Could not determine businessId for agent ${agentId}.`);
-      return NextResponse.json({ message: "Business ID not found for agent" }, { status: 400 });
+    console.error(
+      `Agent Reconciliation API Error: Could not determine businessId for agent ${agentId}.`,
+    );
+    return NextResponse.json(
+      { message: "Business ID not found for agent" },
+      { status: 400 },
+    );
   }
 
-  console.log(`Fetching reconciliation data for agent ${agentId} in business ${targetBusinessId}`);
+  console.log(
+    `Fetching reconciliation data for agent ${agentId} in business ${targetBusinessId}`,
+  );
   const { start, end } = getTodayDateRange();
 
   try {
@@ -107,26 +130,31 @@ export async function GET(
         },
       },
     });
-    console.log(`Found ${transactions.length} transactions for agent ${agentId}.`);
+    console.log(
+      `Found ${transactions.length} transactions for agent ${agentId}.`,
+    );
 
     // 2. Process data for the specific agent
     let expected = 0;
     let submitted = 0;
 
     for (const transaction of transactions) {
-        if (transaction.type?.name) {
-            const transactionTypeName = transaction.type.name.toLowerCase();
-            // ASSUMPTION: 'Charge' transactions contribute to the expected amount.
-            if (transactionTypeName === 'charge') {
-                expected += transaction.amount;
-            }
-            // ASSUMPTION: 'Deposit' transactions with 'CASH' payment method count as submitted.
-            if (transactionTypeName === 'deposit' && transaction.paymentMethod === 'CASH') {
-                submitted += transaction.amount;
-            }
+      if (transaction.type?.name) {
+        const transactionTypeName = transaction.type.name.toLowerCase();
+        // ASSUMPTION: 'Charge' transactions contribute to the expected amount.
+        if (transactionTypeName === "charge") {
+          expected += transaction.amount;
         }
+        // ASSUMPTION: 'Deposit' transactions with 'CASH' payment method count as submitted.
+        if (
+          transactionTypeName === "deposit" &&
+          transaction.paymentMethod === "CASH"
+        ) {
+          submitted += transaction.amount;
+        }
+      }
     }
-    
+
     // 3. Format the response
     const difference = submitted - expected;
     const status = difference === 0 ? "Reconciled" : "Pending";
@@ -140,12 +168,17 @@ export async function GET(
       // You might also want to return the raw transactions or a summary of them
     };
 
-    console.log(`Successfully processed reconciliation data for agent ${agentId}.`);
+    console.log(
+      `Successfully processed reconciliation data for agent ${agentId}.`,
+    );
     return NextResponse.json(agentReconciliationData);
-
   } catch (error) {
     console.error("Agent Reconciliation API - Internal Server Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json({ message: "Internal Server Error", error: errorMessage }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json(
+      { message: "Internal Server Error", error: errorMessage },
+      { status: 500 },
+    );
   }
 }

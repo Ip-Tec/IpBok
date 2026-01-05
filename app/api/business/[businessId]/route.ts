@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 
 export async function GET(
   req: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ businessId: string }> }
+  { params: paramsPromise }: { params: Promise<{ businessId: string }> },
 ) {
   const params = await paramsPromise;
   try {
@@ -31,7 +31,7 @@ export async function GET(
     if (!business) {
       return NextResponse.json(
         { message: "Business not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -40,14 +40,14 @@ export async function GET(
     console.error("Error fetching business:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   req: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ businessId:string }> }
+  { params: paramsPromise }: { params: Promise<{ businessId: string }> },
 ) {
   const params = await paramsPromise;
   try {
@@ -69,7 +69,7 @@ export async function PUT(
     if (!business) {
       return NextResponse.json(
         { message: "Business not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function PUT(
     console.error("Error updating business:", error);
     return NextResponse.json(
       { message: error.message || "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

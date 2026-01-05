@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/src/generated/enums";
+import { Role } from "@/src/generated";
 
 // A helper function to get the start and end of the current day
 const getTodayDateRange = () => {
@@ -18,19 +18,23 @@ const getTodayDateRange = () => {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ agentId: string }> }
+  { params }: { params: Promise<{ agentId: string }> },
 ) {
   const { agentId } = await params;
 
   if (!agentId) {
     console.error("Agent Task Status API Error: agentId is undefined.");
-    return NextResponse.json({ message: "Agent ID is required" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Agent ID is required" },
+      { status: 400 },
+    );
   }
 
-  console.log(`Attempting to fetch agent-specific task status for agentId: ${agentId}`);
+  console.log(
+    `Attempting to fetch agent-specific task status for agentId: ${agentId}`,
+  );
 
   const session = await getServerSession(authOptions);
-
 
   if (!session?.user?.id) {
     console.error("Agent Task Status API Error: No user session found.");
@@ -41,9 +45,12 @@ export async function GET(
   // An owner can view any agent's task status within their business.
   if (session.user.role === Role.AGENT && session.user.id !== agentId) {
     console.error(
-      `Agent Task Status API Error: Agent ${session.user.id} tried to access task status for another agent ${agentId}.`
+      `Agent Task Status API Error: Agent ${session.user.id} tried to access task status for another agent ${agentId}.`,
     );
-    return NextResponse.json({ message: "Unauthorized access" }, { status: 403 });
+    return NextResponse.json(
+      { message: "Unauthorized access" },
+      { status: 403 },
+    );
   }
 
   // If the user is an owner, ensure the agent belongs to their business
@@ -61,33 +68,49 @@ export async function GET(
     });
     if (!agentInBusiness) {
       console.error(
-        `Agent Task Status API Error: Owner ${session.user.id} tried to access task status for agent ${agentId} not in their business.`
+        `Agent Task Status API Error: Owner ${session.user.id} tried to access task status for agent ${agentId} not in their business.`,
       );
-      return NextResponse.json({ message: "Agent not found in your business" }, { status: 403 });
+      return NextResponse.json(
+        { message: "Agent not found in your business" },
+        { status: 403 },
+      );
     }
   } else if (session.user.role === Role.OWNER && !session.user.businessId) {
-    console.error("Agent Task Status API Error: Owner session missing businessId.");
-    return NextResponse.json({ message: "Owner session missing business ID" }, { status: 400 });
+    console.error(
+      "Agent Task Status API Error: Owner session missing businessId.",
+    );
+    return NextResponse.json(
+      { message: "Owner session missing business ID" },
+      { status: 400 },
+    );
   }
 
   // For both AGENT and OWNER roles, we need a businessId for the agent.
   let targetBusinessId: string | undefined;
   if (session.user.role === Role.AGENT) {
-      targetBusinessId = session.user.businessId;
-  } else { // Role.OWNER
-      const agent = await prisma.user.findUnique({
-          where: { id: agentId },
-          select: { memberships: { select: { businessId: true } } }
-      });
-      targetBusinessId = agent?.memberships[0]?.businessId;
+    targetBusinessId = session.user.businessId;
+  } else {
+    // Role.OWNER
+    const agent = await prisma.user.findUnique({
+      where: { id: agentId },
+      select: { memberships: { select: { businessId: true } } },
+    });
+    targetBusinessId = agent?.memberships[0]?.businessId;
   }
 
   if (!targetBusinessId) {
-      console.error(`Agent Task Status API Error: Could not determine businessId for agent ${agentId}.`);
-      return NextResponse.json({ message: "Business ID not found for agent" }, { status: 400 });
+    console.error(
+      `Agent Task Status API Error: Could not determine businessId for agent ${agentId}.`,
+    );
+    return NextResponse.json(
+      { message: "Business ID not found for agent" },
+      { status: 400 },
+    );
   }
 
-  console.log(`Fetching task status data for agent ${agentId} in business ${targetBusinessId}`);
+  console.log(
+    `Fetching task status data for agent ${agentId} in business ${targetBusinessId}`,
+  );
   const { start: todayStart, end: todayEnd } = getTodayDateRange();
 
   try {
@@ -120,12 +143,17 @@ export async function GET(
       reconciled: reconciled,
     };
 
-    console.log(`Successfully processed task status data for agent ${agentId}.`);
+    console.log(
+      `Successfully processed task status data for agent ${agentId}.`,
+    );
     return NextResponse.json(taskStatusData);
-
   } catch (error) {
     console.error("Agent Task Status API - Internal Server Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json({ message: "Internal Server Error", error: errorMessage }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json(
+      { message: "Internal Server Error", error: errorMessage },
+      { status: 500 },
+    );
   }
 }

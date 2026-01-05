@@ -1,22 +1,25 @@
-
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_SERVER_USER,
     pass: process.env.EMAIL_SERVER_PASSWORD?.replace(/\s+/g, ""),
   },
 });
 
-export const sendVerificationEmail = async (email: string, token: string, baseUrl?: string) => {
-  const host = baseUrl || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+export const sendVerificationEmail = async (
+  email: string,
+  token: string,
+  baseUrl?: string,
+) => {
+  const host = baseUrl || process.env.NEXTAUTH_URL || "http://localhost:3000";
   const confirmLink = `${host}/verify-email?token=${token}`;
 
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',
     to: email,
-    subject: 'Verify your IpBok Account',
+    subject: "Verify your IpBok Account",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Welcome to IpBok!</h2>
@@ -38,7 +41,24 @@ export const sendVerificationEmail = async (email: string, token: string, baseUr
     await transporter.sendMail(mailOptions);
     console.log(`Verification email sent to ${email}`);
   } catch (error) {
-    console.error('Error sending verification email:', error);
-    throw new Error('Could not send verification email');
+    console.error("Error sending verification email:", error);
+    throw new Error("Could not send verification email");
   }
 };
+
+/**
+ * Send a password reset email.
+ * @param to Recipient email address
+ * @param token Reset token to embed in the link
+ */
+export async function sendPasswordResetEmail(to: string, token: string) {
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${token}`;
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',
+    to,
+    subject: "Password Reset Request",
+    text: `You requested a password reset. Click the link to reset your password: ${resetUrl}`,
+    html: `<p>You requested a password reset.</p><p><a href="${resetUrl}">Reset Password</a></p>`,
+  };
+  await transporter.sendMail(mailOptions);
+}
