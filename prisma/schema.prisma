@@ -4,7 +4,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated"
-  engineType = "client"
+  engineType = "node"
 }
 datasource db {
   provider = "mysql"
