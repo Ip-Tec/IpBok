@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-// import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/src/generated/client";
 
 export async function GET(req: NextRequest) {
