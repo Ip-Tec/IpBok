@@ -4,10 +4,11 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated"
-  engineType = "node"
+  engineType = "binary"
 }
 datasource db {
   provider = "mysql"
+  url = env("DATABASE_URL")
 }
 
 // NextAuth models

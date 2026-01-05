@@ -1,19 +1,19 @@
 // lib/prisma.ts
 import { PrismaClient } from "@/src/generated";
 
-// Ensure DATABASE_URL exists
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is missing.");
 }
 
-// Singleton to avoid multiple instances in development
+// Singleton to prevent multiple instances in dev
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-// Initialize Prisma Client
-export const prisma: PrismaClient =
-  globalForPrisma.prisma ?? new PrismaClient({});
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    engineType: "binary", // forces the old engine
+  });
 
-// Assign global in development
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
