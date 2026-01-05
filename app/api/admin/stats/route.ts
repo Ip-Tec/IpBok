@@ -9,7 +9,11 @@ import { startOfDay, subDays } from "date-fns";
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || (session.user.role !== "SUPERADMIN" && session.user.role !== "SUPPORT")) {
+  if (
+    !session ||
+    !session.user ||
+    (session.user.role !== "SUPERADMIN" && session.user.role !== "SUPPORT")
+  ) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
@@ -20,7 +24,7 @@ export async function GET(req: NextRequest) {
     // Global Stats
     const totalBusinesses = await prisma.business.count();
     const totalUsers = await prisma.user.count();
-    
+
     const activeBusinessesToday = await prisma.transaction.findMany({
       where: {
         date: { gte: today },
@@ -57,7 +61,7 @@ export async function GET(req: NextRequest) {
         totalTransactionsToday,
         totalVolumeToday: totalVolumeToday._sum.amount || 0,
       },
-      recentBusinesses: recentBusinesses.map(b => ({
+      recentBusinesses: recentBusinesses.map((b: any) => ({
         id: b.id,
         name: b.name,
         type: b.type,
