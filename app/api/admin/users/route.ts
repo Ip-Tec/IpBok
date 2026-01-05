@@ -8,7 +8,11 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || (session.user.role !== "SUPERADMIN" && session.user.role !== "SUPPORT")) {
+  if (
+    !session ||
+    !session.user ||
+    (session.user.role !== "SUPERADMIN" && session.user.role !== "SUPPORT")
+  ) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
@@ -18,9 +22,9 @@ export async function GET(req: NextRequest) {
         memberships: {
           include: {
             business: {
-              select: { name: true }
-            }
-          }
+              select: { name: true },
+            },
+          },
         },
         _count: {
           select: { transactions: true },
@@ -29,15 +33,17 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    return NextResponse.json(users.map(u => ({
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      role: u.role,
-      verified: !!u.emailVerified,
-      transactionCount: u._count.transactions,
-      businesses: u.memberships.map(m => m.business.name),
-    })));
+    return NextResponse.json(
+      users.map((u: any) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        verified: !!u.emailVerified,
+        transactionCount: u._count.transactions,
+        businesses: u.memberships.map((m: any) => m.business.name),
+      })),
+    );
   } catch (error) {
     console.error("Error fetching admin users:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
