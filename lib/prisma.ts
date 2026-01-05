@@ -54,6 +54,7 @@ export const prisma =
   global.prisma ||
   // Use native Prisma Client for better stability with TiDB Cloud
   new PrismaClient({
+    engineType: "node",
     log: ["query", "info", "warn", "error"],
   });
 
