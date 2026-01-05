@@ -2,9 +2,7 @@ import { PrismaClient } from "@/src/generated";
 import { Role, RequestType, RequestStatus } from "@/src/generated";
 
 // @ts-ignore
-const prisma = new PrismaClient({
-  accelerateUrl: process.env.DATABASE_URL || "",
-});
+const prisma = new PrismaClient();
 
 async function main() {
   console.log("🚀 Starting End-to-End Logic Verification...");

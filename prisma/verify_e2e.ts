@@ -3,9 +3,7 @@ import { PrismaClient } from "@/src/generated/client";
 // If this fails, we will try @prisma/client
 
 // @ts-ignore
-const prisma = new PrismaClient({
-  accelerateUrl: process.env.DATABASE_URL || "",
-});
+const prisma = new PrismaClient();
 
 async function main() {
   console.log(
