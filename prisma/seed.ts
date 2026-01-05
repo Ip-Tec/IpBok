@@ -1,8 +1,9 @@
 import { PrismaClient } from "../src/generated";
 
-// @ts-ignore
+// import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient({
-  accelerateUrl: process.env.DATABASE_URL || "",
+  log: process.env.NODE_ENV === "development" ? ["query", "error"] : [],
 });
 
 async function main() {
