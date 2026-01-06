@@ -174,7 +174,9 @@ const OwnerReconciliationView = () => {
           title="Difference"
           value={`₦${data.difference.toLocaleString()}`}
           icon={DollarSign}
-          className={data.difference < 0 ? "text-red-500" : "text-green-500"}
+          valueClassName={
+            data.difference < 0 ? "text-red-500" : "text-green-500"
+          }
         />
       </div>
 

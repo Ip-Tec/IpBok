@@ -524,7 +524,9 @@ const OwnerDashboardContent = (user: User) => {
                   title="Difference"
                   value={`₦${difference.toLocaleString()}`}
                   icon={difference < 0 ? TrendingDown : TrendingUp}
-                  className={difference < 0 ? "text-red-500" : "text-green-500"}
+                  valueClassName={
+                    difference < 0 ? "text-red-500" : "text-green-500"
+                  }
                 />
               </div>
 
