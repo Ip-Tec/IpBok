@@ -1,17 +1,12 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
-//  output   = "../src/generated"
-//  engineType = "binary"
-}
-datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
 }
 
-// NextAuth models
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -28,6 +23,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId], map: "Account_userId_fkey")
 }
 
 model Session {
@@ -36,28 +32,30 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "Session_userId_fkey")
 }
 
 model User {
-  id                   String        @id @default(cuid())
+  id                   String             @id @default(cuid())
   name                 String?
-  email                String?       @unique
+  email                String?            @unique
   emailVerified        DateTime?
   password             String?
-  role                 Role          @default(AGENT)
+  role                 Role               @default(AGENT)
   image                String?
+  transactionsPerPage  Int                @default(10)
   accounts             Account[]
-  sessions             Session[]
-  memberships          Membership[]
-  transactions         Transaction[] @relation("RecordedTransactions")
-  receivedTransactions Transaction[] @relation("ReceivedTransactions")
-  notifications        Notification[]
-  cashAdvancesGiven    CashAdvance[] @relation("CashAdvanceGiver")
-  cashAdvancesReceived CashAdvance[] @relation("CashAdvanceReceiver")
-  transactionsPerPage  Int           @default(10)
+  cashAdvancesGiven    CashAdvance[]      @relation("CashAdvanceGiver")
+  cashAdvancesReceived CashAdvance[]      @relation("CashAdvanceReceiver")
   heldAccounts         FinancialAccount[] @relation("AccountHolder")
-  requestsSent         Request[]     @relation("Requester")
-  requestsApproved     Request[]     @relation("Approver")
+  memberships          Membership[]
+  notifications        Notification[]
+  requestsApproved     Request[]          @relation("Approver")
+  requestsSent         Request[]          @relation("Requester")
+  sessions             Session[]
+  receivedTransactions Transaction[]      @relation("ReceivedTransactions")
+  transactions         Transaction[]      @relation("RecordedTransactions")
 }
 
 model VerificationToken {
@@ -68,7 +66,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Notification model
 model Notification {
   id        String   @id @default(cuid())
   message   String
@@ -77,9 +74,160 @@ model Notification {
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "Notification_userId_fkey")
 }
 
-// IpBok models
+model Business {
+  id                 String             @id @default(cuid())
+  name               String
+  address            String?
+  phone              String?
+  type               BusinessType?
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  trialEndsAt        DateTime?
+  subscriptionEndsAt DateTime?
+  planId             String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  plan               PricingPlan?       @relation(fields: [planId], references: [id])
+  cashAdvances       CashAdvance[]
+  dailySummaries     DailySummary[]
+  accounts           FinancialAccount[]
+  memberships        Membership[]
+  requests           Request[]
+  transactions       Transaction[]
+
+  @@index([planId], map: "Business_planId_fkey")
+}
+
+model PricingPlan {
+  id           String       @id @default(cuid())
+  businessType BusinessType @unique
+  monthlyPrice Float        @default(0)
+  trialDays    Int          @default(30)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  businesses   Business[]
+}
+
+model Membership {
+  id         String   @id @default(cuid())
+  userId     String
+  businessId String
+  role       Role
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([businessId], map: "Membership_businessId_fkey")
+}
+
+model FinancialAccount {
+  id           String        @id @default(cuid())
+  name         String
+  type         AccountType
+  balance      Float         @default(0)
+  businessId   String
+  holderId     String?
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  holder       User?         @relation("AccountHolder", fields: [holderId], references: [id])
+  transactions Transaction[]
+
+  @@index([businessId], map: "FinancialAccount_businessId_fkey")
+  @@index([holderId], map: "FinancialAccount_holderId_fkey")
+}
+
+model TransactionType {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  amount        Float
+  typeId        String
+  paymentMethod PaymentMethod
+  recordedById  String
+  recipientId   String?
+  status        TransactionStatus @default(PENDING)
+  businessId    String
+  accountId     String?
+  date          DateTime          @default(now())
+  description   String?
+  createdAt     DateTime          @default(now())
+  account       FinancialAccount? @relation(fields: [accountId], references: [id])
+  business      Business          @relation(fields: [businessId], references: [id])
+  recipient     User?             @relation("ReceivedTransactions", fields: [recipientId], references: [id])
+  recordedBy    User              @relation("RecordedTransactions", fields: [recordedById], references: [id])
+  type          TransactionType   @relation(fields: [typeId], references: [id])
+
+  @@index([accountId], map: "Transaction_accountId_fkey")
+  @@index([businessId], map: "Transaction_businessId_fkey")
+  @@index([recipientId], map: "Transaction_recipientId_fkey")
+  @@index([recordedById], map: "Transaction_recordedById_fkey")
+  @@index([typeId], map: "Transaction_typeId_fkey")
+}
+
+model DailySummary {
+  id               String   @id @default(cuid())
+  businessId       String
+  date             DateTime @db.Date
+  openingBalance   Float
+  totalDeposits    Float    @default(0)
+  totalWithdrawals Float    @default(0)
+  totalExpenses    Float    @default(0)
+  totalCharges     Float    @default(0)
+  closingBalance   Float
+  reconciled       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, date])
+}
+
+model CashAdvance {
+  id           String            @id @default(cuid())
+  amount       Float
+  description  String?
+  status       CashAdvanceStatus @default(PENDING)
+  businessId   String
+  givenById    String
+  receivedById String
+  date         DateTime          @default(now())
+  confirmedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  business     Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  givenBy      User              @relation("CashAdvanceGiver", fields: [givenById], references: [id])
+  receivedBy   User              @relation("CashAdvanceReceiver", fields: [receivedById], references: [id])
+
+  @@index([businessId], map: "CashAdvance_businessId_fkey")
+  @@index([givenById], map: "CashAdvance_givenById_fkey")
+  @@index([receivedById], map: "CashAdvance_receivedById_fkey")
+}
+
+model Request {
+  id          String        @id @default(cuid())
+  amount      Float
+  type        RequestType
+  status      RequestStatus @default(PENDING)
+  description String?
+  requesterId String
+  approverId  String?
+  businessId  String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  approver    User?         @relation("Approver", fields: [approverId], references: [id])
+  business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  requester   User          @relation("Requester", fields: [requesterId], references: [id])
+
+  @@index([approverId], map: "Request_approverId_fkey")
+  @@index([businessId], map: "Request_businessId_fkey")
+  @@index([requesterId], map: "Request_requesterId_fkey")
+}
+
 enum Role {
   OWNER
   AGENT
@@ -89,28 +237,6 @@ enum Role {
   FINANCE_OFFICER
   SUPERADMIN
   SUPPORT
-}
-
-model Business {
-  id             String             @id @default(cuid())
-  name           String
-  address        String?
-  phone          String?
-  type           BusinessType?      // No formatted default, forces onboarding.
-  subscriptionStatus SubscriptionStatus @default(TRIAL)
-  trialEndsAt        DateTime?
-  subscriptionEndsAt DateTime?
-  planId             String?
-  plan               PricingPlan?      @relation(fields: [planId], references: [id])
-
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  memberships    Membership[]
-  accounts       FinancialAccount[]
-  transactions   Transaction[]
-  dailySummaries DailySummary[]
-  cashAdvances   CashAdvance[]
-  requests       Request[]
 }
 
 enum BusinessType {
@@ -128,68 +254,9 @@ enum SubscriptionStatus {
   PAUSED
 }
 
-model PricingPlan {
-  id            String       @id @default(cuid())
-  businessType  BusinessType @unique
-  monthlyPrice  Float        @default(0)
-  trialDays     Int          @default(30)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  businesses    Business[]
-}
-
-model Membership {
-  id         String   @id @default(cuid())
-  userId     String
-  businessId String
-  role       Role
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, businessId])
-}
-
-model FinancialAccount {
-  id           String        @id @default(cuid())
-  name         String // e.g., "Cash", "Bank Account", "Agent A's Float"
-  type         AccountType
-  balance      Float         @default(0)
-  businessId   String
-  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  holderId     String?       // Link to specific user (Agent)
-  holder       User?         @relation("AccountHolder", fields: [holderId], references: [id])
-  transactions Transaction[]
-}
-
 enum AccountType {
   CASH
   BANK
-}
-
-model TransactionType {
-  id           String        @id @default(cuid())
-  name         String        @unique // e.g., "Deposit", "Withdrawal", "Expense", "Charge"
-  transactions Transaction[]
-}
-
-model Transaction {
-  id            String            @id @default(cuid())
-  amount        Float
-  typeId        String
-  type          TransactionType   @relation(fields: [typeId], references: [id])
-  paymentMethod PaymentMethod
-  recordedById  String
-  recordedBy    User              @relation("RecordedTransactions", fields: [recordedById], references: [id])
-  recipientId   String?
-  recipient     User?             @relation("ReceivedTransactions", fields: [recipientId], references: [id])
-  status        TransactionStatus @default(PENDING)
-  businessId    String
-  business      Business          @relation(fields: [businessId], references: [id])
-  accountId     String?
-  account       FinancialAccount? @relation(fields: [accountId], references: [id])
-  date          DateTime          @default(now())
-  description   String?
-  createdAt     DateTime          @default(now())
 }
 
 enum PaymentMethod {
@@ -206,64 +273,10 @@ enum TransactionStatus {
   CANCELLED
 }
 
-model DailySummary {
-  id               String   @id @default(cuid())
-  businessId       String
-  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  date             DateTime @db.Date
-  openingBalance   Float
-  totalDeposits    Float    @default(0)
-  totalWithdrawals Float    @default(0)
-  totalExpenses    Float    @default(0)
-  totalCharges     Float    @default(0)
-  closingBalance   Float
-  reconciled       Boolean  @default(false)
-  createdAt        DateTime @default(now())
-
-  @@unique([businessId, date])
-}
-
-model CashAdvance {
-  id            String            @id @default(cuid())
-  amount        Float
-  description   String?
-  status        CashAdvanceStatus @default(PENDING)
-  businessId    String
-  business      Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  givenById     String
-  givenBy       User              @relation("CashAdvanceGiver", fields: [givenById], references: [id])
-  receivedById  String
-  receivedBy    User              @relation("CashAdvanceReceiver", fields: [receivedById], references: [id])
-  date          DateTime          @default(now())
-  confirmedAt   DateTime?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-}
-
 enum CashAdvanceStatus {
   PENDING
   CONFIRMED
   REJECTED
-}
-
-model Request {
-  id          String        @id @default(cuid())
-  amount      Float
-  type        RequestType
-  status      RequestStatus @default(PENDING)
-  description String?
-  
-  requesterId String
-  requester   User   @relation("Requester", fields: [requesterId], references: [id])
-  
-  approverId  String?
-  approver    User?  @relation("Approver", fields: [approverId], references: [id])
-  
-  businessId  String
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 enum RequestType {

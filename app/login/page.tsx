@@ -11,6 +11,7 @@ import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 function Login() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
+  const authError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,11 +20,41 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  // Map NextAuth error codes to user-friendly messages
+  const getErrorMessage = (errorCode: string | null) => {
+    if (!errorCode) return "";
+    switch (errorCode) {
+      case "CredentialsSignin":
+        return "Invalid email or password.";
+      case "SessionRequired":
+        return "Please sign in to access this page.";
+      case "OAuthAccountNotLinked":
+        return "This email is already associated with another login method. Please sign in using your original method.";
+      case "OAuthSignin":
+      case "OAuthCallback":
+      case "OAuthCreateAccount":
+        return "There was a problem signing in with Google. Please try again.";
+      case "EmailSignin":
+        return "The e-mail could not be sent. Please try again.";
+      case "AccessDenied":
+        return "Access denied. You do not have permission to sign in.";
+      case "Verification":
+        return "The verification link has expired or has already been used.";
+      case "DatabaseError":
+        return "Cannot connect to the database. Please ensure your IP is whitelisted in TiDB Cloud.";
+      default:
+        return "An unexpected error occurred. Please try again.";
+    }
+  };
+
   // Show success message if redirected from signup
   const successMessage =
     message === "check-email"
       ? "Registration successful! Please check your email to verify your account."
       : "";
+
+  // Combine local error state with auth error from URL
+  const displayedError = error || getErrorMessage(authError);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +74,10 @@ function Login() {
       if (result.error === "Email not verified") {
         setError(
           "Your email is not verified. Please check your inbox for the verification link.",
+        );
+      } else if (result.error === "SocialAccountOnly") {
+        setError(
+          "This account was created with Google. Please use the 'Sign in with Google' button below.",
         );
       } else {
         setError("Invalid credentials");
@@ -74,10 +109,10 @@ function Login() {
           </div>
         )}
 
-        {error && (
+        {displayedError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
             <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
-            <p className="text-sm">{error}</p>
+            <p className="text-sm">{displayedError}</p>
           </div>
         )}
 

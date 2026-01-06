@@ -32,6 +32,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.log("Authorize: Missing credentials");
           return null;
         }
 
@@ -40,29 +41,65 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials.email },
           });
 
-          if (
-            user &&
-            user.password &&
-            (await bcrypt.compare(credentials.password, user.password))
-          ) {
-            if (!user.emailVerified) {
-              // Return null or throw error depending on how you want to handle it.
-              // NextAuth default error page might be shown if we throw.
-              // For now, let's return null which is safest, or we could customize the error handler.
-              // Ideally, we throw an error "Email not verified" but NextAuth behavior varies.
-              // Let's rely on the user knowing they need to verify if login fails right after signup.
-              throw new Error("Email not verified");
-            }
-
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-            } as CustomUser;
+          if (!user) {
+            console.log(
+              `Authorize: User not found for email ${credentials.email}`,
+            );
+            return null;
           }
-        } catch (error) {
-          console.error("Auth error:", error);
+
+          if (!user.password) {
+            console.log(
+              `Authorize: User ${credentials.email} has no password set (likely a social account)`,
+            );
+            // Custom error message for user who should use Google instead
+            throw new Error("SocialAccountOnly");
+          }
+
+          const passwordMatch = await bcrypt.compare(
+            credentials.password,
+            user.password,
+          );
+          if (!passwordMatch) {
+            console.log(
+              `Authorize: Password mismatch for email ${credentials.email}`,
+            );
+            return null;
+          }
+
+          if (!user.emailVerified) {
+            console.log(
+              `Authorize: Email not verified for ${credentials.email}`,
+            );
+            throw new Error("Email not verified");
+          }
+
+          console.log(`Authorize: Success for ${credentials.email}`);
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          } as CustomUser;
+        } catch (error: any) {
+          console.error("Auth error details:", error);
+
+          // Check for Prisma connection errors (P1001, etc.)
+          if (
+            error.code === "P1001" ||
+            error.message.includes("Can't reach database server")
+          ) {
+            console.error("CRITICAL: Database is unreachable");
+            throw new Error("DatabaseError");
+          }
+
+          // Re-throw if it's one of our custom error messages so NextAuth passes it to the client
+          if (
+            error.message === "Email not verified" ||
+            error.message === "SocialAccountOnly"
+          ) {
+            throw error;
+          }
         }
 
         return null;
@@ -130,8 +167,17 @@ export const authOptions: NextAuthOptions = {
               data: { emailVerified: new Date() },
             });
           }
-        } catch (error) {
+          return true;
+        } catch (error: any) {
           console.error("Error in Google signIn callback:", error);
+          if (
+            error.code === "P1001" ||
+            error.message.includes("Can't reach database server")
+          ) {
+            // Throw so NextAuth redirects to error page
+            throw new Error("DatabaseError");
+          }
+          return false;
         }
       }
       return true;
