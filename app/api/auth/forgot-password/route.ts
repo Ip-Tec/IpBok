@@ -29,7 +29,11 @@ export async function POST(request: Request) {
     data: { identifier: email, token, expires },
   });
 
-  await sendPasswordResetEmail(email, token);
+  const protocol = request.headers.get("x-forwarded-proto") || "http";
+  const host = request.headers.get("host");
+  const baseUrl = `${protocol}://${host}`;
+
+  await sendPasswordResetEmail(email, token, baseUrl);
 
   return NextResponse.json(
     { message: "Password reset email sent" },

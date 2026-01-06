@@ -50,15 +50,63 @@ export const sendVerificationEmail = async (
  * Send a password reset email.
  * @param to Recipient email address
  * @param token Reset token to embed in the link
+ * @param baseUrl Optional base URL for the reset link
  */
-export async function sendPasswordResetEmail(to: string, token: string) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${token}`;
+export async function sendPasswordResetEmail(
+  to: string,
+  token: string,
+  baseUrl?: string,
+) {
+  const host =
+    baseUrl ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXTAUTH_URL ||
+    "http://localhost:3000";
+  const resetUrl = `${host}/reset-password/${token}`;
+
   const mailOptions = {
     from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',
     to,
-    subject: "Password Reset Request",
-    text: `You requested a password reset. Click the link to reset your password: ${resetUrl}`,
-    html: `<p>You requested a password reset.</p><p><a href="${resetUrl}">Reset Password</a></p>`,
+    subject: "Reset Your IpBok Password",
+    text: `You requested a password reset for your IpBok account. Click the link below to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email. This link will expire in 1 hour.`,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #000000; padding: 20px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 24px;">IpBok</h1>
+        </div>
+        <div style="padding: 40px 30px; background-color: #ffffff;">
+          <h2 style="color: #333333; margin-top: 0;">Password Reset Request</h2>
+          <p style="color: #666666; line-height: 1.6;">
+            We received a request to reset the password for your IpBok account. No changes have been made to your account yet.
+          </p>
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${resetUrl}" style="background-color: #0070f3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+              Reset Password
+            </a>
+          </div>
+          <p style="color: #666666; line-height: 1.6;">
+            For security reasons, this link will expire in <strong>1 hour</strong>. If you did not request a password reset, please ignore this email or contact support if you have concerns.
+          </p>
+          <hr style="border: none; border-top: 1px solid #eeeeee; margin: 30px 0;" />
+          <p style="color: #999999; font-size: 12px;">
+            If the button above doesn't work, copy and paste this URL into your browser:
+          </p>
+          <p style="color: #999999; font-size: 12px; word-break: break-all;">
+            <a href="${resetUrl}" style="color: #0070f3;">${resetUrl}</a>
+          </p>
+        </div>
+        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #999999; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} IpBok. All rights reserved.
+        </div>
+      </div>
+    `,
   };
-  await transporter.sendMail(mailOptions);
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Password reset email sent to ${to}`);
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    throw new Error("Could not send password reset email");
+  }
 }
