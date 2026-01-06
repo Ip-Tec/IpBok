@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { addDays } from "date-fns";
 
@@ -20,14 +20,17 @@ export async function GET(req: NextRequest) {
 
   try {
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
-    
+
     // Verify transaction with Paystack
-    const response = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${paystackSecret}`,
+    const response = await fetch(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${paystackSecret}`,
+        },
       },
-    });
+    );
 
     const data = await response.json();
 
@@ -36,7 +39,9 @@ export async function GET(req: NextRequest) {
 
       // Ensure we are updating the correct business
       if (businessId !== session.user.businessId) {
-         return new NextResponse("Unauthorized business update", { status: 403 });
+        return new NextResponse("Unauthorized business update", {
+          status: 403,
+        });
       }
 
       // Update business status
@@ -52,12 +57,18 @@ export async function GET(req: NextRequest) {
         },
       });
 
-      return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard/settings/billing?status=success`);
+      return NextResponse.redirect(
+        `${process.env.NEXTAUTH_URL}/dashboard/settings/billing?status=success`,
+      );
     } else {
-      return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard/settings/billing?status=failed&message=${data.message}`);
+      return NextResponse.redirect(
+        `${process.env.NEXTAUTH_URL}/dashboard/settings/billing?status=failed&message=${data.message}`,
+      );
     }
   } catch (error: any) {
     console.error("Error verifying payment:", error);
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard/settings/billing?status=error`);
+    return NextResponse.redirect(
+      `${process.env.NEXTAUTH_URL}/dashboard/settings/billing?status=error`,
+    );
   }
 }

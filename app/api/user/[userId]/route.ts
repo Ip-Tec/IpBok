@@ -1,13 +1,12 @@
 export const dynamic = "force-dynamic";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export async function PUT(
   req: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ userId: string }> }
+  { params: paramsPromise }: { params: Promise<{ userId: string }> },
 ) {
   const params = await paramsPromise;
   const session = await getServerSession(authOptions);
@@ -20,7 +19,11 @@ export async function PUT(
     const body = await req.json();
     const { firstName, lastName, email, transactionsPerPage } = body;
 
-    const dataToUpdate: { name?: string; email?: string; transactionsPerPage?: number } = {};
+    const dataToUpdate: {
+      name?: string;
+      email?: string;
+      transactionsPerPage?: number;
+    } = {};
 
     if (firstName && lastName) {
       dataToUpdate.name = `${firstName} ${lastName}`;
@@ -35,7 +38,7 @@ export async function PUT(
     if (Object.keys(dataToUpdate).length === 0) {
       return NextResponse.json(
         { message: "No fields to update" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,7 +55,7 @@ export async function PUT(
     console.error("Error updating user:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

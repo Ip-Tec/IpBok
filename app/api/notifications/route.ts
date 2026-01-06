@@ -1,15 +1,15 @@
 export const dynamic = "force-dynamic";
-import { NextResponse, NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { prisma } from '@/lib/prisma';
+import { NextResponse, NextRequest } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 // GET /api/notifications - Fetch all notifications for the logged-in user
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
   }
 
   try {
@@ -18,15 +18,18 @@ export async function GET(req: NextRequest) {
         userId: session.user.id,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: 20, // Limit to the last 20 notifications to avoid overloading
     });
 
     return NextResponse.json(notifications);
   } catch (error) {
-    console.error('Error fetching notifications:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    console.error("Error fetching notifications:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -35,7 +38,7 @@ export async function PUT(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
   }
 
   try {
@@ -49,9 +52,15 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: 'Notifications marked as read' }, { status: 200 });
+    return NextResponse.json(
+      { message: "Notifications marked as read" },
+      { status: 200 },
+    );
   } catch (error) {
-    console.error('Error marking notifications as read:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    console.error("Error marking notifications as read:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

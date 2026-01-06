@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { Role } from "@/src/generated";
+import { logAction } from "@/lib/audit";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
   if (!businessId) {
     return NextResponse.json(
       { message: "Business ID is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
   if (!membership) {
     return NextResponse.json(
       { message: "You are not a member of this business" },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -129,7 +130,7 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching transactions:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -173,7 +174,7 @@ export async function POST(req: NextRequest) {
           message: "Missing required fields",
           details: { type, amount, paymentMethod, businessId, userId, date },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -189,10 +190,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           message: `Invalid payment method: ${paymentMethod}. Must be one of: ${validPaymentMethods.join(
-            ", "
+            ", ",
           )}`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -203,7 +204,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { message: "Cannot add transaction for another business" },
-        { status: 403 }
+        { status: 403 },
       );
     }
     // For owner, we need to verify the agent (userId) belongs to their business
@@ -222,7 +223,7 @@ export async function POST(req: NextRequest) {
       if (!agent) {
         return NextResponse.json(
           { message: "Agent not found in your business" },
-          { status: 403 }
+          { status: 403 },
         );
       }
     }
@@ -245,7 +246,7 @@ export async function POST(req: NextRequest) {
           {
             message: `Transaction type '${type}' not found and could not be created`,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -255,7 +256,7 @@ export async function POST(req: NextRequest) {
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       return NextResponse.json(
         { message: "Amount must be a positive number" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -305,6 +306,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    await logAction("TRANSACTION_CREATE", session.user.id, {
+      transactionId: newTransaction.id,
+      amount: parsedAmount,
+      type: transactionType.name,
+      businessId: businessId,
+    });
+
     return NextResponse.json(newTransaction, { status: 201 });
   } catch (error) {
     console.error("Error creating transaction:", error);
@@ -312,7 +320,7 @@ export async function POST(req: NextRequest) {
       error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json(
       { message: "Internal Server Error", error: errorMessage },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

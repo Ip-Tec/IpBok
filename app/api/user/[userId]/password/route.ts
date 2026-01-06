@@ -1,13 +1,13 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function PUT(
   req: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ userId: string }> }
+  { params: paramsPromise }: { params: Promise<{ userId: string }> },
 ) {
   const params = await paramsPromise;
   const session = await getServerSession(authOptions);
@@ -23,7 +23,7 @@ export async function PUT(
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
         { message: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -34,19 +34,19 @@ export async function PUT(
     if (!user || !user.password) {
       return NextResponse.json(
         { message: "User not found or no password set" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
-      user.password
+      user.password,
     );
 
     if (!isPasswordValid) {
       return NextResponse.json(
         { message: "Invalid current password" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,13 +61,13 @@ export async function PUT(
 
     return NextResponse.json(
       { message: "Password updated successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error updating password:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

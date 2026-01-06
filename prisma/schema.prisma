@@ -228,6 +228,16 @@ model Request {
   @@index([requesterId], map: "Request_requesterId_fkey")
 }
 
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  userId    String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 enum Role {
   OWNER
   AGENT

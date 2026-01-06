@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { sendVerificationEmail } from "@/lib/email";
+import { logAction } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -143,6 +144,12 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+
+    await logAction("USER_REGISTER", user.id, {
+      email: user.email,
+      role: user.role,
+      name: user.name,
+    });
 
     return NextResponse.json(
       {

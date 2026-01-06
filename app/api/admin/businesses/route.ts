@@ -1,10 +1,8 @@
 export const dynamic = "force-dynamic";
-
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@/src/generated/client";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -18,19 +16,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const businesses: Prisma.BusinessGetPayload<{
+    const businesses = await prisma.business.findMany({
       include: {
+        plan: true,
         _count: {
           select: {
-            memberships: true;
-            transactions: true;
-          };
-        };
-      };
-    }>[] = await prisma.business.findMany({
-      include: {
-        _count: {
-          select: { memberships: true, transactions: true },
+            memberships: true,
+            transactions: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -41,8 +34,10 @@ export async function GET(req: NextRequest) {
         id: b.id,
         name: b.name,
         type: b.type,
-        address: b.address,
-        phone: b.phone,
+        subscriptionStatus: b.subscriptionStatus,
+        trialEndsAt: b.trialEndsAt,
+        subscriptionEndsAt: b.subscriptionEndsAt,
+        planName: b.plan?.businessType || "None",
         memberCount: b._count.memberships,
         transactionCount: b._count.transactions,
         createdAt: b.createdAt,

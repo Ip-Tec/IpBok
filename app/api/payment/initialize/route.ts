@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -40,28 +40,33 @@ export async function POST(req: NextRequest) {
       throw new Error("PAYSTACK_SECRET_KEY is not configured");
     }
 
-    const response = await fetch("https://api.paystack.co/transaction/initialize", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${paystackSecret}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: session.user.email,
-        amount: plan.monthlyPrice * 100, // Paystack uses kobo (subunits)
-        callback_url: `${process.env.NEXTAUTH_URL}/api/payment/callback`,
-        metadata: {
-          businessId: business.id,
-          planId: plan.id,
-          businessType: plan.businessType,
+    const response = await fetch(
+      "https://api.paystack.co/transaction/initialize",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${paystackSecret}`,
+          "Content-Type": "application/json",
         },
-      }),
-    });
+        body: JSON.stringify({
+          email: session.user.email,
+          amount: plan.monthlyPrice * 100, // Paystack uses kobo (subunits)
+          callback_url: `${process.env.NEXTAUTH_URL}/api/payment/callback`,
+          metadata: {
+            businessId: business.id,
+            planId: plan.id,
+            businessType: plan.businessType,
+          },
+        }),
+      },
+    );
 
     const data = await response.json();
 
     if (!data.status) {
-      throw new Error(data.message || "Failed to initialize Paystack transaction");
+      throw new Error(
+        data.message || "Failed to initialize Paystack transaction",
+      );
     }
 
     return NextResponse.json({
@@ -70,6 +75,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("Error initializing payment:", error);
-    return new NextResponse(JSON.stringify({ error: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

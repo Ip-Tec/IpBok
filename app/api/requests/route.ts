@@ -1,7 +1,7 @@
 ﻿export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { RequestStatus, RequestType, Role } from "@/src/generated";
 
@@ -21,18 +21,18 @@ export async function GET(req: NextRequest) {
     // Agents only see their own requests
     if (role === Role.AGENT) {
       where.requesterId = session.user.id;
-    } 
+    }
     // Managers/Owners see all "PENDING" by default or all history
     // For now, let's return all for non-agents to simplify
-    
+
     const requests = await prisma.request.findMany({
       where,
       include: {
         requester: { select: { name: true, email: true } },
         approver: { select: { name: true, email: true } },
       },
-      orderBy: { createdAt: 'desc' },
-      take: 50
+      orderBy: { createdAt: "desc" },
+      take: 50,
     });
 
     return NextResponse.json(requests);
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         status: RequestStatus.PENDING,
         requesterId: session.user.id,
         businessId: session.user.businessId,
-      }
+      },
     });
 
     return NextResponse.json(request, { status: 201 });

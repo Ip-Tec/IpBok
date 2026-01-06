@@ -1,7 +1,7 @@
 ﻿export const dynamic = "force-dynamic";
 import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/src/generated";
 
@@ -27,13 +27,21 @@ export async function GET(req: NextRequest) {
   }
 
   if (session.user.role !== Role.OWNER) {
-    console.error(`Reconciliation API Error: User role is not OWNER. Role: ${session.user.role}`);
-    return NextResponse.json({ message: "User is not an owner" }, { status: 403 });
+    console.error(
+      `Reconciliation API Error: User role is not OWNER. Role: ${session.user.role}`,
+    );
+    return NextResponse.json(
+      { message: "User is not an owner" },
+      { status: 403 },
+    );
   }
-  
+
   if (!session.user.businessId) {
     console.error("Reconciliation API Error: businessId missing from session.");
-    return NextResponse.json({ message: "Business ID is missing from session" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Business ID is missing from session" },
+      { status: 400 },
+    );
   }
 
   const { businessId } = session.user;
@@ -93,31 +101,36 @@ export async function GET(req: NextRequest) {
         if (transaction.type?.name) {
           const transactionTypeName = transaction.type.name.toLowerCase();
           // ASSUMPTION: 'Charge' transactions contribute to the expected amount.
-          if (transactionTypeName === 'charge') {
+          if (transactionTypeName === "charge") {
             agentData.expected += transaction.amount;
           }
           // ASSUMPTION: 'Deposit' transactions with 'CASH' payment method count as submitted.
-          if (transactionTypeName === 'deposit' && transaction.paymentMethod === 'CASH') {
+          if (
+            transactionTypeName === "deposit" &&
+            transaction.paymentMethod === "CASH"
+          ) {
             agentData.submitted += transaction.amount;
           }
         }
       }
     }
-    
+
     // 4. Format the response
     let totalExpectedCash = 0;
     let totalSubmittedCash = 0;
 
-    const agentDetails = Array.from(agentReconciliation.values()).map(data => {
-      const difference = data.submitted - data.expected;
-      totalExpectedCash += data.expected;
-      totalSubmittedCash += data.submitted;
-      return {
-        ...data,
-        difference,
-        status: difference === 0 ? "Reconciled" : "Pending",
-      };
-    });
+    const agentDetails = Array.from(agentReconciliation.values()).map(
+      (data) => {
+        const difference = data.submitted - data.expected;
+        totalExpectedCash += data.expected;
+        totalSubmittedCash += data.submitted;
+        return {
+          ...data,
+          difference,
+          status: difference === 0 ? "Reconciled" : "Pending",
+        };
+      },
+    );
 
     const dailyReconciliation = {
       totalExpectedCash,
@@ -128,10 +141,13 @@ export async function GET(req: NextRequest) {
 
     console.log("Successfully processed reconciliation data.");
     return NextResponse.json(dailyReconciliation);
-
   } catch (error) {
     console.error("Reconciliation API - Internal Server Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json({ message: "Internal Server Error", error: errorMessage }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json(
+      { message: "Internal Server Error", error: errorMessage },
+      { status: 500 },
+    );
   }
 }

@@ -110,3 +110,48 @@ export async function sendPasswordResetEmail(
     throw new Error("Could not send password reset email");
   }
 }
+
+/**
+ * Send a custom email from an admin.
+ * @param to Recipient email address
+ * @param subject Email subject
+ * @param message Email message (HTML or text)
+ */
+export async function sendCustomEmail(
+  to: string,
+  subject: string,
+  message: string,
+) {
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',
+    to,
+    subject,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #000000; padding: 20px text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 24px;">IpBok</h1>
+        </div>
+        <div style="padding: 40px 30px; background-color: #ffffff;">
+          <p style="color: #333333; line-height: 1.6; white-space: pre-wrap;">
+            ${message}
+          </p>
+          <hr style="border: none; border-top: 1px solid #eeeeee; margin: 30px 0;" />
+          <p style="color: #999999; font-size: 12px; text-align: center;">
+            This email was sent by an IpBok administrator.
+          </p>
+        </div>
+        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #999999; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} IpBok. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Custom admin email sent to ${to}`);
+  } catch (error) {
+    console.error("Error sending custom email:", error);
+    throw new Error("Could not send custom email");
+  }
+}

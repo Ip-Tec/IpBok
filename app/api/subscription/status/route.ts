@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { differenceInDays, isAfter } from "date-fns";
 
@@ -15,12 +15,12 @@ export async function GET(req: NextRequest) {
   try {
     const business = await prisma.business.findUnique({
       where: { id: session.user.businessId },
-      include: { 
+      include: {
         plan: {
           select: {
             monthlyPrice: true,
-          }
-        } 
+          },
+        },
       },
     });
 
@@ -38,17 +38,17 @@ export async function GET(req: NextRequest) {
         // Update DB status if it was TRIAL but time passed
         await prisma.business.update({
           where: { id: business.id },
-          data: { subscriptionStatus: "EXPIRED" }
+          data: { subscriptionStatus: "EXPIRED" },
         });
       } else {
         daysRemaining = differenceInDays(business.trialEndsAt, now);
       }
     } else if (status === "ACTIVE" && business.subscriptionEndsAt) {
-       if (isAfter(now, business.subscriptionEndsAt)) {
-          status = "EXPIRED";
-       } else {
-          daysRemaining = differenceInDays(business.subscriptionEndsAt, now);
-       }
+      if (isAfter(now, business.subscriptionEndsAt)) {
+        status = "EXPIRED";
+      } else {
+        daysRemaining = differenceInDays(business.subscriptionEndsAt, now);
+      }
     }
 
     return NextResponse.json({

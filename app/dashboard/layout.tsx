@@ -12,6 +12,7 @@ import {
   FileText,
   Settings,
   Menu,
+  ShieldAlert,
 } from "lucide-react";
 import { NotificationBell } from "@/components/NotificationBell";
 import TrialProtectionBanner from "@/components/SubscriptionBanner";
@@ -57,6 +58,15 @@ const ownerSidebarNavLinks = [
     href: "/dashboard/requests",
     icon: <ArrowRightLeft className="w-7 h-7" />,
   },
+];
+
+const adminSidebarNavLinks = [
+  {
+    name: "Admin Console",
+    href: "/admin",
+    icon: <ShieldAlert className="w-7 h-7 text-primary font-bold" />,
+  },
+  ...ownerSidebarNavLinks,
 ];
 
 const agentSidebarNavLinks = [
@@ -159,9 +169,16 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   const user = session.user as User;
   const isOwner = user.role.toUpperCase() === "OWNER";
+  const isAdmin =
+    user.role.toUpperCase() === "SUPERADMIN" ||
+    user.role.toUpperCase() === "SUPPORT";
   const businessType = user.businessType;
 
-  let navLinks = isOwner ? ownerSidebarNavLinks : agentSidebarNavLinks;
+  let navLinks = isAdmin
+    ? adminSidebarNavLinks
+    : isOwner
+      ? ownerSidebarNavLinks
+      : agentSidebarNavLinks;
 
   if (isOwner && !businessType) {
     return null;
