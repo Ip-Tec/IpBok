@@ -18,6 +18,99 @@ import { Transaction } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 
+const TransactionMobileRow = ({
+  transaction,
+  onApprove,
+}: {
+  transaction: Transaction;
+  onApprove: () => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="p-4 bg-white dark:bg-gray-800">
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="flex flex-col">
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {transaction.type.name}
+          </span>
+          <span className="text-sm text-gray-500">
+            {new Date(transaction.date).toLocaleDateString()}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-primary">
+            {new Intl.NumberFormat("en-NG", {
+              style: "currency",
+              currency: "NGN",
+            }).format(transaction.amount)}
+          </span>
+          <svg
+            className={cn(
+              "w-5 h-5 transition-transform",
+              isOpen ? "rotate-180" : "",
+            )}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-gray-500">Agent:</div>
+            <div className="text-gray-900 dark:text-white text-right font-medium">
+              {transaction.recordedBy?.name || "N/A"}
+              <div className="text-[10px] text-gray-400 font-normal">
+                {transaction.recordedBy?.email}
+              </div>
+            </div>
+            <div className="text-gray-500">Full Date:</div>
+            <div className="text-gray-900 dark:text-white text-right">
+              {new Date(transaction.date).toLocaleString()}
+            </div>
+            <div className="text-gray-500">Status:</div>
+            <div className="text-right">
+              <span
+                className={cn(
+                  "px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase",
+                  {
+                    "bg-yellow-100 text-yellow-800":
+                      transaction.status === "PENDING",
+                    "bg-green-100 text-green-800":
+                      transaction.status === "CONFIRMED",
+                    "bg-red-100 text-red-800":
+                      transaction.status === "CANCELLED",
+                  },
+                )}
+              >
+                {transaction.status}
+              </span>
+            </div>
+          </div>
+          {transaction.status === "PENDING" && (
+            <Button size="sm" className="w-full mt-2" onClick={onApprove}>
+              Approve Transaction
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const OwnerTransactionsView = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,58 +133,61 @@ const OwnerTransactionsView = () => {
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const fetchTransactions = useCallback(async (page: number, query: string) => {
-    if (!session?.user?.businessId) return;
-    setIsLoading(true);
+  const fetchTransactions = useCallback(
+    async (page: number, query: string) => {
+      if (!session?.user?.businessId) return;
+      setIsLoading(true);
 
-    const params = new URLSearchParams({
-      businessId: session.user.businessId,
-      page: page.toString(),
-      limit: transactionsPerPage.toString(),
-    });
+      const params = new URLSearchParams({
+        businessId: session.user.businessId,
+        page: page.toString(),
+        limit: transactionsPerPage.toString(),
+      });
 
-    if (query) {
-      params.append("searchQuery", query);
-    }
-    if (filters.status !== "all") {
-      params.append("status", filters.status);
-    }
-    if (filters.type !== "all") {
-      params.append("type", filters.type);
-    }
-    if (filters.paymentMethod !== "all") {
-      params.append("paymentMethod", filters.paymentMethod);
-    }
-    if (filters.dateRange?.from) {
-      params.append("startDate", filters.dateRange.from.toISOString());
-    }
-    if (filters.dateRange?.to) {
-      params.append("endDate", filters.dateRange.to.toISOString());
-    }
-
-    try {
-      const response = await fetch(`/api/transactions?${params.toString()}`);
-      if (!response.ok) {
-        toast.error("Could not fetch transactions.");
-        throw new Error("Failed to fetch transactions");
+      if (query) {
+        params.append("searchQuery", query);
       }
-      const data = await response.json();
-      setTransactions(data.transactions);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error(error);
-      toast.error("Could not fetch transactions.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [session, transactionsPerPage, filters]);
+      if (filters.status !== "all") {
+        params.append("status", filters.status);
+      }
+      if (filters.type !== "all") {
+        params.append("type", filters.type);
+      }
+      if (filters.paymentMethod !== "all") {
+        params.append("paymentMethod", filters.paymentMethod);
+      }
+      if (filters.dateRange?.from) {
+        params.append("startDate", filters.dateRange.from.toISOString());
+      }
+      if (filters.dateRange?.to) {
+        params.append("endDate", filters.dateRange.to.toISOString());
+      }
+
+      try {
+        const response = await fetch(`/api/transactions?${params.toString()}`);
+        if (!response.ok) {
+          toast.error("Could not fetch transactions.");
+          throw new Error("Failed to fetch transactions");
+        }
+        const data = await response.json();
+        setTransactions(data.transactions);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error(error);
+        toast.error("Could not fetch transactions.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [session, transactionsPerPage, filters],
+  );
 
   useEffect(() => {
     if (session) {
       fetchTransactions(currentPage, debouncedSearchQuery);
     }
   }, [session, currentPage, debouncedSearchQuery, fetchTransactions, filters]);
-  
+
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchQuery, filters]);
@@ -102,14 +198,14 @@ const OwnerTransactionsView = () => {
         `/api/owner/transactions/${transactionId}/approve`,
         {
           method: "POST",
-        }
+        },
       );
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to approve transaction");
       }
       toast.success("Transaction approved successfully!");
-      fetchTransactions(currentPage, debouncedSearchQuery); // Refresh data for the current page
+      fetchTransactions(currentPage, debouncedSearchQuery);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -128,7 +224,7 @@ const OwnerTransactionsView = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <header className="flex items-center justify-between pb-4 border-b">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
@@ -207,104 +303,126 @@ const OwnerTransactionsView = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" className="px-6 py-3">
-                Agent
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Date
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Type
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Amount
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Status
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+      <div className="bg-white rounded-lg shadow dark:bg-gray-800 overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden md:block">
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
-                <td colSpan={6} className="p-6 text-center">
-                  Loading transactions...
-                </td>
+                <th scope="col" className="px-6 py-3">
+                  Agent
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Date
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Type
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Amount
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Actions
+                </th>
               </tr>
-            ) : transactions.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="p-6 text-center">
-                  No transactions found.
-                </td>
-              </tr>
-            ) : (
-              transactions.map((transaction) => (
-                <tr
-                  key={transaction.id}
-                  className="bg-white border-b last:border-b-0 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                >
-                  <td className="px-6 py-4">
-                    {transaction.recordedBy?.name || "N/A"}
-                    <div className="text-xs text-gray-500">
-                      {transaction.recordedBy?.email}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {new Date(transaction.date).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
-                    })}
-                  </td>
-                  <td className="px-6 py-4">{transaction.type.name}</td>
-                  <td className="px-6 py-4 font-medium">
-                    {new Intl.NumberFormat("en-NG", {
-                      style: "currency",
-                      currency: "NGN",
-                    }).format(transaction.amount)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={cn(
-                        "px-2 py-1 text-xs font-semibold rounded-full",
-                        {
-                          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300":
-                            transaction.status === "PENDING",
-                          "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300":
-                            transaction.status === "CONFIRMED",
-                          "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300":
-                            transaction.status === "CANCELLED",
-                        }
-                      )}
-                    >
-                      {transaction.status.toLowerCase()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {transaction.status === "PENDING" && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleApprove(transaction.id)}
-                      >
-                        Approve
-                      </Button>
-                    )}
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="p-6 text-center">
+                    Loading transactions...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-6 text-center">
+                    No transactions found.
+                  </td>
+                </tr>
+              ) : (
+                transactions.map((transaction) => (
+                  <tr
+                    key={transaction.id}
+                    className="bg-white border-b last:border-b-0 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <td className="px-6 py-4">
+                      {transaction.recordedBy?.name || "N/A"}
+                      <div className="text-xs text-gray-500">
+                        {transaction.recordedBy?.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {new Date(transaction.date).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </td>
+                    <td className="px-6 py-4">{transaction.type.name}</td>
+                    <td className="px-6 py-4 font-medium">
+                      {new Intl.NumberFormat("en-NG", {
+                        style: "currency",
+                        currency: "NGN",
+                      }).format(transaction.amount)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={cn(
+                          "px-2 py-1 text-xs font-semibold rounded-full",
+                          {
+                            "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300":
+                              transaction.status === "PENDING",
+                            "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300":
+                              transaction.status === "CONFIRMED",
+                            "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300":
+                              transaction.status === "CANCELLED",
+                          },
+                        )}
+                      >
+                        {transaction.status.toLowerCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {transaction.status === "PENDING" && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(transaction.id)}
+                        >
+                          Approve
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Collapsible View */}
+        <div className="md:hidden">
+          {isLoading ? (
+            <div className="p-6 text-center">Loading transactions...</div>
+          ) : transactions.length === 0 ? (
+            <div className="p-6 text-center">No transactions found.</div>
+          ) : (
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              {transactions.map((transaction) => (
+                <TransactionMobileRow
+                  key={transaction.id}
+                  transaction={transaction}
+                  onApprove={() => handleApprove(transaction.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
