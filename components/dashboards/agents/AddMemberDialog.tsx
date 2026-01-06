@@ -62,8 +62,18 @@ export function AddMemberDialog({ onMemberAdded }: AddMemberDialogProps) {
           password,
           role,
           businessId: session.user.businessId,
-          initialCash: role === Role.AGENT ? (initialCash ? parseFloat(initialCash) : 0) : undefined,
-          initialBank: role === Role.AGENT ? (initialBank ? parseFloat(initialBank) : 0) : undefined,
+          initialCash:
+            role === Role.AGENT
+              ? initialCash
+                ? parseFloat(initialCash)
+                : 0
+              : undefined,
+          initialBank:
+            role === Role.AGENT
+              ? initialBank
+                ? parseFloat(initialBank)
+                : 0
+              : undefined,
         }),
       });
 
@@ -152,59 +162,94 @@ export function AddMemberDialog({ onMemberAdded }: AddMemberDialogProps) {
                 Role
               </Label>
               <div className="col-span-3">
-                  <Select value={role} onValueChange={setRole}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={Role.AGENT}>Agent</SelectItem>
-                      {/* Hide other roles for now as per user request */}
-                      {/* <SelectItem value={Role.MANAGER}>Manager</SelectItem>
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Role.AGENT}>Agent</SelectItem>
+                    {/* Hide other roles for now as per user request */}
+                    {/* <SelectItem value={Role.MANAGER}>Manager</SelectItem>
                       <SelectItem value={Role.ACCOUNTANT}>Accountant</SelectItem>
                       <SelectItem value={Role.AUDITOR}>Auditor</SelectItem>
                       <SelectItem value={Role.FINANCE_OFFICER}>Finance Officer</SelectItem> */}
-                    </SelectContent>
-                  </Select>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            
+
             {role === Role.AGENT && (
-                <div className="border-t pt-4 mt-4">
-                    <h4 className="text-sm font-medium mb-3">Initial Funds Assignment</h4>
-                    <div className="grid gap-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="initialCash" className="text-right">
-                            Cash Float
-                        </Label>
-                        <Input
-                            id="initialCash"
-                            type="number"
-                            value={initialCash}
-                            onChange={(e) => setInitialCash(e.target.value)}
-                            className="col-span-3"
-                            placeholder="0.00"
-                            min="0"
-                        />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="initialBank" className="text-right">
-                            Bank Float
-                        </Label>
-                        <Input
-                            id="initialBank"
-                            type="number"
-                            value={initialBank}
-                            onChange={(e) => setInitialBank(e.target.value)}
-                            className="col-span-3"
-                            placeholder="0.00"
-                            min="0"
-                        />
-                        </div>
-                    </div>
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-medium mb-3">
+                  Initial Funds Assignment
+                </h4>
+                <div className="grid gap-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="initialCash" className="text-right">
+                      Cash Float
+                    </Label>
+                    <Input
+                      id="initialCash"
+                      type="number"
+                      value={initialCash}
+                      onChange={(e) => setInitialCash(e.target.value)}
+                      className="col-span-3"
+                      placeholder="0.00"
+                      min="0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="initialBank" className="text-right">
+                      Bank Float
+                    </Label>
+                    <Input
+                      id="initialBank"
+                      type="number"
+                      value={initialBank}
+                      onChange={(e) => setInitialBank(e.target.value)}
+                      className="col-span-3"
+                      placeholder="0.00"
+                      min="0"
+                    />
+                  </div>
                 </div>
+              </div>
             )}
           </div>
-          <DialogFooter>
+          <div className="border-t pt-6 mt-6">
+            <h4 className="text-sm font-semibold mb-2">
+              Invite Members via Link
+            </h4>
+            <p className="text-xs text-muted-foreground mb-4">
+              Share this link with your team members. They will be automatically
+              added as Agents.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                readOnly
+                value={
+                  session?.user?.businessId
+                    ? `${typeof window !== "undefined" ? window.location.origin : ""}/signup?businessId=${session.user.businessId}&role=${Role.AGENT}`
+                    : "Loading..."
+                }
+                className="bg-muted text-xs h-9"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-9"
+                onClick={() => {
+                  const link = `${window.location.origin}/signup?businessId=${session?.user?.businessId}&role=${Role.AGENT}`;
+                  navigator.clipboard.writeText(link);
+                  toast.success("Invite link copied!");
+                }}
+              >
+                Copy
+              </Button>
+            </div>
+          </div>
+          <DialogFooter className="mt-8">
             <DialogClose asChild>
               <Button type="button" variant="outline">
                 Cancel

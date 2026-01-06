@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
 
 const Signup = () => {
+  const searchParams = useSearchParams();
+  const businessId = searchParams.get("businessId");
+  const invitedRole = searchParams.get("role");
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +43,8 @@ const Signup = () => {
           name,
           email,
           password,
-          role: "OWNER",
+          role: invitedRole || "OWNER",
+          businessId: businessId || undefined,
         }),
       });
 
@@ -48,7 +53,7 @@ const Signup = () => {
         // Show success message and redirect to login
         setError(""); // Clear any errors
         // You might want to use a toast or a dedicated success page
-        router.push("/login?message=check-email"); 
+        router.push("/login?message=check-email");
       } else {
         const data = await res.json();
         setError(data.error || data.message || "Registration failed");
@@ -68,10 +73,20 @@ const Signup = () => {
       </div>
       <div className="w-full max-w-xl space-y-8 p-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">Create your IpBok account</h2>
+          <h2 className="text-3xl font-bold">
+            {businessId ? `Join as an Agent` : `Create your IpBok account`}
+          </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign up to start managing your finances
+            {businessId
+              ? `You've been invited to join a business on IpBok`
+              : `Sign up to start managing your finances`}
           </p>
+          {businessId && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center gap-2 text-blue-700 text-sm">
+              <UserPlus className="w-4 h-4" />
+              <span>Registering for an existing business</span>
+            </div>
+          )}
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="md:flex justify-between">
@@ -187,7 +202,13 @@ const Signup = () => {
           </div>
           <div className="mt-6">
             <Button
-              onClick={() => signIn("google")}
+              onClick={() =>
+                signIn("google", {
+                  callbackUrl: businessId
+                    ? `/dashboard?inviteBusinessId=${businessId}`
+                    : "/dashboard",
+                })
+              }
               variant="outline"
               className="w-full hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors"
             >
@@ -229,4 +250,18 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+import { Suspense } from "react";
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <Signup />
+    </Suspense>
+  );
+}

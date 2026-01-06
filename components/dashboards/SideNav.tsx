@@ -25,9 +25,10 @@ interface NavLinksProps {
     href: string;
     icon: React.ReactNode;
   }[];
+  setIsSidebarOpen: (isOpen: boolean) => void;
 }
 
-const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
+const NavLinks = ({ sidebarNavLinks, setIsSidebarOpen }: NavLinksProps) => {
   const pathname = usePathname();
 
   return (
@@ -37,12 +38,13 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
           <li key={link.name}>
             <Link
               href={link.href}
+              onClick={() => setIsSidebarOpen(false)}
               className={cn(
                 "flex items-center px-4 py-4 text-lg md:text-base font-medium rounded-md transition-colors",
                 "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground",
-                pathname === link.href 
-                    ? "bg-primary/10 text-primary font-semibold" 
-                    : ""
+                pathname === link.href
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "",
               )}
             >
               {link.icon}
@@ -54,7 +56,10 @@ const NavLinks = ({ sidebarNavLinks }: NavLinksProps) => {
       <ul>
         <li>
           <button
-            onClick={() => signOut()}
+            onClick={() => {
+              setIsSidebarOpen(false);
+              signOut();
+            }}
             className="flex items-center w-full px-4 py-4 text-lg md:text-base font-medium text-left text-destructive rounded-md hover:bg-destructive/10 transition-colors"
           >
             <LogOut className="w-7 h-7" />
@@ -85,15 +90,13 @@ const SideNav = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 flex flex-col w-96 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-card border-r border-border transition-transform lg:translate-x-0 duration-300",
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-30 flex flex-col w-full sm:w-80 md:w-64 lg:w-64 px-4 py-8 overflow-y-auto bg-card border-r border-border transition-transform lg:translate-x-0 duration-300",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-foreground">
-              {user.name}
-            </h2>
+            <h2 className="text-2xl font-bold text-foreground">{user.name}</h2>
             <NotificationBell />
           </div>
           <button
@@ -103,7 +106,10 @@ const SideNav = ({
             <X className="w-6 h-6" />
           </button>
         </div>
-        <NavLinks sidebarNavLinks={sidebarNavLinks} />
+        <NavLinks
+          sidebarNavLinks={sidebarNavLinks}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
       </aside>
     </>
   );

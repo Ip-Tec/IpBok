@@ -1,8 +1,8 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import SideNav from "@/components/dashboards/SideNav";
 import {
   LayoutDashboard,
@@ -12,11 +12,7 @@ import {
   FileText,
   Settings,
   Menu,
-  PlusCircle,
-  Download,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
 import TrialProtectionBanner from "@/components/SubscriptionBanner";
 
@@ -91,15 +87,31 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session, status } = useSession();
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </Suspense>
+  );
+}
+
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+  const { data: session, status, update } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const inviteBusinessId = searchParams.get("inviteBusinessId");
   const [subStatus, setSubStatus] = useState<string>("TRIAL");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/subscription/status")
-      .then(res => res.json())
-      .then(data => setSubStatus(data.status))
+      .then((res) => res.json())
+      .then((data) => setSubStatus(data.status))
       .catch(console.error);
   }, []);
 
@@ -109,14 +121,29 @@ export default function DashboardLayout({
       router.push("/login");
       return;
     }
-    
-    // Check for Onboarding
+
     const user = session.user as User;
-    // If Owner and no Business Type, send to Onboarding
-    if (user.role === 'OWNER' && !user.businessType) {
-        router.push("/onboarding");
+
+    // Handle Invite Linking for Google Users (who didn't go through /api/auth/register)
+    if (inviteBusinessId && !user.businessId) {
+      fetch("/api/agents/link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessId: inviteBusinessId }),
+      }).then((res) => {
+        if (res.ok) {
+          update(); // Refresh session to get new role/businessId
+          router.replace("/dashboard"); // Clean up URL
+        }
+      });
     }
-  }, [session, status, router]);
+
+    // Check for Onboarding
+    // ONLY Owners without a business type go to onboarding
+    if (user.role.toUpperCase() === "OWNER" && !user.businessType) {
+      router.push("/onboarding");
+    }
+  }, [session, status, router, inviteBusinessId, update]);
 
   if (status === "loading") {
     return (
@@ -131,34 +158,19 @@ export default function DashboardLayout({
   }
 
   const user = session.user as User;
-  const isOwner = user.role.toLowerCase() === "owner";
-  // Assuming businessType is added to User type or we cast it
+  const isOwner = user.role.toUpperCase() === "OWNER";
   const businessType = user.businessType;
 
   let navLinks = isOwner ? ownerSidebarNavLinks : agentSidebarNavLinks;
 
-  // Modular Logic: Filter links based on Business Type
-  if (businessType === 'CORPORATE') {
-       // Corporate: Hide Agents/Reconciliation if they don't apply, or show Corp specific
-       // For now, let's keep it simple or user specific request
-       // navLinks = navLinks.filter(link => ...);
-  } else if (businessType === 'POS') {
-       // POS: Maybe hide "Reports" or "Accounting" if they are simple?
-       // Currently user claimed "every tool" is shown.
-       // Verification: Owner links includes Accounting, Reconciliation, Reports.
-  }
-  
   if (isOwner && !businessType) {
-      // This will be handled by the effect, but we can return null to avoid flash
-     return null; 
+    return null;
   }
 
-  // Feature Locking Logic: If EXPIRED, only show Settings/Billing
   const isExpired = subStatus === "EXPIRED";
-  const finalNavLinks = isExpired 
-    ? navLinks.filter(l => l.href.includes("settings"))
+  const finalNavLinks = isExpired
+    ? navLinks.filter((l) => l.href.includes("settings"))
     : navLinks;
-
 
   return (
     <div className="flex h-screen bg-background text-foreground">

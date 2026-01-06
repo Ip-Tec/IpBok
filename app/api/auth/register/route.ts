@@ -7,7 +7,7 @@ import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, role } = await request.json();
+    const { name, email, password, role, businessId } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -116,9 +116,25 @@ export async function POST(request: NextRequest) {
       }
     } else {
       try {
-        user = await prisma.user.create({
-          data: { name, email, password: hashedPassword, role: "AGENT" },
-        });
+        if (businessId) {
+          user = await prisma.$transaction(async (tx: any) => {
+            const newUser = await tx.user.create({
+              data: { name, email, password: hashedPassword, role: "AGENT" },
+            });
+            await tx.membership.create({
+              data: {
+                userId: newUser.id,
+                businessId: businessId,
+                role: "AGENT",
+              },
+            });
+            return newUser;
+          });
+        } else {
+          user = await prisma.user.create({
+            data: { name, email, password: hashedPassword, role: "AGENT" },
+          });
+        }
       } catch (userError) {
         console.error("User creation error:", userError);
         return NextResponse.json(

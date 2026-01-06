@@ -73,49 +73,68 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user, account: _account }) {
-      // For Google OAuth, create user/business if they don't have a business yet
-      if (_account?.provider === "google") {
-        const userWithBusiness = await prisma.user.findUnique({
-          where: { email: user.email! },
-          include: { memberships: true },
-        });
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        try {
+          const userWithBusiness = await prisma.user.findUnique({
+            where: { email: user.email! },
+            include: { memberships: true },
+          });
 
-        // If the user doesn't exist yet, or exists but has no business (e.g. created via adapter but check failed)
-        if (!userWithBusiness || userWithBusiness.memberships.length === 0) {
-          if (!userWithBusiness) {
-            // New user: Create user, business, and membership atomically
-            await prisma.user.create({
-              data: {
-                email: user.email!,
-                name: user.name,
-                role: Role.OWNER,
-                memberships: {
-                  create: {
+          // If the user doesn't exist yet, or exists but has no business
+          if (!userWithBusiness || userWithBusiness.memberships.length === 0) {
+            if (!userWithBusiness) {
+              // New user from Google: Create user, business, and membership atomically
+              await prisma.user.create({
+                data: {
+                  email: user.email!,
+                  name: user.name,
+                  role: Role.OWNER,
+                  emailVerified: new Date(),
+                  memberships: {
+                    create: {
+                      role: Role.OWNER,
+                      business: {
+                        create: { name: `${user.name}'s Business` },
+                      },
+                    },
+                  },
+                },
+              });
+            } else {
+              // Existing user (could be from Credentials or Adapter created them first)
+              // Promote to OWNER, verify email, and create business
+              await prisma.$transaction([
+                prisma.user.update({
+                  where: { id: userWithBusiness.id },
+                  data: {
                     role: Role.OWNER,
+                    emailVerified: new Date(),
+                  },
+                }),
+                prisma.membership.create({
+                  data: {
+                    role: Role.OWNER,
+                    user: { connect: { id: userWithBusiness.id } },
                     business: {
                       create: { name: `${user.name}'s Business` },
                     },
                   },
-                },
-              },
-            });
+                }),
+              ]);
+            }
           } else {
-            // Existing user (e.g. from Credentials or recently created by Adapter) but no business:
-            // Create business and membership
-            await prisma.membership.create({
-              data: {
-                role: Role.OWNER,
-                user: { connect: { id: userWithBusiness.id } },
-                business: {
-                  create: { name: `${user.name}'s Business` },
-                },
-              },
+            // User exists and has a business, just ensure email is verified
+            await prisma.user.update({
+              where: { id: userWithBusiness.id },
+              data: { emailVerified: new Date() },
             });
           }
+        } catch (error) {
+          console.error("Error in Google signIn callback:", error);
         }
       }
-      return true; // Continue with the sign-in process
+      return true;
     },
     async jwt({ token, user, account: _account }) {
       // On initial sign-in, the user object is passed in.
