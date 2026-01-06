@@ -152,7 +152,7 @@ function Login() {
           </div>
           <div className="mt-6">
             <Button
-              onClick={() => signIn("google")}
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
               variant="outline"
               className="w-full hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors"
             >

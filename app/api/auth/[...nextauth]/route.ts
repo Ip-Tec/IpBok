@@ -22,6 +22,7 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       name: "credentials",
@@ -73,28 +74,45 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account: _account }) {
-      // For Google OAuth, create user if they don't exist
+      // For Google OAuth, create user/business if they don't have a business yet
       if (_account?.provider === "google") {
-        const userExists = await prisma.user.findUnique({
+        const userWithBusiness = await prisma.user.findUnique({
           where: { email: user.email! },
+          include: { memberships: true },
         });
-        if (!userExists) {
-          // Use a nested write to create user, business, and membership atomically
-          await prisma.user.create({
-            data: {
-              email: user.email!,
-              name: user.name,
-              role: Role.OWNER,
-              memberships: {
-                create: {
-                  role: Role.OWNER,
-                  business: {
-                    create: { name: `${user.name}'s Business` },
+
+        // If the user doesn't exist yet, or exists but has no business (e.g. created via adapter but check failed)
+        if (!userWithBusiness || userWithBusiness.memberships.length === 0) {
+          if (!userWithBusiness) {
+            // New user: Create user, business, and membership atomically
+            await prisma.user.create({
+              data: {
+                email: user.email!,
+                name: user.name,
+                role: Role.OWNER,
+                memberships: {
+                  create: {
+                    role: Role.OWNER,
+                    business: {
+                      create: { name: `${user.name}'s Business` },
+                    },
                   },
                 },
               },
-            },
-          });
+            });
+          } else {
+            // Existing user (e.g. from Credentials or recently created by Adapter) but no business:
+            // Create business and membership
+            await prisma.membership.create({
+              data: {
+                role: Role.OWNER,
+                user: { connect: { id: userWithBusiness.id } },
+                business: {
+                  create: { name: `${user.name}'s Business` },
+                },
+              },
+            });
+          }
         }
       }
       return true; // Continue with the sign-in process
