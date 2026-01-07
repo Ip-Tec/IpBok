@@ -151,132 +151,140 @@ export default function AdminUsersPage() {
         </div>
 
         <div className="bg-card rounded-xl border border-border overflow-hidden">
-          {loading ? (
-            <div className="p-20 text-center text-muted-foreground animate-pulse">
-              Loading User Directory...
-            </div>
-          ) : error ? (
-            <div className="p-20 text-center space-y-4">
-              <div className="text-destructive font-medium">{error}</div>
-              <Button onClick={() => fetchUsers()} variant="outline" size="sm">
-                Try Again
-              </Button>
-            </div>
-          ) : (
-            <table className="w-full text-left">
-              <thead className="bg-muted text-muted-foreground text-sm">
-                <tr>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider">
-                    Name & Email
-                  </th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider">
-                    Global Role
-                  </th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider">
-                    Business(es)
-                  </th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider">
-                    Activity
-                  </th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filtered.map((u) => (
-                  <tr
-                    key={u.id}
-                    className="hover:bg-muted/50 transition-colors"
+          <div className="overflow-x-auto">
+            <div className="inline-block min-w-full align-middle">
+              {loading ? (
+                <div className="p-20 text-center text-muted-foreground animate-pulse">
+                  Loading User Directory...
+                </div>
+              ) : error ? (
+                <div className="p-20 text-center space-y-4">
+                  <div className="text-destructive font-medium">{error}</div>
+                  <Button
+                    onClick={() => fetchUsers()}
+                    variant="outline"
+                    size="sm"
                   >
-                    <td className="px-6 py-4 text-foreground">
-                      <div className="font-semibold">{u.name}</div>
-                      <div className="text-xs text-muted-foreground flex items-center mt-1">
-                        <Mail className="w-3 h-3 mr-1" /> {u.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded text-[10px] font-bold uppercase border",
-                          u.role === "SUPERADMIN"
-                            ? "bg-primary/20 text-primary border-primary/30"
-                            : "bg-secondary text-secondary-foreground border-border",
-                        )}
+                    Try Again
+                  </Button>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-border text-left">
+                  <thead className="bg-muted text-muted-foreground text-sm">
+                    <tr>
+                      <th className="px-6 py-4 font-medium uppercase tracking-wider whitespace-nowrap">
+                        Name & Email
+                      </th>
+                      <th className="px-6 py-4 font-medium uppercase tracking-wider whitespace-nowrap">
+                        Global Role
+                      </th>
+                      <th className="px-6 py-4 font-medium uppercase tracking-wider whitespace-nowrap">
+                        Business(es)
+                      </th>
+                      <th className="px-6 py-4 font-medium uppercase tracking-wider whitespace-nowrap">
+                        Activity
+                      </th>
+                      <th className="px-6 py-4 font-medium uppercase tracking-wider whitespace-nowrap">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 font-medium uppercase tracking-wider whitespace-nowrap">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filtered.map((u) => (
+                      <tr
+                        key={u.id}
+                        className="hover:bg-muted/50 transition-colors"
                       >
-                        {u.role}
-                      </span>
-                      {u.role === "SUPERADMIN" && (
-                        <ShieldAlert className="w-3 h-3 ml-1 text-primary inline" />
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1">
-                        {u.businesses && u.businesses.length > 0 ? (
-                          u.businesses.map((b: string, i: number) => (
-                            <span
-                              key={i}
-                              className="text-xs px-2 py-0.5 bg-muted rounded border border-border"
-                            >
-                              {b}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-xs text-muted-foreground italic">
-                            None
+                        <td className="px-6 py-4 text-foreground">
+                          <div className="font-semibold">{u.name}</div>
+                          <div className="text-xs text-muted-foreground flex items-center mt-1">
+                            <Mail className="w-3 h-3 mr-1" /> {u.email}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={cn(
+                              "px-2 py-0.5 rounded text-[10px] font-bold uppercase border",
+                              u.role === "SUPERADMIN"
+                                ? "bg-primary/20 text-primary border-primary/30"
+                                : "bg-secondary text-secondary-foreground border-border",
+                            )}
+                          >
+                            {u.role}
                           </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium">
-                      {u.transactionCount || 0} txs
-                    </td>
-                    <td className="px-6 py-4">
-                      {u.verified ? (
-                        <span className="text-xs text-green-500 font-medium">
-                          Verified
-                        </span>
-                      ) : (
-                        <span className="text-xs text-yellow-600 font-medium">
-                          Unverified
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 flex items-center gap-2">
-                      <SendUserEmailDialog
-                        userEmail={u.email}
-                        userName={u.name || u.email}
-                      />
+                          {u.role === "SUPERADMIN" && (
+                            <ShieldAlert className="w-3 h-3 ml-1 text-primary inline" />
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {u.businesses && u.businesses.length > 0 ? (
+                              u.businesses.map((b: string, i: number) => (
+                                <span
+                                  key={i}
+                                  className="text-xs px-2 py-0.5 bg-muted rounded border border-border"
+                                >
+                                  {b}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-xs text-muted-foreground italic">
+                                None
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium">
+                          {u.transactionCount || 0} txs
+                        </td>
+                        <td className="px-6 py-4">
+                          {u.verified ? (
+                            <span className="text-xs text-green-500 font-medium">
+                              Verified
+                            </span>
+                          ) : (
+                            <span className="text-xs text-yellow-600 font-medium">
+                              Unverified
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 flex items-center gap-2">
+                          <SendUserEmailDialog
+                            userEmail={u.email}
+                            userName={u.name || u.email}
+                          />
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground hover:text-foreground"
-                        onClick={() => setEditingUser({ ...u })}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-
-                      {session?.user?.id !== u.id &&
-                        session?.user?.role === "SUPERADMIN" && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => handleDelete(u.id)}
+                            className="text-muted-foreground hover:text-foreground"
+                            onClick={() => setEditingUser({ ...u })}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Edit className="w-4 h-4" />
                           </Button>
-                        )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+
+                          {session?.user?.id !== u.id &&
+                            session?.user?.role === "SUPERADMIN" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDelete(u.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

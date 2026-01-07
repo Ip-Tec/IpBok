@@ -135,100 +135,120 @@ export default function AdminBusinessesPage() {
         </div>
 
         <div className="bg-card rounded-xl border border-border overflow-hidden">
-          {loading ? (
-            <div className="p-20 text-center text-muted-foreground animate-pulse">
-              Gathering Business Data...
-            </div>
-          ) : error ? (
-            <div className="p-20 text-center space-y-4">
-              <div className="text-destructive font-medium">{error}</div>
-              <Button onClick={() => fetchAll()} variant="outline" size="sm">
-                Refresh View
-              </Button>
-            </div>
-          ) : (
-            <table className="w-full text-left">
-              <thead className="bg-muted text-muted-foreground text-sm">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Business Name</th>
-                  <th className="px-6 py-4 font-medium">Type & Plan</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium">Metrics</th>
-                  <th className="px-6 py-4 font-medium">Renewal/Trial</th>
-                  <th className="px-6 py-4 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filtered.map((b) => (
-                  <tr
-                    key={b.id}
-                    className="hover:bg-muted/50 transition-colors"
+          <div className="overflow-x-auto">
+            <div className="inline-block min-w-full align-middle">
+              {loading ? (
+                <div className="p-20 text-center text-muted-foreground animate-pulse">
+                  Gathering Business Data...
+                </div>
+              ) : error ? (
+                <div className="p-20 text-center space-y-4">
+                  <div className="text-destructive font-medium">{error}</div>
+                  <Button
+                    onClick={() => fetchAll()}
+                    variant="outline"
+                    size="sm"
                   >
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-foreground">
-                        {b.name}
-                      </div>
-                      <div className="text-[10px] text-muted-foreground font-mono uppercase mt-0.5">
-                        {b.id}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium">
-                        {b.type || "Undefined"}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {b.planName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                          b.subscriptionStatus === "ACTIVE"
-                            ? "bg-green-500/10 text-green-500"
-                            : b.subscriptionStatus === "TRIAL"
-                              ? "bg-primary/10 text-primary"
-                              : "bg-destructive/10 text-destructive",
-                        )}
+                    Refresh View
+                  </Button>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-border text-left">
+                  <thead className="bg-muted text-muted-foreground text-sm">
+                    <tr>
+                      <th className="px-6 py-4 font-medium whitespace-nowrap">
+                        Business Name
+                      </th>
+                      <th className="px-6 py-4 font-medium whitespace-nowrap">
+                        Type & Plan
+                      </th>
+                      <th className="px-6 py-4 font-medium whitespace-nowrap">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 font-medium whitespace-nowrap">
+                        Metrics
+                      </th>
+                      <th className="px-6 py-4 font-medium whitespace-nowrap">
+                        Renewal/Trial
+                      </th>
+                      <th className="px-6 py-4 font-medium text-right whitespace-nowrap">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filtered.map((b) => (
+                      <tr
+                        key={b.id}
+                        className="hover:bg-muted/50 transition-colors"
                       >
-                        {b.subscriptionStatus}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-xs">
-                        {b.memberCount || 0} members
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {b.transactionCount || 0} txs
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-xs flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {b.subscriptionStatus === "TRIAL" && b.trialEndsAt
-                          ? format(new Date(b.trialEndsAt), "MMM d, yyyy")
-                          : b.subscriptionEndsAt
-                            ? format(
-                                new Date(b.subscriptionEndsAt),
-                                "MMM d, yyyy",
-                              )
-                            : "N/A"}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingBusiness({ ...b })}
-                      >
-                        <Edit3 className="w-4 h-4 mr-1" /> Manage
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                        <td className="px-6 py-4">
+                          <div className="font-semibold text-foreground">
+                            {b.name}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground font-mono uppercase mt-0.5">
+                            {b.id}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-medium">
+                            {b.type || "Undefined"}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {b.planName}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={cn(
+                              "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                              b.subscriptionStatus === "ACTIVE"
+                                ? "bg-green-500/10 text-green-500"
+                                : b.subscriptionStatus === "TRIAL"
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-destructive/10 text-destructive",
+                            )}
+                          >
+                            {b.subscriptionStatus}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-xs">
+                            {b.memberCount || 0} members
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {b.transactionCount || 0} txs
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-xs flex items-center">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            {b.subscriptionStatus === "TRIAL" && b.trialEndsAt
+                              ? format(new Date(b.trialEndsAt), "MMM d, yyyy")
+                              : b.subscriptionEndsAt
+                                ? format(
+                                    new Date(b.subscriptionEndsAt),
+                                    "MMM d, yyyy",
+                                  )
+                                : "N/A"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingBusiness({ ...b })}
+                          >
+                            <Edit3 className="w-4 h-4 mr-1" /> Manage
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
