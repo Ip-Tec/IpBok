@@ -14,8 +14,10 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { BusinessType } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 export default function AdminPricingPage() {
+  const { data: session } = useSession();
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState<string | null>(null);
@@ -93,6 +95,7 @@ export default function AdminPricingPage() {
                   plan={plan}
                   onSave={handleSave}
                   isSaving={isSaving === type}
+                  isReadOnly={session?.user?.role === "SUPPORT"}
                 />
               );
             })}
@@ -107,10 +110,12 @@ function PricingCard({
   plan,
   onSave,
   isSaving,
+  isReadOnly,
 }: {
   plan: any;
   onSave: any;
   isSaving: boolean;
+  isReadOnly?: boolean;
 }) {
   const [price, setPrice] = useState(plan.monthlyPrice.toString());
   const [days, setDays] = useState(plan.trialDays.toString());
@@ -152,6 +157,7 @@ function PricingCard({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="0.00"
+              disabled={isReadOnly}
             />
           </div>
         </div>
@@ -165,21 +171,29 @@ function PricingCard({
             value={days}
             onChange={(e) => setDays(e.target.value)}
             placeholder="30"
+            disabled={isReadOnly}
           />
         </div>
         <Button
           className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
           onClick={() => onSave(plan.businessType, price, days)}
-          disabled={isSaving}
+          disabled={isSaving || isReadOnly}
         >
           {isSaving ? (
             "Saving..."
+          ) : isReadOnly ? (
+            "Read Only Access"
           ) : (
             <span className="flex items-center">
               <Save className="w-4 h-4 mr-2" /> Save Configuration
             </span>
           )}
         </Button>
+        {isReadOnly && (
+          <p className="text-[10px] text-muted-foreground italic text-center">
+            Support agents cannot modify pricing.
+          </p>
+        )}
       </CardContent>
     </Card>
   );

@@ -12,20 +12,42 @@ export async function PATCH(
   const { id } = await params;
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || session.user.role !== "SUPERADMIN") {
+  if (
+    !session ||
+    !session.user ||
+    (session.user.role !== "SUPERADMIN" && session.user.role !== "SUPPORT")
+  ) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
   try {
     const { name, role, emailVerified } = await req.json();
 
+    // Restriction: SUPPORT role cannot change user roles
+    if (session.user.role === "SUPPORT" && role) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id },
+        select: { role: true },
+      });
+
+      if (currentUser?.role !== role) {
+        return NextResponse.json(
+          { message: "Support agents cannot change user roles." },
+          { status: 403 },
+        );
+      }
+    }
+
+    const data: any = {};
+    if (name !== undefined) data.name = name;
+    if (role !== undefined && session.user.role === "SUPERADMIN")
+      data.role = role as Role;
+    if (emailVerified !== undefined)
+      data.emailVerified = emailVerified ? new Date() : null;
+
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: {
-        name,
-        role: role as Role,
-        emailVerified: emailVerified ? new Date() : null,
-      },
+      data,
     });
 
     await logAction("USER_UPDATE", session.user.id, {
@@ -33,6 +55,7 @@ export async function PATCH(
       name,
       role,
       emailVerified: !!emailVerified,
+      updatedByRole: session.user.role,
     });
 
     return NextResponse.json(updatedUser);
@@ -49,6 +72,7 @@ export async function DELETE(
   const { id } = await params;
   const session = await getServerSession(authOptions);
 
+  // DELETION remains restricted to SUPERADMIN only
   if (!session || !session.user || session.user.role !== "SUPERADMIN") {
     return new NextResponse("Unauthorized", { status: 401 });
   }

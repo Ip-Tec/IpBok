@@ -209,6 +209,9 @@ export default function AdminUsersPage() {
                       >
                         {u.role}
                       </span>
+                      {u.role === "SUPERADMIN" && (
+                        <ShieldAlert className="w-3 h-3 ml-1 text-primary inline" />
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
@@ -257,16 +260,17 @@ export default function AdminUsersPage() {
                         <Edit className="w-4 h-4" />
                       </Button>
 
-                      {session?.user?.id !== u.id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDelete(u.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
+                      {session?.user?.id !== u.id &&
+                        session?.user?.role === "SUPERADMIN" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDelete(u.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                     </td>
                   </tr>
                 ))}
@@ -306,8 +310,14 @@ export default function AdminUsersPage() {
                   onValueChange={(v) =>
                     setEditingUser({ ...editingUser, role: v })
                   }
+                  disabled={session?.user?.role === "SUPPORT"}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger
+                    className={cn(
+                      session?.user?.role === "SUPPORT" &&
+                        "bg-muted cursor-not-allowed",
+                    )}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -318,6 +328,11 @@ export default function AdminUsersPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                {session?.user?.role === "SUPPORT" && (
+                  <p className="text-[10px] text-muted-foreground italic mt-1">
+                    Support agents cannot modify global roles.
+                  </p>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <input

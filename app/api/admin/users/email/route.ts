@@ -7,7 +7,11 @@ import { sendCustomEmail } from "@/lib/email";
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || session.user.role !== "SUPERADMIN") {
+  if (
+    !session ||
+    !session.user ||
+    (session.user.role !== "SUPERADMIN" && session.user.role !== "SUPPORT")
+  ) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 

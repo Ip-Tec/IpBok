@@ -29,8 +29,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSession } from "next-auth/react";
 
 export default function AdminBusinessesPage() {
+  const { data: session } = useSession();
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -251,8 +253,14 @@ export default function AdminBusinessesPage() {
                       subscriptionStatus: v,
                     })
                   }
+                  disabled={session?.user?.role === "SUPPORT"}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger
+                    className={cn(
+                      session?.user?.role === "SUPPORT" &&
+                        "bg-muted cursor-not-allowed",
+                    )}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -262,6 +270,11 @@ export default function AdminBusinessesPage() {
                     <SelectItem value="PAUSED">PAUSED</SelectItem>
                   </SelectContent>
                 </Select>
+                {session?.user?.role === "SUPPORT" && (
+                  <p className="text-[10px] text-muted-foreground italic mt-1">
+                    Support agents cannot override subscription statuses.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -274,8 +287,14 @@ export default function AdminBusinessesPage() {
                       planId: v === "none" ? null : v,
                     })
                   }
+                  disabled={session?.user?.role === "SUPPORT"}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger
+                    className={cn(
+                      session?.user?.role === "SUPPORT" &&
+                        "bg-muted cursor-not-allowed",
+                    )}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -287,6 +306,11 @@ export default function AdminBusinessesPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                {session?.user?.role === "SUPPORT" && (
+                  <p className="text-[10px] text-muted-foreground italic mt-1">
+                    Support agents cannot manualy override pricing plans.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

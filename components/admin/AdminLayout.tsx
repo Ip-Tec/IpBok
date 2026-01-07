@@ -26,9 +26,14 @@ const navLinks = [
   { name: "Global Overview", href: "/admin", icon: LayoutDashboard },
   { name: "Manage Businesses", href: "/admin/businesses", icon: Building2 },
   { name: "User Directory", href: "/admin/users", icon: Users },
-  { name: "Pricing Plans", href: "/admin/pricing", icon: CreditCard }, // Added this
+  { name: "Pricing Plans", href: "/admin/pricing", icon: CreditCard },
   { name: "System Logs", href: "/admin/logs", icon: ShieldAlert },
-  { name: "Global Settings", href: "/admin/settings", icon: Settings },
+  {
+    name: "Global Settings",
+    href: "/admin/settings",
+    icon: Settings,
+    requiredRole: "SUPERADMIN",
+  },
 ];
 
 export default function AdminLayout({
@@ -81,6 +86,12 @@ export default function AdminLayout({
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navLinks.map((link) => {
+            if (
+              link.requiredRole &&
+              session?.user?.role !== link.requiredRole
+            ) {
+              return null;
+            }
             const Icon = link.icon;
             const isActive = pathname === link.href;
             return (
@@ -155,17 +166,25 @@ export default function AdminLayout({
             </Button>
           </div>
           <nav className="p-4 space-y-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center space-x-4 p-4 rounded-xl hover:bg-muted font-medium"
-              >
-                <link.icon className="w-6 h-6" />
-                <span>{link.name}</span>
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if (
+                link.requiredRole &&
+                session?.user?.role !== link.requiredRole
+              ) {
+                return null;
+              }
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center space-x-4 p-4 rounded-xl hover:bg-muted font-medium"
+                >
+                  <link.icon className="w-6 h-6" />
+                  <span>{link.name}</span>
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}
