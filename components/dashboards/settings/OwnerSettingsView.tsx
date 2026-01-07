@@ -147,6 +147,7 @@ import PasswordManagementForm from "./PasswordManagementForm";
 import TransactionSettingsForm from "./TransactionSettingsForm";
 
 const OwnerSettingsView = () => {
+  const { data: session } = useSession();
   return (
     <div className="p-8">
       <header className="pb-4 border-b">
@@ -160,7 +161,9 @@ const OwnerSettingsView = () => {
 
       <div className="mt-8 space-y-8 flex flex-wrap justify-start items-center gap-8">
         {/* Business Information Section */}
-        <BusinessInformationForm />
+        {session?.user.businessType !== "PERSONAL" && (
+          <BusinessInformationForm />
+        )}
 
         {/* User Profile Section */}
         <UserProfileForm />

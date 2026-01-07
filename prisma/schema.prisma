@@ -156,6 +156,7 @@ model Transaction {
   accountId     String?
   date          DateTime          @default(now())
   description   String?
+  category      String?
   createdAt     DateTime          @default(now())
   account       FinancialAccount? @relation(fields: [accountId], references: [id])
   business      Business          @relation(fields: [businessId], references: [id])

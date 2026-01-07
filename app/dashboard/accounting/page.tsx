@@ -8,8 +8,10 @@ export default function AccountingDashboardPage() {
   const { data: session } = useSession();
 
   if (!session?.user) {
-    return null; 
+    return null;
   }
 
-  return <AccountingDashboardContent {...(session.user as User)} />;
+  const user = session.user as User;
+
+  return <AccountingDashboardContent {...user} />;
 }

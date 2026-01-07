@@ -36,7 +36,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
 );
 
 interface TabButtonProps {
@@ -52,7 +52,7 @@ const TabButton = ({ name, activeTab, setActiveTab }: TabButtonProps) => (
       "px-4 py-2 text-sm font-medium rounded-md transition-colors",
       activeTab === name
         ? "bg-primary text-primary-foreground shadow-sm"
-        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+        : "text-muted-foreground hover:bg-muted hover:text-foreground",
     )}
   >
     {name}
@@ -69,7 +69,6 @@ const AccountingDashboardContent = (user: User) => {
   if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
 
   const { kpis, recentTransactions } = data;
-
 
   const chartOptions = {
     responsive: true,
@@ -99,25 +98,30 @@ const AccountingDashboardContent = (user: User) => {
     <>
       <header className="flex items-center justify-between p-4 bg-card border-b border-border">
         <h1 className="text-xl font-semibold text-foreground">
-          Accounting Dashboard
+          {user.businessType === "PERSONAL"
+            ? "Personal Accounts"
+            : "Accounting Dashboard"}
         </h1>
         <div className="flex items-center space-x-2">
-            <RecordTransactionDialog 
-                open={isIncomeDialogOpen} 
-                onOpenChange={setIsIncomeDialogOpen} 
-                type="Income" 
-                onSuccess={refresh}
-            />
-            <RecordTransactionDialog 
-                open={isExpenseDialogOpen} 
-                onOpenChange={setIsExpenseDialogOpen} 
-                type="Expense" 
-                onSuccess={refresh}
-            />
+          <RecordTransactionDialog
+            open={isIncomeDialogOpen}
+            onOpenChange={setIsIncomeDialogOpen}
+            type="Income"
+            onSuccess={refresh}
+          />
+          <RecordTransactionDialog
+            open={isExpenseDialogOpen}
+            onOpenChange={setIsExpenseDialogOpen}
+            type="Expense"
+            onSuccess={refresh}
+          />
           <Button variant="outline" onClick={() => setIsIncomeDialogOpen(true)}>
             <PlusCircle className="w-4 h-4 mr-2" /> Record Income
           </Button>
-          <Button variant="outline" onClick={() => setIsExpenseDialogOpen(true)}>
+          <Button
+            variant="outline"
+            onClick={() => setIsExpenseDialogOpen(true)}
+          >
             <PlusCircle className="w-4 h-4 mr-2" /> Record Expense
           </Button>
           <Button>
@@ -128,18 +132,38 @@ const AccountingDashboardContent = (user: User) => {
 
       <div className="p-8">
         <h2 className="text-3xl font-bold text-foreground">
-          Financial Overview
+          {user.businessType === "PERSONAL"
+            ? "Financial Health"
+            : "Financial Overview"}
         </h2>
         <p className="mt-1 text-muted-foreground">
-          Track your business performance.
+          {user.businessType === "PERSONAL"
+            ? "Track your personal money flow."
+            : "Track your business performance."}
         </p>
 
         <div className="mt-6 border-b border-border">
           <nav className="flex -mb-px space-x-4">
-            <TabButton name="Overview" activeTab={activeTab} setActiveTab={setActiveTab} />
-            <TabButton name="Income" activeTab={activeTab} setActiveTab={setActiveTab} />
-            <TabButton name="Expenses" activeTab={activeTab} setActiveTab={setActiveTab} />
-            <TabButton name="Reports" activeTab={activeTab} setActiveTab={setActiveTab} />
+            <TabButton
+              name="Overview"
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            <TabButton
+              name="Income"
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            <TabButton
+              name="Expenses"
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            <TabButton
+              name="Reports"
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
           </nav>
         </div>
 

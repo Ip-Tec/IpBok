@@ -1,63 +1,78 @@
 ﻿"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PaymentMethod } from '@/src/generated';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PaymentMethod } from "@/src/generated";
 
 interface RecordTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type: 'Income' | 'Expense';
+  type: "Income" | "Expense";
   onSuccess: () => void;
 }
 
-export function RecordTransactionDialog({ open, onOpenChange, type, onSuccess }: RecordTransactionDialogProps) {
-    const [amount, setAmount] = useState('');
-    const [description, setDescription] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.CASH);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+export function RecordTransactionDialog({
+  open,
+  onOpenChange,
+  type,
+  onSuccess,
+}: RecordTransactionDialogProps) {
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("Uncategorized");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PaymentMethod.CASH,
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = async () => {
-        setIsSubmitting(true);
-        try {
-            const response = await fetch('/api/dashboard/accounting/transaction', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: parseFloat(amount),
-                    description,
-                    type,
-                    paymentMethod
-                }),
-            });
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/dashboard/accounting/transaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          description,
+          category,
+          type,
+          paymentMethod,
+        }),
+      });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to record transaction');
-            }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to record transaction");
+      }
 
-            toast.success(`${type} recorded successfully!`);
-            onSuccess();
-            onOpenChange(false);
-            setAmount('');
-            setDescription('');
-        } catch (error: any) {
-            toast.error(error.message || 'An error occurred.');
-        } finally {
-            setIsSubmitting(false);
-        }
+      toast.success(`${type} recorded successfully!`);
+      onSuccess();
+      onOpenChange(false);
+      setAmount("");
+      setDescription("");
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,7 +82,9 @@ export function RecordTransactionDialog({ open, onOpenChange, type, onSuccess }:
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="amount" className="text-right">Amount</Label>
+            <Label htmlFor="amount" className="text-right">
+              Amount
+            </Label>
             <Input
               id="amount"
               type="number"
@@ -78,22 +95,55 @@ export function RecordTransactionDialog({ open, onOpenChange, type, onSuccess }:
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="paymentMethod" className="text-right">Method</Label>
-            <Select onValueChange={(val) => setPaymentMethod(val as PaymentMethod)} value={paymentMethod}>
-                <SelectTrigger className="col-span-3">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value={PaymentMethod.CASH}>Cash</SelectItem>
-                    <SelectItem value={PaymentMethod.BANK}>Bank</SelectItem>
-                    <SelectItem value={PaymentMethod.BANK_TRANSFER}>Bank Transfer</SelectItem>
-                    <SelectItem value={PaymentMethod.MOBILE_MONEY}>Mobile Money</SelectItem>
-                    <SelectItem value={PaymentMethod.ATM_CARD}>ATM Card</SelectItem>
-                </SelectContent>
+            <Label htmlFor="paymentMethod" className="text-right">
+              Method
+            </Label>
+            <Select
+              onValueChange={(val) => setPaymentMethod(val as PaymentMethod)}
+              value={paymentMethod}
+            >
+              <SelectTrigger className="col-span-3">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={PaymentMethod.CASH}>Cash</SelectItem>
+                <SelectItem value={PaymentMethod.BANK}>Bank</SelectItem>
+                <SelectItem value={PaymentMethod.BANK_TRANSFER}>
+                  Bank Transfer
+                </SelectItem>
+                <SelectItem value={PaymentMethod.MOBILE_MONEY}>
+                  Mobile Money
+                </SelectItem>
+                <SelectItem value={PaymentMethod.ATM_CARD}>ATM Card</SelectItem>
+              </SelectContent>
             </Select>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">Description</Label>
+            <Label htmlFor="category" className="text-right">
+              Category
+            </Label>
+            <Select onValueChange={setCategory} value={category}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Food">Food & Dining</SelectItem>
+                <SelectItem value="Transport">Transportation</SelectItem>
+                <SelectItem value="Utilities">Utilities</SelectItem>
+                <SelectItem value="Rent">Rent</SelectItem>
+                <SelectItem value="Shopping">Shopping</SelectItem>
+                <SelectItem value="Entertainment">Entertainment</SelectItem>
+                <SelectItem value="Health">Health</SelectItem>
+                <SelectItem value="Salary">Salary</SelectItem>
+                <SelectItem value="Business">Business</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="description" className="text-right">
+              Description
+            </Label>
             <Input
               id="description"
               value={description}
@@ -104,7 +154,7 @@ export function RecordTransactionDialog({ open, onOpenChange, type, onSuccess }:
         </div>
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={isSubmitting || !amount}>
-            {isSubmitting ? 'Recording...' : 'Record'}
+            {isSubmitting ? "Recording..." : "Record"}
           </Button>
         </DialogFooter>
       </DialogContent>

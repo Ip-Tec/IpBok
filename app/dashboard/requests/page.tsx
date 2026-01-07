@@ -13,5 +13,9 @@ export default async function RequestsPage() {
 
   const user = session.user as User;
 
+  if (user.businessType === "PERSONAL") {
+    redirect("/dashboard");
+  }
+
   return <RequestsContent user={user} />;
 }

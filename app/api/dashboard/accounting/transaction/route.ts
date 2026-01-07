@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TransactionStatus } from "@/src/generated";
+import { TransactionStatus } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,7 +13,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { amount, description, type, paymentMethod } = await req.json(); // type is "Income" or "Expense"
+    const { amount, description, type, paymentMethod, category } =
+      await req.json(); // type is "Income" or "Expense"
 
     if (!amount || !type || !paymentMethod) {
       return NextResponse.json(
@@ -22,22 +23,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Find the transaction type ID
-    const txType = await prisma.transactionType.findUnique({
+    // Find or create the transaction type
+    let txType = await prisma.transactionType.findUnique({
       where: { name: type },
     });
 
     if (!txType) {
-      return NextResponse.json(
-        { message: `Invalid transaction type: ${type}` },
-        { status: 400 },
-      );
+      try {
+        txType = await prisma.transactionType.create({
+          data: { name: type },
+        });
+      } catch (error) {
+        console.error(`Failed to create transaction type ${type}:`, error);
+        return NextResponse.json(
+          { message: `Invalid transaction type: ${type}` },
+          { status: 400 },
+        );
+      }
     }
 
     await prisma.transaction.create({
       data: {
         amount: parseFloat(amount),
         description,
+        category,
         typeId: txType.id,
         paymentMethod,
         status: TransactionStatus.CONFIRMED,

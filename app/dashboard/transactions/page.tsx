@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { User } from "@/lib/types";
 import OwnerTransactionsView from "@/components/dashboards/transactions/OwnerTransactionsView";
 import AgentTransactionsView from "@/components/dashboards/transactions/AgentTransactionsView";
+import PersonalTransactionsView from "@/components/dashboards/transactions/PersonalTransactionsView";
 
 export default function TransactionsPage() {
   const { data: session, status } = useSession();
@@ -22,7 +23,11 @@ export default function TransactionsPage() {
   const user = session.user as User;
 
   return user.role.toLowerCase() === "owner" ? (
-    <OwnerTransactionsView />
+    user.businessType === "PERSONAL" ? (
+      <PersonalTransactionsView />
+    ) : (
+      <OwnerTransactionsView />
+    )
   ) : (
     <AgentTransactionsView user={user} />
   );

@@ -1,5 +1,5 @@
-
 import { DefaultSession } from "next-auth";
+import { BusinessType } from "@prisma/client";
 
 declare module "next-auth" {
   /**
@@ -11,6 +11,7 @@ declare module "next-auth" {
       role: string;
       businessId: string;
       transactionsPerPage: number;
+      businessType?: BusinessType | null;
     } & DefaultSession["user"];
   }
 }
@@ -20,5 +21,6 @@ declare module "next-auth/jwt" {
     role: string;
     businessId: string;
     transactionsPerPage: number;
+    businessType?: BusinessType | null;
   }
 }

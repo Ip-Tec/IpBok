@@ -60,6 +60,29 @@ const ownerSidebarNavLinks = [
   },
 ];
 
+const personalSidebarNavLinks = [
+  {
+    name: "Personal Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard className="w-7 h-7" />,
+  },
+  {
+    name: "My Transactions",
+    href: "/dashboard/transactions",
+    icon: <ArrowRightLeft className="w-7 h-7" />,
+  },
+  {
+    name: "Personal Accounts",
+    href: "/dashboard/accounting",
+    icon: <LayoutDashboard className="w-7 h-7" />,
+  },
+  {
+    name: "Settings",
+    href: "/dashboard/settings",
+    icon: <Settings className="w-7 h-7" />,
+  },
+];
+
 const adminSidebarNavLinks = [
   {
     name: "Admin Console",
@@ -177,7 +200,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   let navLinks = isAdmin
     ? adminSidebarNavLinks
     : isOwner
-      ? ownerSidebarNavLinks
+      ? businessType === "PERSONAL"
+        ? personalSidebarNavLinks
+        : ownerSidebarNavLinks
       : agentSidebarNavLinks;
 
   if (isOwner && !businessType) {
@@ -190,7 +215,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     : navLinks;
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <div className="flex min-h-screen bg-background text-foreground">
       <TrialProtectionBanner />
       <SideNav
         user={user}

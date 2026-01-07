@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { User } from "@/lib/types";
 import OwnerDashboardContent from "@/components/dashboards/OwnerDashboardContent";
 import AgentDashboardContent from "@/components/dashboards/AgentDashboardContent";
+import PersonalDashboardContent from "@/components/dashboards/PersonalDashboardContent";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -22,7 +23,11 @@ export default function DashboardPage() {
   const user = session.user as User;
 
   return user.role.toLowerCase() === "owner" ? (
-    <OwnerDashboardContent {...user} />
+    user.businessType === "PERSONAL" ? (
+      <PersonalDashboardContent {...user} />
+    ) : (
+      <OwnerDashboardContent {...user} />
+    )
   ) : (
     <AgentDashboardContent {...user} />
   );

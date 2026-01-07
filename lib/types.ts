@@ -17,6 +17,7 @@ export interface Transaction {
     name: string;
   };
   paymentMethod: string;
+  category?: string | null;
   description: string | null;
   date: string;
   recordedBy: {
