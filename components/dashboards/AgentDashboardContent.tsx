@@ -47,7 +47,7 @@ const AgentDashboardContent = (user: User) => {
   const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
 
   const [taskStatusData, setTaskStatusData] = useState<AgentTaskStatus>(
-    {} as AgentTaskStatus
+    {} as AgentTaskStatus,
   );
   const [isLoadingTaskStatus, setIsLoadingTaskStatus] = useState<boolean>(true);
 
@@ -71,10 +71,13 @@ const AgentDashboardContent = (user: User) => {
     try {
       const response = await fetch(`/api/agents/${user.id}/summary`);
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Failed to fetch summary" }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Failed to fetch summary" }));
         toast({
           title: "Error",
-          description: errorData.message || `HTTP error! status: ${response.status}`,
+          description:
+            errorData.message || `HTTP error! status: ${response.status}`,
           variant: "destructive",
         });
         setIsLoadingSummary(false);
@@ -144,7 +147,7 @@ const AgentDashboardContent = (user: User) => {
     setIsLoadingTransactions(true);
     try {
       const response = await fetch(
-        `/api/transactions?businessId=${user.businessId}`
+        `/api/transactions?businessId=${user.businessId}`,
       );
       if (!response.ok)
         toast({
@@ -214,12 +217,24 @@ const AgentDashboardContent = (user: User) => {
     async (
       mainTransaction: Omit<
         Transaction,
-        "id" | "businessId" | "userId" | "date" | "status" | "type" | "recordedBy"
+        | "id"
+        | "businessId"
+        | "userId"
+        | "date"
+        | "status"
+        | "type"
+        | "recordedBy"
       > & { type: "Deposit" | "Withdrawal" | "Charge" },
       chargeTransaction?: Omit<
         Transaction,
-        "id" | "businessId" | "userId" | "date" | "status" | "type" | "recordedBy"
-      > & { type: "Deposit" | "Withdrawal" | "Charge" }
+        | "id"
+        | "businessId"
+        | "userId"
+        | "date"
+        | "status"
+        | "type"
+        | "recordedBy"
+      > & { type: "Deposit" | "Withdrawal" | "Charge" },
     ) => {
       if (!user.id || !user.businessId) return;
 
@@ -239,7 +254,7 @@ const AgentDashboardContent = (user: User) => {
             userId: user.id,
             date: new Date().toISOString(),
           };
-          
+
           const response = await fetch("/api/transactions", {
             method: "POST",
             headers: {
@@ -249,13 +264,17 @@ const AgentDashboardContent = (user: User) => {
           });
 
           if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: "Failed to add transaction" }));
+            const errorData = await response
+              .json()
+              .catch(() => ({ message: "Failed to add transaction" }));
             toast({
               title: "Error",
               description: errorData.message || "Failed to add transaction.",
               variant: "destructive",
             });
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new Error(
+              errorData.message || `HTTP error! status: ${response.status}`,
+            );
           }
         }
 
@@ -295,7 +314,7 @@ const AgentDashboardContent = (user: User) => {
       fetchTransactionsData,
       fetchSummaryData,
       fetchReconciliationData,
-    ]
+    ],
   );
 
   return (
@@ -305,21 +324,26 @@ const AgentDashboardContent = (user: User) => {
           Welcome, {user.name}
         </h1>
         <div className="flex items-center gap-2">
-            <RequestCashDialog 
-                open={isRequestDialogOpen} 
-                onOpenChange={setIsRequestDialogOpen} 
-                onSuccess={() => toast({ title: "Request Sent" })}
-            />
-            <Button variant="outline" onClick={() => setIsRequestDialogOpen(true)}>
-                Request Cash
-            </Button>
+          <RequestCashDialog
+            open={isRequestDialogOpen}
+            onOpenChange={setIsRequestDialogOpen}
+            onSuccess={() => toast({ title: "Request Sent" })}
+          />
+          <Button
+            variant="outline"
+            onClick={() => setIsRequestDialogOpen(true)}
+          >
+            Request Cash
+          </Button>
         </div>
       </header>
-      <div className="w-full p-8 text-gray-800 dark:text-gray-200">
+      <div className="w-full p-4 md:p-8 text-gray-800 dark:text-gray-200">
         {/* Grid for Summary, Task Status, Reconciliation, Notifications */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <div className="sm:col-span-1 md:col-span-2 xl:col-span-3 py-4 px-6 rounded-lg shadow-md bg-card border border-border">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Summary</h3>{" "}
+            <h3 className="text-lg font-semibold mb-4 text-foreground">
+              Summary
+            </h3>{" "}
             {isLoadingSummary ? (
               <p className="text-center text-gray-500 dark:text-gray-400">
                 Loading summary...
@@ -330,7 +354,9 @@ const AgentDashboardContent = (user: User) => {
           </div>
 
           <div className="py-4 px-6 rounded-lg shadow-md bg-card border border-border">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Daily Task Status</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">
+              Daily Task Status
+            </h3>
             {isLoadingTaskStatus ? (
               <p className="text-center text-gray-500 dark:text-gray-400">
                 Loading task status...
@@ -345,13 +371,16 @@ const AgentDashboardContent = (user: User) => {
               Reconciliation (End of Day)
             </h3>
             {isLoadingReconciliation ? (
-              <p className="text-center text-gray-500 dark:text-gray-400">
+              <p className="text-center text-card-foreground">
                 Loading reconciliation data...
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="systemExpectedCash">
+                  <Label
+                    htmlFor="systemExpectedCash"
+                    className="text-card-foreground"
+                  >
                     System Expected Cash
                   </Label>
                   <Input
@@ -359,11 +388,16 @@ const AgentDashboardContent = (user: User) => {
                     type="number"
                     value={systemExpectedCash.toFixed(2)}
                     readOnly
-                    className="bg-muted cursor-not-allowed"
+                    className="text-card-foreground cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="agentEnteredCash">Agent Entered Cash</Label>
+                  <Label
+                    htmlFor="agentEnteredCash"
+                    className="text-card-foreground"
+                  >
+                    Agent Entered Cash
+                  </Label>
                   <Input
                     id="agentEnteredCash"
                     type="number"
@@ -374,19 +408,21 @@ const AgentDashboardContent = (user: User) => {
                     readOnly={isDayLocked}
                     className={
                       isDayLocked
-                        ? "bg-muted cursor-not-allowed"
+                        ? "text-card-foreground cursor-not-allowed"
                         : ""
                     }
                   />
                 </div>
                 <div>
-                  <Label htmlFor="difference">Difference</Label>
+                  <Label htmlFor="difference" className="text-card-foreground">
+                    Difference
+                  </Label>
                   <Input
                     id="difference"
                     type="number"
                     value={reconciliationDifference.toFixed(2)}
                     readOnly
-                    className="bg-muted cursor-not-allowed"
+                    className="text-card-foreground cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -409,11 +445,13 @@ const AgentDashboardContent = (user: User) => {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 p-2">
         <div className="py-4 px-6 rounded-lg shadow-md bg-card border border-border">
-          <h3 className="text-lg font-semibold mb-4 text-foreground">Today&apos;s Transactions</h3>
+          <h3 className="text-lg font-semibold mb-4 text-foreground">
+            Today&apos;s Transactions
+          </h3>
           {isLoadingTransactions ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">
+            <p className="text-center text-card-foreground">
               Loading transactions...
             </p>
           ) : (

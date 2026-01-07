@@ -45,10 +45,8 @@ const AgentDashboard = (user: User) => {
 
   const { toast } = useToast();
 
-
-
   const [summaryCardsData, setSummaryCardsData] = useState<AgentSummaryCards>(
-    {} as AgentSummaryCards
+    {} as AgentSummaryCards,
   );
   const [isLoadingSummary, setIsLoadingSummary] = useState<boolean>(true);
   const [pendingCashAdvance, setPendingCashAdvance] =
@@ -152,12 +150,24 @@ const AgentDashboard = (user: User) => {
   const handleAddTransaction = async (
     mainTransaction: Omit<
       Transaction,
-      "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
+      | "id"
+      | "businessId"
+      | "recordedBy"
+      | "date"
+      | "status"
+      | "type"
+      | "recipientId"
     > & { type: "Deposit" | "Withdrawal" | "Charge" },
     chargeTransaction?: Omit<
       Transaction,
-      "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
-    > & { type: "Deposit" | "Withdrawal" | "Charge" }
+      | "id"
+      | "businessId"
+      | "recordedBy"
+      | "date"
+      | "status"
+      | "type"
+      | "recipientId"
+    > & { type: "Deposit" | "Withdrawal" | "Charge" },
   ) => {
     const transactionsToProcess = [mainTransaction];
     if (chargeTransaction) {
@@ -194,7 +204,7 @@ const AgentDashboard = (user: User) => {
             variant: "destructive",
           });
           throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
+            errorData.message || `HTTP error! status: ${response.status}`,
           );
         }
       }
@@ -334,10 +344,10 @@ const AgentDashboard = (user: User) => {
         <div className="mt-6">
           <div className="py-4 px-6 rounded-lg shadow-md bg-white dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-4">Today’s Transactions</h3>
-            <AgentTransactionsTable 
-              transactions={transactionsData} 
-              user={user} 
-              onTransactionUpdate={fetchSummaryData} 
+            <AgentTransactionsTable
+              transactions={transactionsData}
+              user={user}
+              onTransactionUpdate={fetchSummaryData}
             />
           </div>
         </div>
