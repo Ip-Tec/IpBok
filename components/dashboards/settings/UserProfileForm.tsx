@@ -77,7 +77,7 @@ const UserProfileForm = () => {
   const [firstName, lastName] = session?.user?.name?.split(" ") || ["", ""];
 
   return (
-    <div className="bg-white rounded-lg shadow dark:bg-gray-800 md:w-[45%] w-full">
+    <div className="bg-card rounded-lg shadow md:w-[45%] w-full">
       <form onSubmit={handleSubmit}>
         <div className="p-6">
           <h2 className="text-lg font-semibold">User Profile</h2>

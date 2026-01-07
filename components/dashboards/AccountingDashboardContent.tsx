@@ -96,13 +96,13 @@ const AccountingDashboardContent = (user: User) => {
 
   return (
     <>
-      <header className="flex items-center justify-between p-4 bg-card border-b border-border">
+      <header className="flex flex-wrap items-center justify-between p-4 bg-card border-b border-border">
         <h1 className="text-xl font-semibold text-foreground">
           {user.businessType === "PERSONAL"
             ? "Personal Accounts"
             : "Accounting Dashboard"}
         </h1>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <RecordTransactionDialog
             open={isIncomeDialogOpen}
             onOpenChange={setIsIncomeDialogOpen}
@@ -130,7 +130,7 @@ const AccountingDashboardContent = (user: User) => {
         </div>
       </header>
 
-      <div className="p-8">
+      <div className="p-5 w-full">
         <h2 className="text-3xl font-bold text-foreground">
           {user.businessType === "PERSONAL"
             ? "Financial Health"
@@ -169,7 +169,7 @@ const AccountingDashboardContent = (user: User) => {
 
         <div className="mt-8">
           {activeTab === "Overview" && (
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-2">
               <div className="lg:col-span-2">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <KpiCard

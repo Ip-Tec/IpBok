@@ -71,7 +71,7 @@ const Signup = () => {
       <div className="text-center mb-8">
         <Logo />
       </div>
-      <div className="w-full max-w-xl space-y-8 p-8">
+      <div className="w-full max-w-xl space-y-8 p-8 bg-card rounded-lg">
         <div className="text-center">
           <h2 className="text-3xl font-bold">
             {businessId ? `Join as an Agent` : `Create your IpBok account`}
@@ -139,7 +139,7 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -170,7 +170,7 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -184,7 +184,11 @@ const Signup = () => {
           </div>
           {regError && <div className="text-red-500 text-sm">{regError}</div>}
           <div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={loading}
+            >
               {loading ? "Signing Up..." : "Sign Up"}
             </Button>
           </div>
@@ -195,7 +199,7 @@ const Signup = () => {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-background text-muted-foreground">
+              <span className="px-2 bg-card text-muted-foreground">
                 Or continue with
               </span>
             </div>
@@ -210,7 +214,7 @@ const Signup = () => {
                 })
               }
               variant="outline"
-              className="w-full hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors"
+              className="w-full cursor-pointer hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path

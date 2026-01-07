@@ -94,7 +94,7 @@ function Login() {
       <div className="text-center mb-8">
         <Logo />
       </div>
-      <div className="w-full max-w-md space-y-8 p-8">
+      <div className="w-full max-w-md space-y-8 p-8 bg-card rounded-lg">
         <div className="text-center">
           <h2 className="text-3xl font-bold">Sign in to IpBok</h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -147,7 +147,7 @@ function Login() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -180,7 +180,7 @@ function Login() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-background text-muted-foreground">
+              <span className="px-2 bg-card text-muted-foreground">
                 Or continue with
               </span>
             </div>

@@ -91,7 +91,7 @@ const PersonalTransactionsView = () => {
 
   return (
     <div className="p-4 md:p-8 space-y-6">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border">
+      <header className="p-2 flex flex-col bg-card md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border">
         <div>
           <h1 className="text-3xl font-bold">My Transactions</h1>
           <p className="text-muted-foreground mt-1">

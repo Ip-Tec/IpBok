@@ -83,7 +83,7 @@ const BusinessInformationForm = () => {
 
   if (session && !businessId) {
     return (
-      <div className="bg-white rounded-lg shadow dark:bg-gray-800 md:w-[45%] w-full p-6">
+      <div className="bg-card rounded-lg shadow md:w-[45%] w-full p-6">
         <h2 className="text-lg font-semibold">Business Information</h2>
         <p className="mt-4 text-gray-600 dark:text-gray-400">
           No business associated with this account was found. Please contact
@@ -98,7 +98,7 @@ const BusinessInformationForm = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow dark:bg-gray-800 md:w-[45%] w-full">
+    <div className="bg-card rounded-lg shadow md:w-[45%] w-full">
       <form onSubmit={handleSubmit}>
         <div className="p-6">
           <h2 className="text-lg font-semibold">Business Information</h2>
@@ -149,17 +149,15 @@ import TransactionSettingsForm from "./TransactionSettingsForm";
 const OwnerSettingsView = () => {
   const { data: session } = useSession();
   return (
-    <div className="p-8">
-      <header className="pb-4 border-b">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-          Settings
-        </h1>
+    <div className="p-2">
+      <header className="pb-4 border-b bg-card p-6">
+        <h1 className="text-3xl font-bold">Settings</h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
           Manage your account and application settings.
         </p>
       </header>
 
-      <div className="mt-8 space-y-8 flex flex-wrap justify-start items-center gap-8">
+      <div className="p-8 mt-8 space-y-8 flex flex-wrap justify-start items-center gap-8">
         {/* Business Information Section */}
         {session?.user.businessType !== "PERSONAL" && (
           <BusinessInformationForm />
@@ -175,7 +173,7 @@ const OwnerSettingsView = () => {
         <TransactionSettingsForm />
 
         {/* Theme Settings Section */}
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 w-full">
+        <div className="bg-card rounded-lg shadow-lg w-full">
           <div className="p-6">
             <h2 className="text-lg font-semibold">Theme Settings</h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">

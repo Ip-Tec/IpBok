@@ -224,10 +224,10 @@ const OwnerTransactionsView = () => {
   };
 
   return (
-    <div className="p-4 md:p-8">
-      <header className="flex items-center justify-between pb-4 border-b">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+    <div className="p-4">
+      <header className="bg-card flex items-center justify-between pb-4 border-b">
+        <div className="px-4">
+          <h1 className="text-3xl font-bold text-secondary-foreground">
             All Transactions
           </h1>
           <p className="mt-1 text-gray-500 dark:text-gray-400">
@@ -236,7 +236,7 @@ const OwnerTransactionsView = () => {
         </div>
       </header>
 
-      <div className="flex flex-wrap items-center justify-between my-6 gap-4">
+      <div className="md:p-8 flex flex-wrap items-center justify-between my-6 gap-4">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
@@ -303,11 +303,11 @@ const OwnerTransactionsView = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow dark:bg-gray-800 overflow-hidden">
+      <div className="bg-card rounded-lg shadow overflow-hidden">
         {/* Desktop Table View */}
         <div className="hidden md:block">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-secondary-foreground uppercase bg-card text-accent">
               <tr>
                 <th scope="col" className="px-6 py-3">
                   Agent
@@ -346,7 +346,7 @@ const OwnerTransactionsView = () => {
                 transactions.map((transaction) => (
                   <tr
                     key={transaction.id}
-                    className="bg-white border-b last:border-b-0 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    className="bg-card-foreground/10 hover:bg-muted/50 border-b last:border-b-0 dark:border-gray-700"
                   >
                     <td className="px-6 py-4">
                       {transaction.recordedBy?.name || "N/A"}

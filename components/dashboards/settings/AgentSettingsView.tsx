@@ -28,7 +28,7 @@ const AgentSettingsView = () => {
         <TransactionSettingsForm />
 
         {/* Theme Settings Section */}
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 w-full">
+        <div className="bg-card rounded-lg shadow w-full">
           <div className="p-6">
             <h2 className="text-lg font-semibold">Theme Settings</h2>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">

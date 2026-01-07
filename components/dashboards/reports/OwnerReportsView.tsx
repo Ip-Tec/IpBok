@@ -166,17 +166,17 @@ const OwnerReportsView = () => {
   }
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="w-full p-4 md:p-8">
       <header className="flex flex-col md:flex-row md:items-center md:justify-between pb-4 border-b">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary">
             Reports
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             View key metrics and performance overviews.
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-2 mt-4 md:mt-0">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 md:mt-0">
           <DatePickerWithRange date={date} onDateChange={setDate} />
           <Button onClick={handleExport} className="w-full sm:w-auto">
             Export
@@ -185,7 +185,7 @@ const OwnerReportsView = () => {
       </header>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         <KpiCard
           title="Total Revenue"
           value={isLoading ? "..." : formatCurrency(data?.totalRevenue || 0)}
@@ -214,9 +214,7 @@ const OwnerReportsView = () => {
 
       {/* Charts Section */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white px-2">
-          Revenue Over Time
-        </h2>
+        <h2 className="text-lg font-semibold px-2">Revenue Over Time</h2>
         <div className="mt-4 p-4 bg-white rounded-lg shadow dark:bg-gray-800 h-[300px] md:h-[400px]">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
@@ -232,9 +230,7 @@ const OwnerReportsView = () => {
 
       {/* Data Table Section */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-white px-2">
-          Agent Performance
-        </h2>
+        <h2 className="text-lg font-semibold px-2">Agent Performance</h2>
         <div className="mt-4 bg-white rounded-lg shadow dark:bg-gray-800 overflow-hidden">
           {/* Desktop View */}
           <div className="hidden md:block overflow-x-auto">

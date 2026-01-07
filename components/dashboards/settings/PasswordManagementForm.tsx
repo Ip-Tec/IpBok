@@ -58,9 +58,7 @@ const PasswordManagementForm = () => {
       toast.error("Could not find user ID. Please try logging in again.");
       return;
     }
-    if (
-      newPasswordRef.current?.value !== confirmPasswordRef.current?.value
-    ) {
+    if (newPasswordRef.current?.value !== confirmPasswordRef.current?.value) {
       toast.error("New passwords do not match.");
       return;
     }
@@ -72,7 +70,7 @@ const PasswordManagementForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow dark:bg-gray-800 md:w-[45%] w-full">
+    <div className="bg-card rounded-lg shadow md:w-[45%] w-full">
       <form onSubmit={handleSubmit}>
         <div className="p-6">
           <h2 className="text-lg font-semibold">Password Management</h2>

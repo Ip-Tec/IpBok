@@ -41,7 +41,7 @@ const AgentMobileRow = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800">
+    <div className="p-4 bg-card">
       <div
         className="flex items-center justify-between cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
@@ -51,7 +51,7 @@ const AgentMobileRow = ({
             <User className="w-6 h-6 text-gray-400" />
           </div>
           <div className="flex flex-col">
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className="font-semibold text-primary">
               {agent.name || "Unnamed"}
             </span>
             <span className="text-xs text-gray-500">{agent.email}</span>
@@ -70,12 +70,12 @@ const AgentMobileRow = ({
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="text-gray-500">Role:</div>
             <div className="text-right">
-              <span className="px-2 py-0.5 text-[10px] font-semibold rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+              <span className="px-4 py-2 text-[10px] font-semibold rounded bg-primary text-primary-foreground">
                 {agent.role}
               </span>
             </div>
             <div className="text-gray-500">Today's Tx:</div>
-            <div className="text-gray-900 dark:text-white text-right font-medium">
+            <div className="text-secondary-foreground text-right font-medium">
               {agent.dailyTransactionCount}
             </div>
             <div className="text-gray-500">Status:</div>
@@ -208,10 +208,10 @@ const OwnerAgentsView = () => {
   };
 
   return (
-    <div className="p-4 md:p-8">
-      <header className="flex items-center justify-between pb-4 border-b">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
+    <div className="p-4">
+      <header className="flex bg-card shadow border border-border items-center justify-between pb-4 border-b">
+        <div className="p-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Manage Team
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -221,7 +221,7 @@ const OwnerAgentsView = () => {
         <AddMemberDialog onMemberAdded={fetchAgents} />
       </header>
 
-      <div className="my-6">
+      <div className="my-6 md:px-8">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
@@ -233,11 +233,11 @@ const OwnerAgentsView = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow dark:bg-gray-800 overflow-hidden">
+      <div className="bg-card rounded-lg shadow overflow-hidden">
         {/* Desktop View */}
         <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <table className="w-full text-sm text-left text-foreground">
+            <thead className="text-xs text-card uppercase bg-muted-foreground">
               <tr>
                 <th scope="col" className="px-6 py-3">
                   Member
@@ -273,17 +273,19 @@ const OwnerAgentsView = () => {
                 filteredAgents.map((agent) => (
                   <tr
                     key={agent.id}
-                    className="bg-white border-b last:border-b-0 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    className="bg-card border-b last:border-b-0 border-border hover:bg-muted transition-colors"
                   >
                     <th
                       scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                      className="px-6 py-4 font-medium text-muted-foreground whitespace-nowrap dark:text-white"
                     >
                       <div className="flex items-center">
-                        <User className="w-8 h-8 mr-3 text-gray-400" />
+                        <User className="w-8 h-8 mr-3 text-muted-foreground" />
                         <div>
-                          <div>{agent.name}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-accent-foreground">
+                            {agent.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
                             {agent.email}
                           </div>
                         </div>

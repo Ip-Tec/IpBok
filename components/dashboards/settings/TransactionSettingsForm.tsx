@@ -38,7 +38,7 @@ const TransactionSettingsForm = () => {
   const { data: session, update } = useSession();
   const queryClient = useQueryClient();
   const [transactionsPerPage, setTransactionsPerPage] = useState(
-    session?.user?.transactionsPerPage?.toString() || "10"
+    session?.user?.transactionsPerPage?.toString() || "10",
   );
 
   const mutation = useMutation({
@@ -61,7 +61,7 @@ const TransactionSettingsForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow dark:bg-gray-800 md:w-[45%] w-full">
+    <div className="bg-card rounded-lg shadow md:w-[45%] w-full">
       <div className="p-6">
         <h2 className="text-lg font-semibold">Transaction Settings</h2>
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -69,9 +69,7 @@ const TransactionSettingsForm = () => {
         </p>
         <div className="mt-6 space-y-4">
           <div>
-            <Label htmlFor="transactions-per-page">
-              Transactions per Page
-            </Label>
+            <Label htmlFor="transactions-per-page">Transactions per Page</Label>
             <Select
               value={transactionsPerPage}
               onValueChange={setTransactionsPerPage}
