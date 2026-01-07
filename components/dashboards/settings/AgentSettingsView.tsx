@@ -7,11 +7,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 const AgentSettingsView = () => {
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <header className="pb-4 border-b">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-          Settings
-        </h1>
+        <h1 className="text-3xl font-bold text-accent-foreground">Settings</h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
           Manage your account settings.
         </p>

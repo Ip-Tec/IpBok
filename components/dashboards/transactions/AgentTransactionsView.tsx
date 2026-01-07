@@ -37,7 +37,7 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/transactions?businessId=${user.businessId}`
+        `/api/transactions?businessId=${user.businessId}`,
       ); // Pass businessId as a query parameter
       if (!response.ok) {
         toast({
@@ -69,12 +69,24 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
     async (
       mainTransaction: Omit<
         Transaction,
-        "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
+        | "id"
+        | "businessId"
+        | "recordedBy"
+        | "date"
+        | "status"
+        | "type"
+        | "recipientId"
       > & { type: "Deposit" | "Withdrawal" | "Charge" },
       chargeTransaction?: Omit<
         Transaction,
-        "id" | "businessId" | "recordedBy" | "date" | "status" | "type" | "recipientId"
-      > & { type: "Deposit" | "Withdrawal" | "Charge" }
+        | "id"
+        | "businessId"
+        | "recordedBy"
+        | "date"
+        | "status"
+        | "type"
+        | "recipientId"
+      > & { type: "Deposit" | "Withdrawal" | "Charge" },
     ) => {
       setIsLoading(true);
       const transactionsToProcess = [mainTransaction];
@@ -92,7 +104,7 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
             userId: user.id,
             date: new Date().toISOString(),
           };
-          
+
           const response = await fetch("/api/transactions", {
             method: "POST",
             headers: {
@@ -102,13 +114,17 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
           });
 
           if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: "Failed to add transaction" }));
+            const errorData = await response
+              .json()
+              .catch(() => ({ message: "Failed to add transaction" }));
             toast({
               title: "Error",
               description: errorData.message || "Failed to add transaction.",
               variant: "destructive",
             });
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new Error(
+              errorData.message || `HTTP error! status: ${response.status}`,
+            );
           }
         }
 
@@ -138,14 +154,14 @@ const AgentTransactionsView = ({ user }: AgentTransactionsViewProps) => {
         setIsLoading(false);
       }
     },
-    [user.businessId, user.id, toast, fetchTransactions]
+    [user.businessId, user.id, toast, fetchTransactions],
   );
 
   return (
-    <div className="p-8">
-      <header className="flex items-center justify-between pb-4 border-b">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+    <div className="p-2 md:p-8">
+      <header className="items-center justify-between pb-4 border-b bg-card px-2">
+        <div className="mb-2">
+          <h1 className="text-3xl font-bold text-accent-foreground">
             My Transactions
           </h1>
           <p className="mt-1 text-gray-500 dark:text-gray-400">

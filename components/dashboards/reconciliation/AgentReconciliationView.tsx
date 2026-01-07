@@ -31,9 +31,9 @@ const AgentReconciliationView = ({ user }: AgentReconciliationViewProps) => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <header className="pb-4 border-b">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+        <h1 className="text-3xl font-bold text-accent-foreground">
           End of Day Reconciliation
         </h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
@@ -44,14 +44,16 @@ const AgentReconciliationView = ({ user }: AgentReconciliationViewProps) => {
       {isDayLocked ? (
         <div className="mt-8 flex flex-col items-center justify-center text-center p-12 bg-green-50 dark:bg-green-900/20 rounded-lg">
           <Lock className="w-16 h-16 text-green-500 dark:text-green-400" />
-          <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Day Locked</h2>
+          <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">
+            Day Locked
+          </h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Your reconciliation has been submitted for today.
           </p>
         </div>
       ) : (
         <div className="mt-8 max-w-lg mx-auto">
-          <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
+          <div className="p-6 bg-card rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">
               Cash Reconciliation Form
             </h2>
@@ -63,7 +65,7 @@ const AgentReconciliationView = ({ user }: AgentReconciliationViewProps) => {
                   type="number"
                   value={systemExpectedCash.toFixed(2)}
                   readOnly
-                  className="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                  className="cursor-not-allowed"
                 />
               </div>
               <div>
@@ -85,17 +87,17 @@ const AgentReconciliationView = ({ user }: AgentReconciliationViewProps) => {
                   type="number"
                   value={reconciliationDifference.toFixed(2)}
                   readOnly
-                  className={`bg-gray-100 dark:bg-gray-700 cursor-not-allowed ${
+                  className={`cursor-not-allowed ${
                     reconciliationDifference < 0
-                      ? "text-red-500 dark:text-red-400"
-                      : "text-green-500 dark:text-green-400"
+                      ? "text-destructive"
+                      : "text-green-500"
                   }`}
                 />
               </div>
             </div>
 
             {reconciliationDifference !== 0 && (
-              <div className="mt-6 flex items-start p-4 bg-yellow-50 text-yellow-800 rounded-lg dark:bg-yellow-900/20 dark:text-yellow-300">
+              <div className="mt-6 flex items-start p-4 bg-yellow-100 text-yellow-800 rounded-lg">
                 <AlertTriangle className="w-5 h-5 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold">Attention Required</h3>
