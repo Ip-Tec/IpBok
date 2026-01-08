@@ -58,7 +58,7 @@ const PersonalDashboardContent = (user: User) => {
   }
 
   const { kpis, recentTransactions } = data;
-
+  console.log(data);
   const hasCategoryData =
     data.charts?.spendingCategoriesData?.labels &&
     data.charts.spendingCategoriesData.labels.length > 0;
@@ -157,7 +157,7 @@ const PersonalDashboardContent = (user: User) => {
         <div className="p-6 bg-card rounded-xl border border-border shadow-sm">
           <h3 className="text-lg font-semibold mb-6 flex items-center">
             <PieChartIcon className="w-5 h-5 mr-2 text-primary" />
-            Spending Categories
+            Transaction Categories
           </h3>
           <div className="h-64 sm:h-80">
             <Pie
@@ -199,9 +199,9 @@ const PersonalDashboardContent = (user: User) => {
                     </span>
                   </td>
                   <td
-                    className={`px-4 py-3 text-right font-bold ${tx.type === "Withdrawal" ? "text-red-500" : "text-green-500"}`}
+                    className={`px-4 py-3 text-right font-bold ${["Expense", "Withdrawal"].includes(tx.type) ? "text-red-500" : "text-green-500"}`}
                   >
-                    {tx.type === "Withdrawal" ? "-" : "+"}₦
+                    {["Expense", "Withdrawal"].includes(tx.type) ? "-" : "+"}₦
                     {tx.amount.toLocaleString()}
                   </td>
                 </tr>

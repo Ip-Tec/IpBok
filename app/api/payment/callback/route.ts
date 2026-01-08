@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     const data = await response.json();
 
     if (data.status && data.data.status === "success") {
-      const { businessId, planId } = data.data.metadata;
+      const { businessId, planId, months } = data.data.metadata;
 
       // Ensure we are updating the correct business
       if (businessId !== session.user.businessId) {
@@ -46,7 +46,8 @@ export async function GET(req: NextRequest) {
 
       // Update business status
       const now = new Date();
-      const subscriptionEndsAt = addDays(now, 30); // Standard 30 days for now
+      const durationDays = (months || 1) * 30;
+      const subscriptionEndsAt = addDays(now, durationDays);
 
       await prisma.business.update({
         where: { id: businessId },

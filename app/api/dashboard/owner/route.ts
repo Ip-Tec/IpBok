@@ -93,6 +93,8 @@ export async function GET(req: NextRequest) {
         tx.type.name === "Income"
       ) {
         currentMonthIncome += tx.amount;
+        const category = tx.category || "Uncategorized";
+        categoryMap[category] = (categoryMap[category] || 0) + tx.amount;
       } else if (tx.type.name === "Withdrawal" || tx.type.name === "Expense") {
         currentMonthExpenses += tx.amount;
         const category = tx.category || "Uncategorized";

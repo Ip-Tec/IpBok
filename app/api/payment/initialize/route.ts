@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { planId } = await req.json();
+    const { planId, months = 1 } = await req.json();
 
     if (!planId) {
       return new NextResponse("Plan ID is required", { status: 400 });
@@ -40,6 +40,8 @@ export async function POST(req: NextRequest) {
       throw new Error("PAYSTACK_SECRET_KEY is not configured");
     }
 
+    const amount = plan.monthlyPrice * months * 100; // Total amount in kobo
+
     const response = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {
@@ -50,12 +52,13 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           email: session.user.email,
-          amount: plan.monthlyPrice * 100, // Paystack uses kobo (subunits)
+          amount: amount,
           callback_url: `${process.env.NEXTAUTH_URL}/api/payment/callback`,
           metadata: {
             businessId: business.id,
             planId: plan.id,
             businessType: plan.businessType,
+            months: months, // Pass months to callback
           },
         }),
       },

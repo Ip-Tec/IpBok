@@ -16,6 +16,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [months, setMonths] = useState(1);
 
   const fetchStatus = () => {
     setLoading(true);
@@ -35,7 +36,10 @@ export default function BillingPage() {
       const res = await fetch("/api/payment/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId: subscription.planId }),
+        body: JSON.stringify({
+          planId: subscription.planId,
+          months: months,
+        }),
       });
       const data = await res.json();
       if (data.authorization_url) {
@@ -196,19 +200,43 @@ export default function BillingPage() {
               </div>
             )}
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+            <div className="mt-10 flex flex-col gap-4">
+              {/* Interval Selection */}
+              {!isActive && (
+                <div className="bg-muted/50 p-1 rounded-lg flex">
+                  {[
+                    { label: "Monthly", value: 1 },
+                    { label: "6 Months", value: 6 },
+                    { label: "Yearly", value: 12 },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setMonths(option.value)}
+                      className={cn(
+                        "flex-1 py-2 text-sm font-medium rounded-md transition-all",
+                        months === option.value
+                          ? "bg-background shadow text-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-background/50",
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {!isActive && (
                 <Button
                   size="lg"
                   onClick={handleUpgrade}
                   disabled={upgrading}
-                  className="flex-1 py-6 text-lg font-bold shadow-xl shadow-primary/20"
+                  className="w-full py-6 text-lg font-bold shadow-xl shadow-primary/20"
                 >
                   {upgrading
                     ? "Initializing..."
                     : isTrial
-                      ? "Upgrade to Active"
-                      : "Renew Subscription"}
+                      ? `Pay ₦${(subscription.monthlyPrice * months).toLocaleString()} for ${months} Month${months > 1 ? "s" : ""}`
+                      : `Renew for ₦${(subscription.monthlyPrice * months).toLocaleString()}`}
                 </Button>
               )}
 
@@ -217,6 +245,7 @@ export default function BillingPage() {
                 size="lg"
                 onClick={handleManualVerify}
                 disabled={verifying}
+                className="w-full"
               >
                 {verifying ? "Verifying..." : "Verify Past Payment"}
               </Button>
@@ -315,15 +344,6 @@ export default function BillingPage() {
                 </>
               )}
             </ul>
-          </div>
-
-          <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
-            <p className="text-xs text-primary font-medium leading-relaxed uppercase tracking-wider">
-              Paystack Test Mode Active
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Use Paystack test cards to simulate successful transactions.
-            </p>
           </div>
         </div>
       </div>
