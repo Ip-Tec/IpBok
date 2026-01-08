@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Trash2, Edit, Mail, Search, ShieldAlert } from "lucide-react";
+import { Trash2, Edit, Mail, Search, ShieldAlert, LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -123,6 +123,34 @@ export default function AdminUsersPage() {
       }
       setUsers((prev) => prev.filter((u) => u.id !== id));
       toast.success("User deleted successfully");
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleImpersonate = async (id: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to impersonate this user? You will be logged out of your current admin session.",
+      )
+    )
+      return;
+
+    try {
+      const response = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Impersonation failed");
+      }
+
+      toast.success("Logging in as user...");
+      // Force reload to pick up new cookie
+      window.location.href = "/dashboard";
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -262,9 +290,22 @@ export default function AdminUsersPage() {
                             size="sm"
                             className="text-muted-foreground hover:text-foreground"
                             onClick={() => setEditingUser({ ...u })}
+                            title="Edit User"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
+
+                          {session?.user?.id !== u.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-primary hover:text-primary hover:bg-primary/10"
+                              onClick={() => handleImpersonate(u.id)}
+                              title="Impersonate User"
+                            >
+                              <LogIn className="w-4 h-4" />
+                            </Button>
+                          )}
 
                           {session?.user?.id !== u.id &&
                             session?.user?.role === "SUPERADMIN" && (
