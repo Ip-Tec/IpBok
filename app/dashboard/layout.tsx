@@ -123,7 +123,7 @@ export default function DashboardLayout({
   return (
     <Suspense
       fallback={
-        <div className="h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center">
           Loading...
         </div>
       }

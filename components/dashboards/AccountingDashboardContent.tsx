@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import KpiCard from "./KpiCard";
 import { RecordTransactionDialog } from "./accounting/RecordTransactionDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import TransactionList from "./accounting/TransactionList";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -106,13 +107,13 @@ const AccountingDashboardContent = (user: User) => {
           <RecordTransactionDialog
             open={isIncomeDialogOpen}
             onOpenChange={setIsIncomeDialogOpen}
-            type="Income"
+            type="Deposit"
             onSuccess={refresh}
           />
           <RecordTransactionDialog
             open={isExpenseDialogOpen}
             onOpenChange={setIsExpenseDialogOpen}
-            type="Expense"
+            type="Withdrawal"
             onSuccess={refresh}
           />
           <Button variant="outline" onClick={() => setIsIncomeDialogOpen(true)}>
@@ -206,9 +207,48 @@ const AccountingDashboardContent = (user: User) => {
               </div>
             </div>
           )}
-          {/* Add other tabs placeholders */}
-          {activeTab === "Income" && <div>Income Table Component here</div>}
-          {activeTab === "Expenses" && <div>Expenses Table Component here</div>}
+          {activeTab === "Income" && (
+            <TransactionList type="Deposit" title="Income Records" />
+          )}
+          {activeTab === "Expenses" && (
+            <TransactionList type="Withdrawal" title="Expense Records" />
+          )}
+          {activeTab === "Reports" && (
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+              <div className="p-6 bg-card rounded-xl border border-border shadow-sm">
+                <h3 className="text-lg font-semibold mb-6 flex items-center">
+                  <Activity className="w-5 h-5 mr-2 text-primary" />
+                  Income vs Expenses
+                </h3>
+                <div className="h-80">
+                  <Bar
+                    options={chartOptions}
+                    data={
+                      data.charts || {
+                        labels: [],
+                        datasets: [],
+                      }
+                    }
+                  />
+                </div>
+              </div>
+              <div className="p-6 bg-card rounded-xl border border-border shadow-sm flex flex-col items-center justify-center text-center">
+                <div className="bg-muted p-8 rounded-full mb-4">
+                  <DollarSign className="w-12 h-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-semibold">
+                  Detailed Reports Coming Soon
+                </h3>
+                <p className="text-muted-foreground mt-2 max-w-sm">
+                  Advanced PDF reporting and tax statements will be available in
+                  future updates.
+                </p>
+                <Button className="mt-4" variant="outline" disabled>
+                  <Download className="w-4 h-4 mr-2" /> Download Report
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

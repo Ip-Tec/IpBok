@@ -23,7 +23,7 @@ const ReportsPage = () => {
 
   if (status === "loading" || !session) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         Loading Reports...
       </div>
     );

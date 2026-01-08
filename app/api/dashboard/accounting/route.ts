@@ -16,38 +16,24 @@ export async function GET(req: NextRequest) {
   const businessId = session.user.businessId;
 
   try {
-    // 1. Fetch Income and Expenses
-    // We assume TransactionType names are "Income" and "Expense"
-    // We need to find their IDs first, or join.
+    // 1. Fetch Income (Deposit + Income) and Expenses (Withdrawal + Expense)
+    // We aggregate directly by checking type names to handle legacy data mixed with new data
 
-    // Let's get the type IDs
-    const incomeType = await prisma.transactionType.findUnique({
-      where: { name: "Income" },
+    const incomeTransactions = await prisma.transaction.aggregate({
+      where: {
+        businessId,
+        type: { name: { in: ["Deposit", "Income"] } },
+      },
+      _sum: { amount: true },
     });
-    const expenseType = await prisma.transactionType.findUnique({
-      where: { name: "Expense" },
+
+    const expenseTransactions = await prisma.transaction.aggregate({
+      where: {
+        businessId,
+        type: { name: { in: ["Withdrawal", "Expense"] } },
+      },
+      _sum: { amount: true },
     });
-
-    // Fetch transactions
-    const incomeTransactions = incomeType
-      ? await prisma.transaction.aggregate({
-          where: {
-            businessId,
-            typeId: incomeType.id,
-          },
-          _sum: { amount: true },
-        })
-      : { _sum: { amount: 0 } };
-
-    const expenseTransactions = expenseType
-      ? await prisma.transaction.aggregate({
-          where: {
-            businessId,
-            typeId: expenseType.id,
-          },
-          _sum: { amount: true },
-        })
-      : { _sum: { amount: 0 } };
 
     const totalIncome = incomeTransactions._sum.amount || 0;
     const totalExpenses = expenseTransactions._sum.amount || 0;
@@ -57,7 +43,9 @@ export async function GET(req: NextRequest) {
     const recentTx = await prisma.transaction.findMany({
       where: {
         businessId,
-        typeId: { in: [incomeType?.id || "", expenseType?.id || ""] },
+        type: {
+          name: { in: ["Deposit", "Income", "Withdrawal", "Expense"] },
+        },
       },
       include: {
         type: true,
@@ -72,7 +60,10 @@ export async function GET(req: NextRequest) {
       id: tx.id,
       date: format(new Date(tx.date), "MMM dd, yyyy HH:mm"),
       description: tx.description,
-      type: tx.type.name,
+      type:
+        tx.type.name === "Deposit" || tx.type.name === "Income"
+          ? "Income"
+          : "Expense", // UI Mapping
       amount: tx.amount,
       recordedBy: tx.recordedBy?.name || tx.recordedBy?.email || "Unknown",
     }));
@@ -89,9 +80,6 @@ export async function GET(req: NextRequest) {
       months.push(format(d, "MMM"));
     }
 
-    // Advanced: To do this properly with Prisma across months usually requires Raw SQL or grouping by date on application side if volume is low.
-    // For MVP/Low Volume: Fetch all transactions for last 6 months and reduce.
-
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -99,7 +87,9 @@ export async function GET(req: NextRequest) {
       where: {
         businessId,
         date: { gte: sixMonthsAgo },
-        typeId: { in: [incomeType?.id || "", expenseType?.id || ""] },
+        type: {
+          name: { in: ["Deposit", "Income", "Withdrawal", "Expense"] },
+        },
       },
       include: { type: true },
     });
@@ -109,9 +99,9 @@ export async function GET(req: NextRequest) {
 
     chartTransactions.forEach((tx: any) => {
       const monthKey = format(new Date(tx.date), "MMM");
-      if (tx.type.name === "Income") {
+      if (tx.type.name === "Deposit" || tx.type.name === "Income") {
         incomeMap[monthKey] = (incomeMap[monthKey] || 0) + tx.amount;
-      } else if (tx.type.name === "Expense") {
+      } else if (tx.type.name === "Withdrawal" || tx.type.name === "Expense") {
         expenseMap[monthKey] = (expenseMap[monthKey] || 0) + tx.amount;
       }
     });
@@ -136,12 +126,12 @@ export async function GET(req: NextRequest) {
           {
             label: "Income",
             data: incomeData,
-            backgroundColor: "rgba(75, 192, 192, 0.5)",
+            backgroundColor: "rgba(16, 185, 129, 0.5)", // Green for Income
           },
           {
             label: "Expenses",
             data: expenseData,
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
+            backgroundColor: "rgba(239, 68, 68, 0.5)", // Red for Expenses
           },
         ],
       },

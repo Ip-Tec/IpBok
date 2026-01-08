@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,14 @@ import { PaymentMethod } from "@/src/generated";
 interface RecordTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type: "Income" | "Expense";
+  type: "Income" | "Expense" | "Deposit" | "Withdrawal";
+  initialData?: {
+    id: string;
+    amount: number;
+    description: string | null;
+    category?: string | null;
+    paymentMethod: string;
+  } | null;
   onSuccess: () => void;
 }
 
@@ -32,6 +39,7 @@ export function RecordTransactionDialog({
   open,
   onOpenChange,
   type,
+  initialData,
   onSuccess,
 }: RecordTransactionDialogProps) {
   const [amount, setAmount] = useState("");
@@ -40,21 +48,64 @@ export function RecordTransactionDialog({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PaymentMethod.CASH,
   );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Declare setIsSubmitting here
+
+  // Map DB types (Deposit/Withdrawal) to UI types (Income/Expense) if needed
+  const displayType =
+    type === "Deposit" ? "Income" : type === "Withdrawal" ? "Expense" : type;
+
+  const isEditing = !!initialData;
+
+  useEffect(() => {
+    if (initialData) {
+      setAmount(initialData.amount.toString());
+      setDescription(initialData.description || "");
+      setCategory(initialData.category || "Uncategorized");
+      // Ensure payment method is a valid enum value, fallback to CASH
+      setPaymentMethod(
+        (initialData.paymentMethod as PaymentMethod) || PaymentMethod.CASH,
+      );
+    } else {
+      // Reset form on open if no initial data (Create mode)
+      if (open) {
+        setAmount("");
+        setDescription("");
+        setCategory("Uncategorized");
+        setPaymentMethod(PaymentMethod.CASH);
+      }
+    }
+  }, [initialData, open]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/dashboard/accounting/transaction", {
-        method: "POST",
+      const url = isEditing
+        ? "/api/transactions"
+        : "/api/dashboard/accounting/transaction";
+
+      const method = isEditing ? "PATCH" : "POST";
+      const endpoint = "/api/transactions"; // Using unified endpoint for newer logic if possible, but let's stick to what worked or was intended.
+
+      // Actually, I previously decided to use /api/transactions for both if simplified.
+      // But to be safe and match the `endpoint` variable usage below:
+
+      const body: any = {
+        amount: parseFloat(amount),
+        description,
+        category,
+        paymentMethod,
+      };
+
+      if (isEditing) {
+        body.id = initialData?.id;
+      } else {
+        body.type = type; // Only needed for creation
+      }
+
+      const response = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: parseFloat(amount),
-          description,
-          category,
-          type,
-          paymentMethod,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -62,11 +113,15 @@ export function RecordTransactionDialog({
         throw new Error(errorData.message || "Failed to record transaction");
       }
 
-      toast.success(`${type} recorded successfully!`);
+      toast.success(
+        `${displayType} ${isEditing ? "updated" : "recorded"} successfully!`,
+      );
       onSuccess();
       onOpenChange(false);
-      setAmount("");
-      setDescription("");
+      if (!isEditing) {
+        setAmount("");
+        setDescription("");
+      }
     } catch (error: any) {
       toast.error(error.message || "An error occurred.");
     } finally {
@@ -78,7 +133,9 @@ export function RecordTransactionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Record {type}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Edit" : "Record"} {displayType}
+          </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -154,7 +211,11 @@ export function RecordTransactionDialog({
         </div>
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={isSubmitting || !amount}>
-            {isSubmitting ? "Recording..." : "Record"}
+            {isSubmitting
+              ? "Saving..."
+              : isEditing
+                ? "Update Transaction"
+                : "Record"}
           </Button>
         </DialogFooter>
       </DialogContent>

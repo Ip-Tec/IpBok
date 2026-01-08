@@ -6,6 +6,9 @@ import {
   Filter,
   ArrowUpRight,
   ArrowDownLeft,
+  MoreHorizontal,
+  Trash2,
+  Edit,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
@@ -18,18 +21,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DateRange } from "react-day-picker";
 import { DatePickerWithRange } from "@/components/ui/DatePickerWithRange";
 import { Transaction } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 import { RecordTransactionDialog } from "@/components/dashboards/accounting/RecordTransactionDialog";
 
 const PersonalTransactionsView = () => {
@@ -48,6 +53,8 @@ const PersonalTransactionsView = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isRecordDialogOpen, setIsRecordDialogOpen] = useState(false);
   const [recordType, setRecordType] = useState<"Income" | "Expense">("Income");
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
   const transactionsPerPage = 10;
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -89,6 +96,42 @@ const PersonalTransactionsView = () => {
     fetchTransactions(currentPage, debouncedSearchQuery);
   }, [fetchTransactions, currentPage, debouncedSearchQuery]);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this transaction?")) return;
+    try {
+      const response = await fetch(`/api/transactions?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete");
+      toast.success("Transaction deleted");
+      fetchTransactions(currentPage, debouncedSearchQuery);
+    } catch (error) {
+      toast.error("Could not delete transaction");
+    }
+  };
+
+  const handleEdit = (tx: Transaction) => {
+    setEditingTransaction(tx);
+    // Determine type for dialog (UI purposes mainly, passed data overrides)
+    const typeName =
+      tx.type.name === "Deposit" || tx.type.name === "Income"
+        ? "Deposit"
+        : "Withdrawal";
+    // Wait, setRecordType expects "Income" | "Expense" string usually?
+    // Let's check state definition: const [recordType, setRecordType] = useState<"Income" | "Expense">("Income");
+    // So I should pass "Income" or "Expense".
+    setRecordType(
+      ["Deposit", "Income"].includes(tx.type.name) ? "Income" : "Expense",
+    );
+    setIsRecordDialogOpen(true);
+  };
+
+  const getDisplayType = (typeName: string) => {
+    if (typeName === "Deposit" || typeName === "Income") return "Income";
+    if (typeName === "Withdrawal" || typeName === "Expense") return "Expense";
+    return typeName;
+  };
+
   return (
     <div className="p-4 md:p-8 space-y-6">
       <header className="p-2 flex flex-col bg-card md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border">
@@ -102,6 +145,7 @@ const PersonalTransactionsView = () => {
           <Button
             className="rounded-full shadow-lg"
             onClick={() => {
+              setEditingTransaction(null);
               setRecordType("Income");
               setIsRecordDialogOpen(true);
             }}
@@ -112,6 +156,7 @@ const PersonalTransactionsView = () => {
             variant="outline"
             className="rounded-full shadow-lg"
             onClick={() => {
+              setEditingTransaction(null);
               setRecordType("Expense");
               setIsRecordDialogOpen(true);
             }}
@@ -125,6 +170,17 @@ const PersonalTransactionsView = () => {
         open={isRecordDialogOpen}
         onOpenChange={setIsRecordDialogOpen}
         type={recordType}
+        initialData={
+          editingTransaction
+            ? {
+                id: editingTransaction.id,
+                amount: editingTransaction.amount,
+                description: editingTransaction.description,
+                category: editingTransaction.category,
+                paymentMethod: editingTransaction.paymentMethod,
+              }
+            : null
+        }
         onSuccess={() => fetchTransactions(currentPage, debouncedSearchQuery)}
       />
 
@@ -153,7 +209,6 @@ const PersonalTransactionsView = () => {
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="Deposit">Income</SelectItem>
               <SelectItem value="Withdrawal">Expense</SelectItem>
-              <SelectItem value="Transfer">Transfer</SelectItem>
             </SelectContent>
           </Select>
 
@@ -166,8 +221,85 @@ const PersonalTransactionsView = () => {
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
+      {/* Mobile Card View (Visible on Small Screens) */}
+      <div className="md:hidden space-y-4">
+        {isLoading ? (
+          <div className="text-center py-8 animate-pulse text-muted-foreground">
+            Loading transactions...
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground italic">
+            No transactions found.
+          </div>
+        ) : (
+          transactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="bg-card p-4 rounded-xl border border-border shadow-sm flex items-start justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "p-2 rounded-full",
+                    getDisplayType(tx.type.name) === "Income"
+                      ? "bg-green-500/10 text-green-600"
+                      : "bg-red-500/10 text-red-600",
+                  )}
+                >
+                  {getDisplayType(tx.type.name) === "Income" ? (
+                    <ArrowDownLeft className="w-4 h-4" />
+                  ) : (
+                    <ArrowUpRight className="w-4 h-4" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">
+                    {tx.description || "Transaction"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(tx.date).toLocaleDateString("en-GB")} •{" "}
+                    {tx.category}
+                  </p>
+                  <p
+                    className={cn(
+                      "font-bold mt-1",
+                      getDisplayType(tx.type.name) === "Income"
+                        ? "text-green-600"
+                        : "text-foreground",
+                    )}
+                  >
+                    {getDisplayType(tx.type.name) === "Income" ? "+" : "-"}₦
+                    {tx.amount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => handleEdit(tx)}>
+                    <Edit className="w-4 h-4 mr-2" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(tx.id)}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View (Hidden on Small Screens) */}
+      <div className="hidden md:block bg-card rounded-xl border border-border overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
@@ -177,13 +309,14 @@ const PersonalTransactionsView = () => {
                 <th className="px-6 py-4">Description</th>
                 <th className="px-6 py-4">Method</th>
                 <th className="px-6 py-4 text-right">Amount</th>
+                <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {isLoading ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-6 py-12 text-center text-muted-foreground animate-pulse"
                   >
                     Updating list...
@@ -192,7 +325,7 @@ const PersonalTransactionsView = () => {
               ) : transactions.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-6 py-12 text-center text-muted-foreground italic"
                   >
                     No transactions recorded yet.
@@ -209,12 +342,12 @@ const PersonalTransactionsView = () => {
                         <div
                           className={cn(
                             "p-2 rounded-full",
-                            tx.type.name === "Deposit"
+                            getDisplayType(tx.type.name) === "Income"
                               ? "bg-green-500/10 text-green-600"
                               : "bg-red-500/10 text-red-600",
                           )}
                         >
-                          {tx.type.name === "Deposit" ? (
+                          {getDisplayType(tx.type.name) === "Income" ? (
                             <ArrowDownLeft className="w-4 h-4" />
                           ) : (
                             <ArrowUpRight className="w-4 h-4" />
@@ -222,10 +355,10 @@ const PersonalTransactionsView = () => {
                         </div>
                         <div>
                           <p className="font-semibold text-foreground">
-                            {tx.type.name === "Deposit" ? "Income" : "Expense"}
+                            {getDisplayType(tx.type.name)}
                           </p>
                           <p className="text-[10px] text-muted-foreground">
-                            {new Date(tx.date).toLocaleDateString()}
+                            {new Date(tx.date).toLocaleDateString("en-GB")}
                           </p>
                         </div>
                       </div>
@@ -246,13 +379,38 @@ const PersonalTransactionsView = () => {
                     <td
                       className={cn(
                         "px-6 py-4 text-right font-bold text-lg",
-                        tx.type.name === "Deposit"
+                        getDisplayType(tx.type.name) === "Income"
                           ? "text-green-600"
                           : "text-foreground",
                       )}
                     >
-                      {tx.type.name === "Deposit" ? "+" : "-"}₦
+                      {getDisplayType(tx.type.name) === "Income" ? "+" : "-"}₦
                       {tx.amount.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => handleEdit(tx)}>
+                            <Edit className="w-4 h-4 mr-2" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(tx.id)}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))

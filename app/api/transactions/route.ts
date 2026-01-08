@@ -75,7 +75,14 @@ export async function GET(req: NextRequest) {
   }
 
   if (type && type !== "all") {
-    where.AND.push({ type: { name: type } });
+    // Handle aliasing for legacy types
+    if (type === "Deposit") {
+      where.AND.push({ type: { name: { in: ["Deposit", "Income"] } } });
+    } else if (type === "Withdrawal") {
+      where.AND.push({ type: { name: { in: ["Withdrawal", "Expense"] } } });
+    } else {
+      where.AND.push({ type: { name: type } });
+    }
   }
 
   if (paymentMethod && paymentMethod !== "all") {
@@ -320,6 +327,131 @@ export async function POST(req: NextRequest) {
       error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json(
       { message: "Internal Server Error", error: errorMessage },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { id, amount, description, date, category } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Transaction ID is required" },
+        { status: 400 },
+      );
+    }
+
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return NextResponse.json(
+        { message: "Transaction not found" },
+        { status: 404 },
+      );
+    }
+
+    const isOwner =
+      session.user.role === Role.OWNER &&
+      session.user.businessId === transaction.businessId;
+    const isRecorder = transaction.recordedById === session.user.id;
+
+    if (!isRecorder && !isOwner) {
+      return NextResponse.json(
+        { message: "You are not authorized to edit this transaction" },
+        { status: 403 },
+      );
+    }
+
+    const updatedTransaction = await prisma.transaction.update({
+      where: { id },
+      data: {
+        amount: amount ? parseFloat(amount) : undefined,
+        description: description,
+        date: date ? new Date(date) : undefined,
+        category: category,
+      },
+    });
+
+    await logAction("TRANSACTION_UPDATE", session.user.id, {
+      transactionId: id,
+      changes: body,
+    });
+
+    return NextResponse.json(updatedTransaction);
+  } catch (error) {
+    console.error("Error updating transaction:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json(
+      { message: "Transaction ID is required" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return NextResponse.json(
+        { message: "Transaction not found" },
+        { status: 404 },
+      );
+    }
+
+    const isOwner =
+      session.user.role === Role.OWNER &&
+      session.user.businessId === transaction.businessId;
+    const isRecorder = transaction.recordedById === session.user.id;
+
+    if (!isRecorder && !isOwner) {
+      return NextResponse.json(
+        { message: "You are not authorized to delete this transaction" },
+        { status: 403 },
+      );
+    }
+
+    await prisma.transaction.delete({
+      where: { id },
+    });
+
+    await logAction("TRANSACTION_DELETE", session.user.id, {
+      transactionId: id,
+    });
+
+    return NextResponse.json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
       { status: 500 },
     );
   }

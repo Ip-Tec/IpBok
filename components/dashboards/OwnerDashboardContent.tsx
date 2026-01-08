@@ -230,7 +230,7 @@ const OwnerDashboardContent = (user: User) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-2xl font-semibold text-foreground animate-pulse">
           Loading...
         </div>
@@ -240,7 +240,7 @@ const OwnerDashboardContent = (user: User) => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-2xl font-semibold text-destructive">
           Error: {error}
         </div>

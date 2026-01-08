@@ -39,7 +39,7 @@ const PersonalDashboardContent = (user: User) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-2xl font-semibold text-foreground animate-pulse">
           Loading Personal Dashboard...
         </div>
@@ -49,7 +49,7 @@ const PersonalDashboardContent = (user: User) => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-2xl font-semibold text-destructive">
           Error: {error}
         </div>
@@ -183,7 +183,7 @@ const PersonalDashboardContent = (user: User) => {
             <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold">
               <tr>
                 <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">description</th>
+                <th className="px-4 py-3">Description</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3 text-right">Amount</th>
               </tr>
