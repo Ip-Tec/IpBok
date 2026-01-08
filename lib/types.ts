@@ -7,6 +7,7 @@ export interface User {
   businessId?: string;
   transactionsPerPage?: number;
   businessType?: string;
+  impersonatorId?: string;
 }
 
 export interface Transaction {

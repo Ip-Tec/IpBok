@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { encode } from "next-auth/jwt";
 import { cookies } from "next/headers";
+import { logAction } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -36,6 +37,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
+    // Security: Prevent impersonating SUPERADMIN
+    if (targetUser.role === "SUPERADMIN") {
+      return NextResponse.json(
+        { message: "Cannot impersonate a Super Admin" },
+        { status: 403 },
+      );
+    }
+
+    // Audit Log: Record who is impersonating whom
+    await logAction("ADMIN_IMPERSONATE", session.user.id, {
+      targetUserId: targetUser.id,
+      targetUserEmail: targetUser.email,
+    });
+
     // 3. Construct JWT Token
     // We mimic the structure created in lib/auth.ts `jwt` callback
     const tokenPayload = {
@@ -48,6 +63,7 @@ export async function POST(req: NextRequest) {
       transactionsPerPage: targetUser.transactionsPerPage,
       businessId: targetUser.memberships[0]?.businessId,
       businessType: targetUser.memberships[0]?.business?.type,
+      impersonatorId: session.user.id, // Tag session with original admin ID
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days
       jti: crypto.randomUUID(),

@@ -176,6 +176,9 @@ export const authOptions: NextAuthOptions = {
         if (token.businessType) {
           (session.user as any).businessType = token.businessType;
         }
+        if (token.impersonatorId) {
+          (session.user as any).impersonatorId = token.impersonatorId;
+        }
       }
       return session;
     },

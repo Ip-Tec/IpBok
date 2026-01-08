@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef } from "react";
+import { CreditCard } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -142,6 +143,96 @@ const BusinessInformationForm = () => {
   );
 };
 
+// Helper to fetch subscription status
+const getSubscriptionStatus = async () => {
+  const res = await fetch("/api/subscription/status");
+  if (!res.ok) throw new Error("Failed to fetch subscription status");
+  return res.json();
+};
+
+import { cn } from "@/lib/utils";
+
+const SubscriptionInfoCard = () => {
+  const { data: sub, isLoading } = useQuery({
+    queryKey: ["subscription-status"],
+    queryFn: getSubscriptionStatus,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="bg-card rounded-lg shadow md:w-[45%] w-full p-6 space-y-4 animate-pulse">
+        <div className="h-6 w-1/3 bg-muted rounded"></div>
+        <div className="h-4 w-2/3 bg-muted rounded"></div>
+      </div>
+    );
+  }
+
+  // Fallback if error or no data
+  const planName = sub?.planName || "Unknown";
+  const status = sub?.status || "UNKNOWN";
+  const isTrial = status === "TRIAL";
+  const isExpired = status === "EXPIRED";
+  const isActive = status === "ACTIVE";
+
+  return (
+    <div className="bg-card rounded-lg shadow md:w-[45%] w-full p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-primary" /> Subscription
+        </h2>
+        <span
+          className={cn(
+            "text-xs px-2 py-1 rounded-full font-bold border",
+            isActive
+              ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400"
+              : isExpired
+                ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400"
+                : "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400",
+          )}
+        >
+          {status}
+        </span>
+      </div>
+
+      <div className="space-y-1">
+        <p className="font-medium text-lg">{planName} Plan</p>
+        {isTrial && (
+          <p className="text-sm text-muted-foreground">
+            Trial ends in{" "}
+            <span className="font-bold text-foreground">
+              {sub.daysRemaining} days
+            </span>
+          </p>
+        )}
+        {isActive && (
+          <p className="text-sm text-green-600 dark:text-green-400">
+            Account represents a verified business.
+          </p>
+        )}
+        {isExpired && (
+          <p className="text-sm text-destructive font-medium">
+            Your plan has expired. Please renew now.
+          </p>
+        )}
+      </div>
+
+      <Button
+        asChild
+        className="w-full mt-4"
+        variant={isExpired ? "destructive" : "outline"}
+      >
+        <a href="/dashboard/settings/billing">
+          {isExpired
+            ? "Renew Now"
+            : isTrial
+              ? "Upgrade Plan"
+              : "Manage Subscription"}
+        </a>
+      </Button>
+    </div>
+  );
+};
+
 import UserProfileForm from "./UserProfileForm";
 import PasswordManagementForm from "./PasswordManagementForm";
 import TransactionSettingsForm from "./TransactionSettingsForm";
@@ -162,6 +253,9 @@ const OwnerSettingsView = () => {
         {session?.user.businessType !== "PERSONAL" && (
           <BusinessInformationForm />
         )}
+
+        {/* Subscription & Billing Section */}
+        <SubscriptionInfoCard />
 
         {/* User Profile Section */}
         <UserProfileForm />

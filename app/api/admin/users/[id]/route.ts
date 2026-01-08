@@ -21,7 +21,7 @@ export async function PATCH(
   }
 
   try {
-    const { name, role, emailVerified } = await req.json();
+    const { name, role, emailVerified, businessType } = await req.json();
 
     // Restriction: SUPPORT role cannot change user roles
     if (session.user.role === "SUPPORT" && role) {
@@ -45,9 +45,32 @@ export async function PATCH(
     if (emailVerified !== undefined)
       data.emailVerified = emailVerified ? new Date() : null;
 
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data,
+    // Transaction to update user and optionally business type
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedUser = await tx.user.update({
+        where: { id },
+        data,
+      });
+
+      if (businessType && session.user.role === "SUPERADMIN") {
+        // Find primary business for this user (where they are OWNER)
+        // Adjust logic if "primary" means something else in your schema
+        const membership = await tx.membership.findFirst({
+          where: { userId: id, role: "OWNER" },
+          select: { businessId: true },
+        });
+
+        if (membership) {
+          await tx.business.update({
+            where: { id: membership.businessId },
+            data: { type: businessType },
+          });
+
+          // Also update PricingPlan or subscription status if needed?
+          // For now, we assume changing the type is enough, and subscription logic relies on business.type
+        }
+      }
+      return updatedUser;
     });
 
     await logAction("USER_UPDATE", session.user.id, {
@@ -55,10 +78,11 @@ export async function PATCH(
       name,
       role,
       emailVerified: !!emailVerified,
+      businessType,
       updatedByRole: session.user.role,
     });
 
-    return NextResponse.json(updatedUser);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error updating user:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

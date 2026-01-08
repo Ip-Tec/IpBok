@@ -146,53 +146,59 @@ function PricingCard({
           <Label htmlFor={`${plan.businessType}-price`}>
             Monthly Price (₦)
           </Label>
-          <div className="relative">
-            <span className="absolute left-3 top-2.5 text-muted-foreground font-medium">
-              ₦
-            </span>
-            <Input
-              id={`${plan.businessType}-price`}
-              type="number"
-              className="pl-8"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="0.00"
-              disabled={isReadOnly}
-            />
-          </div>
+          {isReadOnly ? (
+            <div className="p-2 bg-muted rounded-md text-foreground font-medium">
+              ₦{parseFloat(price).toLocaleString()}
+            </div>
+          ) : (
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-muted-foreground font-medium">
+                ₦
+              </span>
+              <Input
+                id={`${plan.businessType}-price`}
+                type="number"
+                className="pl-8"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0.00"
+              />
+            </div>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor={`${plan.businessType}-days`}>
             Trial Period (Days)
           </Label>
-          <Input
-            id={`${plan.businessType}-days`}
-            type="number"
-            value={days}
-            onChange={(e) => setDays(e.target.value)}
-            placeholder="30"
-            disabled={isReadOnly}
-          />
-        </div>
-        <Button
-          className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-          onClick={() => onSave(plan.businessType, price, days)}
-          disabled={isSaving || isReadOnly}
-        >
-          {isSaving ? (
-            "Saving..."
-          ) : isReadOnly ? (
-            "Read Only Access"
+          {isReadOnly ? (
+            <div className="p-2 bg-muted rounded-md text-foreground font-medium">
+              {days} Days
+            </div>
           ) : (
-            <span className="flex items-center">
-              <Save className="w-4 h-4 mr-2" /> Save Configuration
-            </span>
+            <Input
+              id={`${plan.businessType}-days`}
+              type="number"
+              value={days}
+              onChange={(e) => setDays(e.target.value)}
+              placeholder="30"
+            />
           )}
-        </Button>
-        {isReadOnly && (
-          <p className="text-[10px] text-muted-foreground italic text-center">
-            Support agents cannot modify pricing.
-          </p>
+        </div>
+
+        {!isReadOnly && (
+          <Button
+            className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+            onClick={() => onSave(plan.businessType, price, days)}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              "Saving..."
+            ) : (
+              <span className="flex items-center">
+                <Save className="w-4 h-4 mr-2" /> Save Configuration
+              </span>
+            )}
+          </Button>
         )}
       </CardContent>
     </Card>

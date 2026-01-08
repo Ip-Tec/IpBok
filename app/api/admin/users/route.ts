@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
         memberships: {
           include: {
             business: {
-              select: { name: true },
+              select: { name: true, type: true },
             },
           },
         },
@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
         verified: !!u.emailVerified,
         transactionCount: u._count.transactions,
         businesses: u.memberships.map((m: any) => m.business.name),
+        primaryBusinessType: u.memberships[0]?.business?.type,
       })),
     );
   } catch (error) {

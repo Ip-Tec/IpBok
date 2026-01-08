@@ -78,6 +78,7 @@ export default function AdminUsersPage() {
           name: editingUser.name,
           role: editingUser.role,
           emailVerified: editingUser.verified,
+          businessType: editingUser.businessType,
         }),
       });
 
@@ -289,23 +290,29 @@ export default function AdminUsersPage() {
                             variant="ghost"
                             size="sm"
                             className="text-muted-foreground hover:text-foreground"
-                            onClick={() => setEditingUser({ ...u })}
+                            onClick={() =>
+                              setEditingUser({
+                                ...u,
+                                businessType: u.primaryBusinessType,
+                              })
+                            }
                             title="Edit User"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
 
-                          {session?.user?.id !== u.id && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-primary hover:text-primary hover:bg-primary/10"
-                              onClick={() => handleImpersonate(u.id)}
-                              title="Impersonate User"
-                            >
-                              <LogIn className="w-4 h-4" />
-                            </Button>
-                          )}
+                          {session?.user?.id !== u.id &&
+                            u.role !== "SUPERADMIN" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-primary hover:text-primary hover:bg-primary/10"
+                                onClick={() => handleImpersonate(u.id)}
+                                title="Impersonate User"
+                              >
+                                <LogIn className="w-4 h-4" />
+                              </Button>
+                            )}
 
                           {session?.user?.id !== u.id &&
                             session?.user?.role === "SUPERADMIN" && (
@@ -383,6 +390,33 @@ export default function AdminUsersPage() {
                   </p>
                 )}
               </div>
+              <div className="space-y-2">
+                <Label>Business Package</Label>
+                <Select
+                  value={editingUser.businessType || ""}
+                  onValueChange={(v) =>
+                    setEditingUser({ ...editingUser, businessType: v })
+                  }
+                  disabled={session?.user?.role === "SUPPORT"}
+                >
+                  <SelectTrigger
+                    className={cn(
+                      session?.user?.role === "SUPPORT" &&
+                        "bg-muted cursor-not-allowed",
+                    )}
+                  >
+                    <SelectValue placeholder="Select Plan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* Hardcoded types for now, or fetch from BusinessType enum if imported */}
+                    <SelectItem value="PERSONAL">Personal</SelectItem>
+                    <SelectItem value="POS">POS System</SelectItem>
+                    <SelectItem value="SME">SME Business</SelectItem>
+                    <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
