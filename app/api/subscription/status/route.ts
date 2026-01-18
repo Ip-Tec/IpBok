@@ -28,6 +28,33 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Business not found", { status: 404 });
     }
 
+    // If no direct plan link, try to find one matching the business type
+    let planId = business.planId;
+    let monthlyPrice = business.plan?.monthlyPrice || 0;
+
+    // Default the type for plan lookup if it's missing (e.g. legacy or new registration)
+    const activeType = business.type || "PERSONAL";
+
+    if (!planId) {
+      const defaultPlan = await prisma.pricingPlan.findUnique({
+        where: { businessType: activeType as any },
+      });
+      if (defaultPlan) {
+        planId = defaultPlan.id;
+        monthlyPrice = defaultPlan.monthlyPrice;
+
+        // Proactively update the business record if it's missing either type or planId
+        // This ensures the next check is faster and data is consistent
+        await prisma.business.update({
+          where: { id: business.id },
+          data: {
+            type: activeType as any,
+            planId: planId,
+          },
+        });
+      }
+    }
+
     const now = new Date();
     let status = business.subscriptionStatus;
     let daysRemaining = 0;
@@ -55,7 +82,8 @@ export async function GET(req: NextRequest) {
       status,
       daysRemaining,
       planName: business.type,
-      monthlyPrice: business.plan?.monthlyPrice || 0,
+      planId: planId,
+      monthlyPrice: monthlyPrice,
       trialEndsAt: business.trialEndsAt,
       subscriptionEndsAt: business.subscriptionEndsAt,
     });

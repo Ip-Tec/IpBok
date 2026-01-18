@@ -100,7 +100,12 @@ export async function POST(request: NextRequest) {
               memberships: {
                 create: {
                   role: "OWNER",
-                  business: { create: { name: `${name}'s Business` } },
+                  business: {
+                    create: {
+                      name: `${name}'s Business`,
+                      type: "PERSONAL",
+                    },
+                  },
                 },
               },
             },

@@ -112,8 +112,79 @@ const TransactionList = ({ type, title }: TransactionListProps) => {
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
+      {/* Mobile Card View (Visible on Small Screens) */}
+      <div className="md:hidden space-y-4">
+        {isLoading ? (
+          <div className="text-center py-8 animate-pulse text-muted-foreground">
+            Loading list...
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground italic">
+            No transactions found.
+          </div>
+        ) : (
+          transactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col gap-3"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      "p-2 rounded-full",
+                      ["Deposit", "Income"].includes(tx.type.name)
+                        ? "bg-green-500/10 text-green-600"
+                        : "bg-red-500/10 text-red-600",
+                    )}
+                  >
+                    {["Deposit", "Income"].includes(tx.type.name) ? (
+                      <ArrowDownLeft className="w-4 h-4" />
+                    ) : (
+                      <ArrowUpRight className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-sm">
+                      {tx.description || "Transaction"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(tx.date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p
+                    className={cn(
+                      "font-bold text-base",
+                      ["Deposit", "Income"].includes(tx.type.name)
+                        ? "text-green-600"
+                        : "text-foreground",
+                    )}
+                  >
+                    {["Deposit", "Income"].includes(tx.type.name) ? "+" : "-"}₦
+                    {tx.amount.toLocaleString()}
+                  </p>
+                  <span className="inline-block px-2 py-0.5 bg-muted rounded border text-[10px] font-mono mt-1">
+                    {tx.category || "General"}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border text-xs text-muted-foreground">
+                <span>Method: {tx.paymentMethod}</span>
+                {/* Actions can be added here if needed, or kept simple */}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Table Section (Hidden on Small Screens) */}
+      <div className="hidden md:block bg-card rounded-xl border border-border overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="bg-muted text-muted-foreground uppercase text-[10px] font-bold tracking-wider">

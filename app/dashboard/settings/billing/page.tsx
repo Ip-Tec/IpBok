@@ -9,10 +9,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function BillingPage() {
   const [subscription, setSubscription] = useState<any>(null);
+  const [allPlans, setAllPlans] = useState<any[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -22,7 +26,17 @@ export default function BillingPage() {
     setLoading(true);
     fetch("/api/subscription/status")
       .then((res) => res.json())
-      .then(setSubscription)
+      .then((data) => {
+        setSubscription(data);
+        setSelectedPlanId(data.planId);
+      });
+
+    fetch("/api/admin/pricing") // We should probably make a public pricing API, but this works if user is auth'd
+      .then((res) => res.json())
+      .then((data) => {
+        // Only show paid plans as options if they are on personal, or show all
+        setAllPlans(Array.isArray(data) ? data : []);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -31,13 +45,19 @@ export default function BillingPage() {
   }, []);
 
   const handleUpgrade = async () => {
+    const targetPlanId = selectedPlanId || subscription?.planId;
     try {
       setUpgrading(true);
+      if (!targetPlanId) {
+        toast.error("Please select a plan to continue.");
+        setUpgrading(false);
+        return;
+      }
       const res = await fetch("/api/payment/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          planId: subscription.planId,
+          planId: targetPlanId,
           months: months,
         }),
       });
@@ -45,13 +65,13 @@ export default function BillingPage() {
       if (data.authorization_url) {
         window.location.href = data.authorization_url;
       } else {
-        alert(
+        toast.error(
           "Failed to initialize payment: " + (data.error || "Unknown error"),
         );
       }
     } catch (error) {
       console.error("Upgrade error:", error);
-      alert("An error occurred while initiating upgrade.");
+      toast.error("An error occurred while initiating upgrade.");
     } finally {
       setUpgrading(false);
     }
@@ -67,13 +87,13 @@ export default function BillingPage() {
       setVerifying(true);
       const res = await fetch(`/api/payment/callback?reference=${reference}`);
       if (res.ok) {
-        alert("Payment verified successfully!");
+        toast.success("Payment verified successfully!");
         fetchStatus();
       } else {
-        alert("Verification failed. Please check the reference.");
+        toast.error("Verification failed. Please check the reference.");
       }
     } catch (error) {
-      alert("Error during verification.");
+      toast.error("Error during verification.");
     } finally {
       setVerifying(false);
     }
@@ -86,6 +106,10 @@ export default function BillingPage() {
       </div>
     );
 
+  if (!subscription) return null;
+
+  const selectedPlan =
+    allPlans.find((p) => p.id === selectedPlanId) || subscription;
   const isTrial = subscription.status === "TRIAL";
   const isExpired = subscription.status === "EXPIRED";
   const isActive = subscription.status === "ACTIVE";
@@ -200,14 +224,62 @@ export default function BillingPage() {
               </div>
             )}
 
-            <div className="mt-10 flex flex-col gap-4">
-              {/* Interval Selection */}
-              {!isActive && (
+            <div className="mt-10 flex flex-col gap-6">
+              {/* Plan Selection (Dynamic) */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  Select Subscription Plan
+                </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {allPlans
+                    .filter((p) => p.businessType !== "PERSONAL")
+                    .map((plan) => (
+                      <button
+                        key={plan.id}
+                        onClick={() => setSelectedPlanId(plan.id)}
+                        className={cn(
+                          "p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden group",
+                          selectedPlanId === plan.id
+                            ? "border-primary bg-primary/5 ring-1 ring-primary"
+                            : "border-border bg-card hover:border-primary/50",
+                        )}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-bold text-lg">
+                              {plan.businessType}
+                            </p>
+                            <p className="text-xl font-black text-primary">
+                              ₦{plan.monthlyPrice.toLocaleString()}
+                              <span className="text-xs font-normal text-muted-foreground">
+                                /mo
+                              </span>
+                            </p>
+                          </div>
+                          {selectedPlanId === plan.id && (
+                            <div className="bg-primary text-primary-foreground p-1 rounded-full">
+                              <CheckCircle2 className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-tighter">
+                          {plan.trialDays} Day Trial included
+                        </p>
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Interval Selection (Always visible now for top-ups) */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  Payment Interval
+                </Label>
                 <div className="bg-muted/50 p-1 rounded-lg flex">
                   {[
-                    { label: "Monthly", value: 1 },
+                    { label: "1 Month", value: 1 },
                     { label: "6 Months", value: 6 },
-                    { label: "Yearly", value: 12 },
+                    { label: "1 Year", value: 12 },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -223,22 +295,28 @@ export default function BillingPage() {
                     </button>
                   ))}
                 </div>
-              )}
+              </div>
 
-              {!isActive && (
+              <div className="pt-2">
                 <Button
                   size="lg"
                   onClick={handleUpgrade}
-                  disabled={upgrading}
-                  className="w-full py-6 text-lg font-bold shadow-xl shadow-primary/20"
+                  disabled={
+                    upgrading ||
+                    !selectedPlanId ||
+                    selectedPlan?.monthlyPrice === 0
+                  }
+                  className="w-full py-8 text-xl font-black shadow-2xl shadow-primary/30 transition-transform active:scale-95 bg-primary hover:bg-primary/90"
                 >
+                  <CreditCard className="w-6 h-6 mr-3" />
                   {upgrading
-                    ? "Initializing..."
-                    : isTrial
-                      ? `Pay ₦${(subscription.monthlyPrice * months).toLocaleString()} for ${months} Month${months > 1 ? "s" : ""}`
-                      : `Renew for ₦${(subscription.monthlyPrice * months).toLocaleString()}`}
+                    ? "Processing..."
+                    : `PROCEED TO PAY ₦${((selectedPlan?.monthlyPrice || 0) * months).toLocaleString()}`}
                 </Button>
-              )}
+                <p className="text-center text-[10px] text-muted-foreground mt-3 uppercase tracking-widest font-bold opacity-60">
+                  Secure Payment Powered by Paystack
+                </p>
+              </div>
 
               <Button
                 variant="outline"

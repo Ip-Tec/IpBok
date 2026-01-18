@@ -1,10 +1,6 @@
-import { PrismaClient } from "../src/generated";
+import { PrismaClient } from "@prisma/client";
 
-// import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === "development" ? ["query", "error"] : [],
-});
+const prisma = new PrismaClient();
 
 async function main() {
   const transactionTypes = [
@@ -17,42 +13,36 @@ async function main() {
     "Expense",
   ];
 
+  console.log("Seeding transaction types...");
   for (const typeName of transactionTypes) {
-    const transactionType = await prisma.transactionType.findUnique({
+    await prisma.transactionType.upsert({
       where: { name: typeName },
+      update: {},
+      create: { name: typeName },
     });
-
-    if (!transactionType) {
-      await prisma.transactionType.create({
-        data: {
-          name: typeName,
-        },
-      });
-      console.log(`"${typeName}" transaction type created.`);
-    } else {
-      console.log(`"${typeName}" transaction type already exists.`);
-    }
+    console.log(`- ${typeName}`);
   }
 
   const pricingPlans = [
-    { type: "POS" as any, price: 5000, trial: 60 },
-    { type: "SME" as any, price: 5000, trial: 60 },
-    { type: "CORPORATE" as any, price: 10000, trial: 30 },
-    { type: "RETAIL" as any, price: 7500, trial: 30 },
-    { type: "PERSONAL" as any, price: 0, trial: 999 },
+    { type: "POS", price: 5000, trial: 60 },
+    { type: "SME", price: 5000, trial: 60 },
+    { type: "CORPORATE", price: 10000, trial: 30 },
+    { type: "RETAIL", price: 7500, trial: 30 },
+    { type: "PERSONAL", price: 0, trial: 999 },
   ];
 
+  console.log("Seeding pricing plans...");
   for (const plan of pricingPlans) {
     await prisma.pricingPlan.upsert({
-      where: { businessType: plan.type },
+      where: { businessType: plan.type as any },
       update: { monthlyPrice: plan.price, trialDays: plan.trial },
       create: {
-        businessType: plan.type,
+        businessType: plan.type as any,
         monthlyPrice: plan.price,
         trialDays: plan.trial,
       },
     });
-    console.log(`"${plan.type}" pricing plan ensured.`);
+    console.log(`- ${plan.type}`);
   }
 }
 
