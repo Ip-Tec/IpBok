@@ -239,6 +239,31 @@ model AuditLog {
   @@index([createdAt])
 }
 
+model GatewayTransaction {
+  id               String                   @id @default(cuid())
+  reference        String                   @unique
+  amount           Int
+  currency         String?                  @default("NGN")
+  product          String
+  source           String
+  purpose          String
+  status           GatewayTransactionStatus @default(PENDING)
+  authorizationUrl String?
+  paystackResponse Json?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  paidAt           DateTime?
+
+  @@index([reference])
+  @@index([status])
+}
+
+enum GatewayTransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
 enum Role {
   OWNER
   AGENT
