@@ -101,48 +101,55 @@ export async function POST(req: NextRequest) {
       return serverError('Failed to create local transaction record');
     }
 
+    /* 
+       SKIP SERVER-SIDE INIT to avoid "Invalid Merchant" errors if server keys are unresponsive/invalid.
+       We delegate initialization to the Client UI Page (react-paystack) using the Reference we generated.
+    */
+    /*
     const { ok, status, data } = await callPaystackInitialize(initializeBody);
     
     if (!ok || !data) {
       console.error('Paystack initialize error', { status, data });
-      // Mark as FAILED locally if Paystack rejected it
-      try {
-        await prisma.gatewayTransaction.update({
-            where: { reference },
-            data: { status: 'FAILED', paystackResponse: data ?? {} }
-        });
-      } catch (e) {}
-      
+      // ... handling ...
       return NextResponse.json({ error: 'Payment initialization failed upstream' }, { status: 502 });
     }
+    */
+    
+    // We mock the "data" that would have come back, just to structure our context storage similarly
+    const mockData = {
+        reference,
+        status: 'pending_client_init'
+    };
 
-    // Only return what IP-Cosy needs
-    const authorization_url = data?.data?.authorization_url;
-    const returnedReference = data?.data?.reference ?? reference;
+    // Persist response info AND context (email/callback) for the UI page to use
+    const contextData = {
+        ...mockData, 
+        original_email: email,
+        callback_url: payload.callback_url
+    };
 
-    if (!authorization_url) {
-      console.error('Paystack returned malformed initialize response', { data });
-       try {
-        await prisma.gatewayTransaction.update({
-            where: { reference },
-            data: { status: 'FAILED', paystackResponse: data ?? {} }
-        });
-      } catch (e) {}
-      return NextResponse.json({ error: 'Payment initialization returned invalid response' }, { status: 502 });
-    }
-
-    // Persist response info
     try {
       await prisma.gatewayTransaction.update({
-        where: { reference: reference }, // Use the reference we created/stored
-        data: { authorizationUrl: authorization_url, paystackResponse: data },
+        where: { reference: reference }, 
+        data: { 
+            // authorizationUrl: authorization_url, // We don't have this yet
+            paystackResponse: contextData 
+        },
       });
     } catch (dbErr) {
       console.error('Prisma update gatewayTransaction after init failed', dbErr);
     }
 
-    // Return the reference expected by us alongside the auth URL
-    return NextResponse.json({ authorization_url, reference: returnedReference }, { status: 200 });
+    // Construct Local Checkout URL
+    // We guess the base URL or use NEXTAUTH_URL if available
+    const baseUrl = process.env.NEXTAUTH_URL || `https://${req.headers.get('host')}`;
+    const checkout_url = `${baseUrl}/gateway/pay/${reference}`;
+
+    // Return the checkout_url as the authorization_url to redirect the user to OUR page
+    return NextResponse.json({ 
+        authorization_url: checkout_url, // IpCosy client redirects here
+        reference: reference 
+    }, { status: 200 });
   } catch (err) {
     console.error('Gateway POST error', err);
     return serverError();
