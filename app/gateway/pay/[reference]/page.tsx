@@ -89,7 +89,7 @@ export default async function GatewayPayPage(props: PageProps) {
             email={email} 
             reference={tx.reference}
             callbackUrl={callbackUrl}
-            publicKey={process.env.PAYSTACK_PUBLIC_KEY || ''}
+            publicKey={process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || process.env.PAYSTACK_PUBLIC_KEY || ''}
         />
         
         <p className="text-xs text-center text-gray-400 mt-4">

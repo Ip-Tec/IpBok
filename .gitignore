@@ -43,4 +43,5 @@ env_raw.txt
 *.tsbuildinfo
 next-env.d.ts
 
+/scripts
 /lib/generated/prisma
