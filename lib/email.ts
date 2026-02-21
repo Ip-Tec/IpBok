@@ -155,3 +155,105 @@ export async function sendCustomEmail(
     throw new Error("Could not send custom email");
   }
 }
+
+/**
+ * Send an invitation email to a new staff member.
+ */
+export async function sendStaffInvitationEmail(
+  to: string,
+  token: string,
+  businessName: string,
+  role: string,
+  baseUrl?: string,
+) {
+  const host = baseUrl || process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const inviteUrl = `${host}/signup?token=${token}`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',
+    to,
+    subject: `Invitation to join ${businessName} on IpBok`,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #000000; padding: 20px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 24px;">IpBok</h1>
+        </div>
+        <div style="padding: 40px 30px; background-color: #ffffff;">
+          <h2 style="color: #333333; margin-top: 0;">Staff Invitation</h2>
+          <p style="color: #666666; line-height: 1.6;">
+            You have been invited to join <strong>${businessName}</strong> as a <strong>${role}</strong> on IpBok.
+          </p>
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${inviteUrl}" style="background-color: #0070f3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+              Accept Invitation & Sign Up
+            </a>
+          </div>
+          <p style="color: #666666; line-height: 1.6;">
+            For security reasons, this invitation link will expire in <strong>50 minutes</strong>. If you did not expect this invitation, you can safely ignore this email.
+          </p>
+          <hr style="border: none; border-top: 1px solid #eeeeee; margin: 30px 0;" />
+          <p style="color: #999999; font-size: 12px;">
+            If the button above doesn't work, copy and paste this URL into your browser:
+          </p>
+          <p style="color: #999999; font-size: 12px; word-break: break-all;">
+            <a href="${inviteUrl}" style="color: #0070f3;">${inviteUrl}</a>
+          </p>
+        </div>
+        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #999999; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} IpBok. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
+/**
+ * Send a notification email to an existing user about their new role in a business.
+ */
+export async function sendStaffUpgradeEmail(
+  to: string,
+  businessName: string,
+  role: string,
+  baseUrl?: string,
+) {
+  const host = baseUrl || process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const dashboardUrl = `${host}/login`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || '"IpBok Support" <support@ipbok.com>',
+    to,
+    subject: `New Role Assigned at ${businessName}`,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #000000; padding: 20px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 24px;">IpBok</h1>
+        </div>
+        <div style="padding: 40px 30px; background-color: #ffffff;">
+          <h2 style="color: #333333; margin-top: 0;">Business Team Update</h2>
+          <p style="color: #666666; line-height: 1.6;">
+            Great news! You have been added to the team at <strong>${businessName}</strong> as a <strong>${role}</strong>.
+          </p>
+          <p style="color: #666666; line-height: 1.6;">
+            You can now access the business dashboard by logging into your account.
+          </p>
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${dashboardUrl}" style="background-color: #0070f3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+              Go to Dashboard
+            </a>
+          </div>
+          <hr style="border: none; border-top: 1px solid #eeeeee; margin: 30px 0;" />
+          <p style="color: #999999; font-size: 12px; text-align: center;">
+            Thank you for being part of the IpBok network.
+          </p>
+        </div>
+        <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #999999; font-size: 12px;">
+          &copy; ${new Date().getFullYear()} IpBok. All rights reserved.
+        </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}

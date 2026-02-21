@@ -75,9 +75,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
@@ -182,6 +179,9 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+  },
+  session: {
+    strategy: "jwt",
   },
   pages: {
     signIn: "/login",

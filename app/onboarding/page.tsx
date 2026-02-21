@@ -21,17 +21,18 @@ export default function OnboardingPage() {
   const businessTypes = [
     {
       id: "SME",
-      title: "SME / POS Business",
+      title: "POS Business",
       description:
         "For small businesses, POS agents, money transfer, and daily floating cash management.",
       icon: ShoppingBag,
     },
-    /*   {
+    {
       id: "RETAIL",
       title: "Retail Business",
       description: "For shops managing inventory, sales, and simple expenses.",
       icon: Building,
     },
+    /*
     {
       id: "CORPORATE",
       title: "Corporate / Firm",

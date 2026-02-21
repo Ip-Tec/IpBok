@@ -56,6 +56,7 @@ model User {
   sessions             Session[]
   receivedTransactions Transaction[]      @relation("ReceivedTransactions")
   transactions         Transaction[]      @relation("RecordedTransactions")
+  retailSales          RetailSale[]
 }
 
 model VerificationToken {
@@ -81,21 +82,24 @@ model Notification {
 model Business {
   id                 String             @id @default(cuid())
   name               String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
   address            String?
   phone              String?
   type               BusinessType?
+  planId             String?
+  subscriptionEndsAt DateTime?
   subscriptionStatus SubscriptionStatus @default(TRIAL)
   trialEndsAt        DateTime?
-  subscriptionEndsAt DateTime?
-  planId             String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
   plan               PricingPlan?       @relation(fields: [planId], references: [id])
   cashAdvances       CashAdvance[]
   dailySummaries     DailySummary[]
   accounts           FinancialAccount[]
   memberships        Membership[]
   requests           Request[]
+  retailCategories   RetailCategory[]
+  retailProducts     RetailProduct[]
+  retailSales        RetailSale[]
   transactions       Transaction[]
 
   @@index([planId], map: "Business_planId_fkey")
@@ -150,14 +154,14 @@ model Transaction {
   typeId        String
   paymentMethod PaymentMethod
   recordedById  String
-  recipientId   String?
-  status        TransactionStatus @default(PENDING)
   businessId    String
   accountId     String?
   date          DateTime          @default(now())
   description   String?
-  category      String?
   createdAt     DateTime          @default(now())
+  recipientId   String?
+  status        TransactionStatus @default(PENDING)
+  category      String?
   account       FinancialAccount? @relation(fields: [accountId], references: [id])
   business      Business          @relation(fields: [businessId], references: [id])
   recipient     User?             @relation("ReceivedTransactions", fields: [recipientId], references: [id])
@@ -258,6 +262,59 @@ model GatewayTransaction {
   @@index([status])
 }
 
+model RetailProduct {
+  id            String          @id @default(cuid())
+  name          String
+  description   String?         @db.Text
+  sku           String?         @unique
+  costPrice     Float           @default(0)
+  sellingPrice  Float?
+  minPrice      Float?
+  maxPrice      Float?
+  stockQuantity Int             @default(0)
+  businessId    String
+  categoryId    String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  business      Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category      RetailCategory? @relation(fields: [categoryId], references: [id])
+  sales         RetailSale[]
+
+  @@index([businessId])
+  @@index([categoryId])
+}
+
+model RetailCategory {
+  id         String          @id @default(cuid())
+  name       String
+  businessId String
+  business   Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  products   RetailProduct[]
+
+  @@unique([businessId, name])
+  @@index([businessId])
+}
+
+model RetailSale {
+  id          String        @id @default(cuid())
+  productId   String
+  quantity    Int
+  price       Float
+  totalAmount Float
+  profit      Float
+  businessId  String
+  date        DateTime      @default(now())
+  business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  product     RetailProduct @relation(fields: [productId], references: [id])
+  recordedById String
+  recordedBy   User          @relation(fields: [recordedById], references: [id])
+
+  @@index([businessId])
+  @@index([productId])
+  @@index([date])
+  @@index([recordedById])
+}
+
 enum GatewayTransactionStatus {
   PENDING
   SUCCESS
@@ -273,6 +330,7 @@ enum Role {
   FINANCE_OFFICER
   SUPERADMIN
   SUPPORT
+  CASHIER
 }
 
 enum BusinessType {

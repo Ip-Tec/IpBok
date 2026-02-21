@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,36 @@ const Signup = () => {
   const [regError, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [invitationLoading, setInvitationLoading] = useState(!!searchParams.get("token"));
+  const [tokenError, setTokenError] = useState("");
   const router = useRouter();
+
+  const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (token) {
+      verifyToken(token);
+    }
+  }, [token]);
+
+  const verifyToken = async (token: string) => {
+    try {
+      const res = await fetch(`/api/auth/verify-token?token=${token}`);
+      if (!res.ok) {
+        setTokenError("Invalid or expired invitation link");
+        return;
+      }
+      const data = await res.json();
+      if (data.type === "INVITE") {
+        setEmail(data.email);
+        // We can't easily lock the form without more state, but let's at least pre-fill.
+      }
+    } catch (err) {
+      setTokenError("Failed to verify invitation");
+    } finally {
+      setInvitationLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +74,7 @@ const Signup = () => {
           password,
           role: invitedRole || "OWNER",
           businessId: businessId || undefined,
+          token: token || undefined,
         }),
       });
 
@@ -74,14 +104,21 @@ const Signup = () => {
       <div className="w-full max-w-xl space-y-8 p-8 bg-card rounded-lg">
         <div className="text-center">
           <h2 className="text-3xl font-bold">
-            {businessId ? `Join as an Agent` : `Create your IpBok account`}
+            {token ? `Accept Invitation` : businessId ? `Join as an Agent` : `Create your IpBok account`}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            {businessId
+            {token 
+              ? `Complete your profile to join the business team`
+              : businessId
               ? `You've been invited to join a business on IpBok`
               : `Sign up to start managing your finances`}
           </p>
-          {businessId && (
+          {tokenError && (
+             <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg text-red-700 text-sm">
+               {tokenError}
+             </div>
+          )}
+          {(businessId || token) && !tokenError && (
             <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center gap-2 text-blue-700 text-sm">
               <UserPlus className="w-4 h-4" />
               <span>Registering for an existing business</span>
@@ -109,34 +146,36 @@ const Signup = () => {
               <label htmlFor="email" className="block text-sm font-medium">
                 Email address
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="peterinnocent@mail.etc"
-                className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="md:flex justify-between">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium">
-                Password
-              </label>
-              <div className="relative">
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
+                  id="email"
+                  name="email"
+                  type="email"
                   required
-                  placeholder="********"
-                  className="mt-1 block w-full px-3 py-2 pr-10 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={!!token}
+                  placeholder="peterinnocent@mail.etc"
+                  className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary disabled:bg-muted"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
+              </div>
+            </div>
+            <div className="md:flex justify-between">
+              <div>
+                <label htmlFor="password" title={tokenError} className="block text-sm font-medium">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    disabled={!!tokenError}
+                    placeholder="********"
+                    className="mt-1 block w-full px-3 py-2 pr-10 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary disabled:opacity-50"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 <button
                   type="button"
                   className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
@@ -187,9 +226,9 @@ const Signup = () => {
             <Button
               type="submit"
               className="w-full cursor-pointer"
-              disabled={loading}
+              disabled={loading || !!tokenError || invitationLoading}
             >
-              {loading ? "Signing Up..." : "Sign Up"}
+              {invitationLoading ? "Verifying Invitation..." : loading ? "Signing Up..." : token ? "Accept Invitation" : "Sign Up"}
             </Button>
           </div>
         </form>

@@ -52,12 +52,7 @@ const Navbar = () => {
         <Logo />
 
         <div className="hidden items-center gap-8 md:flex">
-          <a
-            href="#features"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Features
-          </a>
+{/* Features link removed */}
           <Link
             href="/pricing"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

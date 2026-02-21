@@ -4,6 +4,7 @@ import { User } from "@/lib/types";
 import OwnerDashboardContent from "@/components/dashboards/OwnerDashboardContent";
 import AgentDashboardContent from "@/components/dashboards/AgentDashboardContent";
 import PersonalDashboardContent from "@/components/dashboards/PersonalDashboardContent";
+import RetailDashboardContent from "@/components/dashboards/RetailDashboardContent";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -25,6 +26,8 @@ export default function DashboardPage() {
   return user.role.toLowerCase() === "owner" ? (
     user.businessType === "PERSONAL" ? (
       <PersonalDashboardContent {...user} />
+    ) : user.businessType === "RETAIL" ? (
+      <RetailDashboardContent {...user} />
     ) : (
       <OwnerDashboardContent {...user} />
     )

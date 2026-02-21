@@ -2,13 +2,34 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@/src/generated";
 import { v4 as uuidv4 } from "uuid";
 import { sendVerificationEmail } from "@/lib/email";
 import { logAction } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, role, businessId } = await request.json();
+    const { name, email: reqEmail, password, role: reqRole, businessId: reqBusinessId, token: inviteToken } = await request.json();
+    let email = reqEmail;
+    let role = reqRole;
+    let businessId = reqBusinessId;
+
+    if (inviteToken) {
+      const vToken = await prisma.verificationToken.findUnique({
+        where: { token: inviteToken }
+      });
+
+      if (!vToken || vToken.expires < new Date()) {
+        return NextResponse.json({ error: "Invalid or expired invitation token" }, { status: 400 });
+      }
+
+      if (vToken.identifier.startsWith("INVITE:")) {
+        const [, inviteEmail, inviteRole, inviteBusinessId] = vToken.identifier.split(":");
+        email = inviteEmail;
+        role = inviteRole;
+        businessId = inviteBusinessId;
+      }
+    }
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -125,13 +146,13 @@ export async function POST(request: NextRequest) {
         if (businessId) {
           user = await prisma.$transaction(async (tx: any) => {
             const newUser = await tx.user.create({
-              data: { name, email, password: hashedPassword, role: "AGENT" },
+              data: { name, email, password: hashedPassword, role: role as Role },
             });
             await tx.membership.create({
               data: {
                 userId: newUser.id,
                 businessId: businessId,
-                role: "AGENT",
+                role: role as Role,
               },
             });
             return newUser;
@@ -156,10 +177,15 @@ export async function POST(request: NextRequest) {
       name: user.name,
     });
 
+    if (inviteToken) {
+      await prisma.verificationToken.delete({ where: { token: inviteToken } }).catch(e => console.error("Failed to delete token", e));
+    }
+
     return NextResponse.json(
       {
-        message:
-          "Registration successful. Please check your email to verify your account.",
+        message: inviteToken 
+          ? "Account created and invitation accepted successfully!"
+          : "Registration successful. Please check your email to verify your account.",
         userId: user.id,
       },
       { status: 201 },

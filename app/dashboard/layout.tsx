@@ -13,6 +13,9 @@ import {
   Settings,
   Menu,
   ShieldAlert,
+  Package,
+  ShoppingCart,
+  TrendingUp,
 } from "lucide-react";
 import { NotificationBell } from "@/components/NotificationBell";
 import TrialProtectionBanner from "@/components/SubscriptionBanner";
@@ -80,6 +83,45 @@ const personalSidebarNavLinks = [
     name: "Settings",
     href: "/dashboard/settings",
     icon: <Settings className="w-7 h-7" />,
+  },
+];
+
+const retailSidebarNavLinks = [
+  {
+    name: "Retail Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard className="w-7 h-7" />,
+    roles: ["OWNER", "MANAGER", "CASHIER"],
+  },
+  {
+    name: "Staff",
+    href: "/dashboard/retail/staff",
+    icon: <Users className="w-7 h-7" />,
+    roles: ["OWNER"],
+  },
+  {
+    name: "Inventory",
+    href: "/dashboard/retail/products",
+    icon: <Package className="w-7 h-7" />,
+    roles: ["OWNER", "MANAGER", "CASHIER"],
+  },
+  {
+    name: "Sales",
+    href: "/dashboard/retail/sales",
+    icon: <ShoppingCart className="w-7 h-7" />,
+    roles: ["OWNER", "MANAGER", "CASHIER"],
+  },
+  {
+    name: "Reports",
+    href: "/dashboard/retail/reports",
+    icon: <TrendingUp className="w-7 h-7" />,
+    roles: ["OWNER", "MANAGER"],
+  },
+  {
+    name: "Settings",
+    href: "/dashboard/settings",
+    icon: <Settings className="w-7 h-7" />,
+    roles: ["OWNER"],
   },
 ];
 
@@ -199,11 +241,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   let navLinks = isAdmin
     ? adminSidebarNavLinks
-    : isOwner
-      ? businessType === "PERSONAL"
-        ? personalSidebarNavLinks
-        : ownerSidebarNavLinks
-      : agentSidebarNavLinks;
+    : businessType === "RETAIL"
+      ? retailSidebarNavLinks.filter(l => l.roles.includes(user.role.toUpperCase()))
+      : isOwner
+        ? businessType === "PERSONAL"
+          ? personalSidebarNavLinks
+          : ownerSidebarNavLinks
+        : agentSidebarNavLinks;
 
   if (isOwner && !businessType) {
     return null;

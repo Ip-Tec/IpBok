@@ -45,3 +45,6 @@ next-env.d.ts
 
 /scripts
 /lib/generated/prisma
+
+PAYSTACK_SETUP.md
+verify_*
