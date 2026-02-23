@@ -67,44 +67,48 @@ export async function POST(request: NextRequest) {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const token = uuidv4();
-    const expires = new Date(new Date().getTime() + 24 * 60 * 60 * 1000); // 24 hours
+    const emailVerifiedDate = inviteToken ? new Date() : null;
 
-    // Create verification token
-    try {
-      await prisma.verificationToken.create({
-        data: {
-          identifier: email,
-          token,
-          expires,
-        },
-      });
-    } catch (dbError) {
-      console.error("Database error creating token:", dbError);
-      return NextResponse.json(
-        {
-          error:
-            "Failed to initialize verification. Database connection may be down.",
-        },
-        { status: 500 },
-      );
-    }
+    if (!inviteToken) {
+      const token = uuidv4();
+      const expires = new Date(new Date().getTime() + 24 * 60 * 60 * 1000); // 24 hours
 
-    // Send email
-    try {
-      const protocol = request.nextUrl.protocol;
-      const host = request.headers.get("host");
-      const baseUrl = `${protocol}//${host}`;
-      await sendVerificationEmail(email, token, baseUrl);
-    } catch (emailError) {
-      console.error("Failed to send email:", emailError);
-      return NextResponse.json(
-        {
-          error:
-            "Failed to send verification email. Please check your email configuration.",
-        },
-        { status: 500 },
-      );
+      // Create verification token
+      try {
+        await prisma.verificationToken.create({
+          data: {
+            identifier: email,
+            token,
+            expires,
+          },
+        });
+      } catch (dbError) {
+        console.error("Database error creating token:", dbError);
+        return NextResponse.json(
+          {
+            error:
+              "Failed to initialize verification. Database connection may be down.",
+          },
+          { status: 500 },
+        );
+      }
+
+      // Send email
+      try {
+        const protocol = request.nextUrl.protocol;
+        const host = request.headers.get("host");
+        const baseUrl = `${protocol}//${host}`;
+        await sendVerificationEmail(email, token, baseUrl);
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+        return NextResponse.json(
+          {
+            error:
+              "Failed to send verification email. Please check your email configuration.",
+          },
+          { status: 500 },
+        );
+      }
     }
 
     let user;
@@ -116,6 +120,7 @@ export async function POST(request: NextRequest) {
             data: {
               name,
               email,
+              emailVerified: emailVerifiedDate,
               password: hashedPassword,
               role: "OWNER",
               memberships: {
@@ -146,7 +151,7 @@ export async function POST(request: NextRequest) {
         if (businessId) {
           user = await prisma.$transaction(async (tx: any) => {
             const newUser = await tx.user.create({
-              data: { name, email, password: hashedPassword, role: role as Role },
+              data: { name, email, emailVerified: emailVerifiedDate, password: hashedPassword, role: role as Role },
             });
             await tx.membership.create({
               data: {
@@ -159,7 +164,7 @@ export async function POST(request: NextRequest) {
           });
         } else {
           user = await prisma.user.create({
-            data: { name, email, password: hashedPassword, role: "AGENT" },
+            data: { name, email, emailVerified: emailVerifiedDate, password: hashedPassword, role: "AGENT" },
           });
         }
       } catch (userError) {

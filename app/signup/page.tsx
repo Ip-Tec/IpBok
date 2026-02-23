@@ -70,11 +70,13 @@ const Signup = () => {
         },
         body: JSON.stringify({
           name,
-          email,
           password,
-          role: invitedRole || "OWNER",
-          businessId: businessId || undefined,
           token: token || undefined,
+          ...(token ? {} : {
+            email,
+            role: invitedRole || "OWNER",
+            businessId: businessId || undefined,
+          }),
         }),
       });
 
@@ -83,7 +85,11 @@ const Signup = () => {
         // Show success message and redirect to login
         setError(""); // Clear any errors
         // You might want to use a toast or a dedicated success page
-        router.push("/login?message=check-email");
+        if (token) {
+          router.push("/login?message=registered");
+        } else {
+          router.push("/login?message=check-email");
+        }
       } else {
         const data = await res.json();
         setError(data.error || data.message || "Registration failed");
@@ -142,22 +148,23 @@ const Signup = () => {
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium">
-                Email address
-              </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  disabled={!!token}
-                  placeholder="peterinnocent@mail.etc"
-                  className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary disabled:bg-muted"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+            {!token && (
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium">
+                  Email address
+                </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="peterinnocent@mail.etc"
+                    className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary disabled:bg-muted"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
               </div>
+            )}
             </div>
             <div className="md:flex justify-between">
               <div>

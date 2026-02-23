@@ -1,8 +1,10 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { User } from "@/lib/types";
 import { useEffect, useState, Suspense } from "react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 import SideNav from "@/components/dashboards/SideNav";
 import {
   LayoutDashboard,
@@ -178,10 +180,10 @@ export default function DashboardLayout({
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status, update } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const inviteBusinessId = searchParams.get("inviteBusinessId");
   const [subStatus, setSubStatus] = useState<string>("TRIAL");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/subscription/status")
@@ -263,22 +265,44 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       <TrialProtectionBanner />
       <SideNav
         user={user}
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
+        isSidebarOpen={false}
+        setIsSidebarOpen={() => {}}
         sidebarNavLinks={finalNavLinks}
       />
-      <main className="flex-1 flex flex-col lg:ml-64">
+      <main className="flex-1 flex flex-col lg:ml-64 pb-16 lg:pb-0">
         <header className="flex items-center justify-between p-4 bg-card border-b border-border lg:hidden">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 text-gray-500 rounded-md hover:text-gray-600 focus:outline-none focus:ring"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          <h1 className="font-bold text-lg truncate">IpBok</h1>
           <NotificationBell />
         </header>
         <div className="flex-1 overflow-y-auto h-full">{children}</div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-card border-t border-border overflow-x-auto px-2 py-2 lg:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] hide-scrollbar">
+        {finalNavLinks.map((link) => {
+          const isActive = pathname === link.href;
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={cn(
+                "flex flex-col items-center justify-center min-w-[64px] rounded-md transition-colors gap-1",
+                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <div className="flex items-center justify-center p-1 rounded-full">
+                {link.icon}
+              </div>
+              <span className={cn(
+                "text-[10px] truncate max-w-[64px] text-center",
+                isActive ? "font-bold" : "font-medium"
+              )}>
+                {link.name}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
