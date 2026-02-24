@@ -130,7 +130,12 @@ export const authOptions: NextAuthOptions = {
           }
           return true;
         } catch (error: any) {
-          console.error("Error in Google signIn callback:", error);
+          console.error("CRITICAL: Error in Google signIn callback:", {
+            error,
+            message: error.message,
+            stack: error.stack,
+            user: { email: user.email, name: user.name }
+          });
           return false;
         }
       }

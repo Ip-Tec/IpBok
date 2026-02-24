@@ -25,23 +25,23 @@ function Login() {
     if (!errorCode) return "";
     switch (errorCode) {
       case "CredentialsSignin":
-        return "Invalid email or password.";
+        return "Invalid email or password. Please check your credentials and try again.";
       case "SessionRequired":
         return "Please sign in to access this page.";
       case "OAuthAccountNotLinked":
-        return "This email is already associated with another login method. Please sign in using your original method.";
+        return "This email is already associated with another login method (e.g., Email/Password). Please sign in using your original method.";
       case "OAuthSignin":
       case "OAuthCallback":
       case "OAuthCreateAccount":
-        return "There was a problem signing in with Google. Please try again.";
+        return "Google sign-in failed. This usually happens due to a configuration issue. Please try email login if the problem persists.";
       case "EmailSignin":
-        return "The e-mail could not be sent. Please try again.";
+        return "The check-out email could not be sent. Please try again.";
       case "AccessDenied":
         return "Access denied. You do not have permission to sign in.";
       case "Verification":
         return "The verification link has expired or has already been used.";
       case "DatabaseError":
-        return "Cannot connect to the database. Please ensure your IP is whitelisted in TiDB Cloud.";
+        return "Database connection error. Please try again later.";
       default:
         return "An unexpected error occurred. Please try again.";
     }
