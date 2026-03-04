@@ -200,9 +200,12 @@ const RetailDashboardContent = (user: User) => {
           </div>
 
           <div className="p-6 bg-card rounded-lg shadow border-2 border-primary/20 bg-primary/5">
-            <h3 className="text-lg font-semibold mb-2">Performance Tip</h3>
+            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Performance Tip
+            </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Your "Accessories" category has the highest profit margin (25%). Consider restocking more items in this category to maximize overall profit.
+              {dashboardData.performanceTip || "Keep recording your sales regularly to see tailored performance insights here."}
             </p>
           </div>
         </div>

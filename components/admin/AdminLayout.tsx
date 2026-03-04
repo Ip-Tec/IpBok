@@ -154,7 +154,7 @@ export default function AdminLayout({
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden bg-background">
+        <div className="fixed inset-0 z-50 md:hidden bg-background flex flex-col">
           <div className="p-6 border-b border-border flex justify-between items-center">
             <span className="text-xl font-bold">Admin Menu</span>
             <Button
@@ -165,7 +165,7 @@ export default function AdminLayout({
               <X />
             </Button>
           </div>
-          <nav className="p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navLinks.map((link) => {
               if (
                 link.requiredRole &&
@@ -186,6 +186,17 @@ export default function AdminLayout({
               );
             })}
           </nav>
+          <div className="p-4 border-t border-border space-y-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-destructive hover:bg-destructive/10"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+            >
+              <LogOut className="w-5 h-5 mr-3" />
+              Logout
+            </Button>
+          </div>
         </div>
       )}
     </div>

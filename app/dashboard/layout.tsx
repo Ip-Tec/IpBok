@@ -123,7 +123,7 @@ const retailSidebarNavLinks = [
     name: "Settings",
     href: "/dashboard/settings",
     icon: <Settings className="w-7 h-7" />,
-    roles: ["OWNER"],
+    roles: ["OWNER", "MANAGER", "CASHIER"],
   },
 ];
 
@@ -184,6 +184,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const inviteBusinessId = searchParams.get("inviteBusinessId");
   const [subStatus, setSubStatus] = useState<string>("TRIAL");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/subscription/status")
@@ -241,9 +242,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     user.role.toUpperCase() === "SUPPORT";
   const businessType = user.businessType;
 
+  const isRetailStaff = businessType === "RETAIL" && ["OWNER", "MANAGER", "CASHIER"].includes(user.role.toUpperCase());
+
   let navLinks = isAdmin
     ? adminSidebarNavLinks
-    : businessType === "RETAIL"
+    : isRetailStaff
       ? retailSidebarNavLinks.filter(l => l.roles.includes(user.role.toUpperCase()))
       : isOwner
         ? businessType === "PERSONAL"
@@ -265,13 +268,21 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       <TrialProtectionBanner />
       <SideNav
         user={user}
-        isSidebarOpen={false}
-        setIsSidebarOpen={() => {}}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
         sidebarNavLinks={finalNavLinks}
       />
       <main className="flex-1 flex flex-col lg:ml-64 pb-16 lg:pb-0">
         <header className="flex items-center justify-between p-4 bg-card border-b border-border lg:hidden">
-          <h1 className="font-bold text-lg truncate">IpBok</h1>
+          <div className="flex items-center gap-2">
+            <button 
+              className="p-1 text-muted-foreground mr-1 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors" 
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="font-bold text-lg truncate">IpBok</h1>
+          </div>
           <NotificationBell />
         </header>
         <div className="flex-1 overflow-y-auto h-full">{children}</div>

@@ -13,11 +13,9 @@ const SettingsPage = () => {
 
   if (session.user?.role === "OWNER") {
     return <OwnerSettingsView />;
-  } else if (session.user?.role === "AGENT") {
-    return <AgentSettingsView />;
   } else {
-    // Fallback or error for unknown roles
-    return <div>Unauthorized role.</div>;
+    // Other roles get the standard settings view (profile, password, theme)
+    return <AgentSettingsView />;
   }
 };
 

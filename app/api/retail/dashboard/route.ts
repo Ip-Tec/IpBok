@@ -88,6 +88,15 @@ export async function GET(req: NextRequest) {
       .slice(0, 5)
       .map(p => ({ name: p.name, qty: p.stockQuantity }));
 
+    let performanceTip = null;
+    if (!isCashier && categoryProfit.length > 0) {
+      const topCategory = categoryProfit.reduce((prev, current) => 
+        (current.profit > prev.profit) ? current : prev
+      , categoryProfit[0]);
+
+      performanceTip = `Your "${topCategory.name}" category is your highest profit driver. Consider restocking popular items in this category or expanding its product line to maximize overall profit.`;
+    }
+
     return NextResponse.json({
       kpis: {
         totalSales,
@@ -120,6 +129,7 @@ export async function GET(req: NextRequest) {
         date: s.date.toISOString().split("T")[0],
       })),
       lowStockProducts,
+      performanceTip,
     });
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
